@@ -1,0 +1,53 @@
+###
+POST http://localhost:8080/api/new-did/ HTTP/1.1
+content-type: application/json
+
+{
+    "companyName": "Kukulu",
+    "fileName": "ffff_gggg_hhhh_0000",
+    "content": {
+        "author": "Bao Bao",
+        "dateCreated": "10-10-2021",
+        "text": "This is a private document 2."
+    }
+}
+
+###
+POST http://localhost:8080/api/update-did/ HTTP/1.1
+content-type: application/json
+
+{
+    "companyName": "Kukulu",
+    "fileName": "ffff_gggg_hhhh_0000",
+    "content": {
+        "author": "Bao Bao",
+        "dateCreated": "10-10-2021",
+        "text": "This is a private document (updated)."
+    }
+}
+
+###
+POST http://localhost:8080/api/get-all-did/ HTTP/1.1
+content-type: application/json
+
+{
+    "companyName": "Kukulu"
+}
+
+###
+POST http://localhost:8080/api/get-did/ HTTP/1.1
+content-type: application/json
+
+{
+    "companyName": "Kukulu",
+    "fileName": "ffff_gggg_hhhh_0000"
+}
+
+###
+POST http://localhost:8080/api/delete-did/ HTTP/1.1
+content-type: application/json
+
+{
+    "companyName": "Kukulu",
+    "fileName": "ffff_gggg_hhhh_0000"
+}
