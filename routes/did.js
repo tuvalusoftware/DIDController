@@ -24,7 +24,7 @@ const router = express.Router();
 /**
  * @swagger
  * /api/get-all-did:
- *   post:
+ *   get:
  *     summary: Retrieve all the DID of a company.
  *     requestBody:
  *       required: true
@@ -51,7 +51,7 @@ const router = express.Router();
  *                     $ref: '#/components/schemas/DID_Object'
  *
  */
-router.route("/api/get-all-did").post(async (req, res) => {
+router.route("/api/get-all-did").get(async (req, res) => {
     const { companyName } = req.body;
 
     try {
@@ -78,7 +78,7 @@ router.route("/api/get-all-did").post(async (req, res) => {
 /**
  * @swagger
  * /api/get-did:
- *   post:
+ *   get:
  *     summary: Retrieve one single DID.
  *     requestBody:
  *       required: true
@@ -107,7 +107,7 @@ router.route("/api/get-all-did").post(async (req, res) => {
  *                   $ref: '#/components/schemas/DID_Object'
  *
  */
-router.route("/api/get-did").post(async (req, res) => {
+router.route("/api/get-did").get(async (req, res) => {
     const { companyName, fileName } = req.body;
 
     try {
@@ -162,7 +162,7 @@ router.route("/api/get-did").post(async (req, res) => {
  *                      example: Delete success
  *
  */
-router.route("/api/delete-did").post(async (req, res) => {
+router.route("/api/delete-did").delete(async (req, res) => {
     const { companyName, fileName } = req.body;
 
     try {
