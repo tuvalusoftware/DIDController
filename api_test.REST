@@ -4,7 +4,7 @@ content-type: application/json
 
 {
     "companyName": "Kukulu",
-    "fileName": "ffff_gggg_hhhh_0000",
+    "fileName": "ffff_gggg_hhhh_2222",
     "content": {
         "author": "Bao Bao",
         "dateCreated": "10-10-2021",
@@ -27,7 +27,7 @@ content-type: application/json
 }
 
 ###
-POST http://localhost:8080/api/get-all-did/ HTTP/1.1
+GET http://localhost:8080/api/get-all-did/ HTTP/1.1
 content-type: application/json
 
 {
@@ -35,7 +35,7 @@ content-type: application/json
 }
 
 ###
-POST http://localhost:8080/api/get-did/ HTTP/1.1
+GET http://localhost:8080/api/get-did/ HTTP/1.1
 content-type: application/json
 
 {
@@ -44,10 +44,10 @@ content-type: application/json
 }
 
 ###
-POST http://localhost:8080/api/delete-did/ HTTP/1.1
+DELETE http://localhost:8080/api/delete-did/ HTTP/1.1
 content-type: application/json
 
 {
     "companyName": "Kukulu",
-    "fileName": "ffff_gggg_hhhh_0000"
+    "fileName": "ffff_gggg_hhhh_2222"
 }
