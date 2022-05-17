@@ -613,14 +613,32 @@ export default {
                 });
         });
     },
-    getATag: function (tagName) {
+    /**
+     * Query first 100 tags with GraphQL Github API
+     * @param {String} cursor element that the cursor point to after retrieve the last element
+     * @ref: https://docs.github.com/en/graphql/reference/enums#reforderfield
+     * @returns {Promise} An object contains list of tags, { endCursor, hasNextPage }
+     */
+    _getAllTags: function (cursor = null) {
+        const pagination = cursor ? `after: "${cursor}"` : "";
+
         const queryString = `
         query {
             repository(owner: "${owner}", name: "${repo}") {
-                release(tagName: "${tagName}") {
-                    name
-                    tagName
-                    createdAt
+                refs(refPrefix: "refs/tags/", first: 100, orderBy: { field: ALPHABETICAL, direction: DESC}, ${pagination}) {
+                    edges {
+                        node {
+                            name
+                            target {
+                                oid
+                                commitUrl
+                            }
+                        }
+                    }
+                    pageInfo {
+                        endCursor
+                        hasNextPage
+                    }
                 }
             }
         }
@@ -628,7 +646,7 @@ export default {
 
         return new Promise((resolve, reject) => {
             GithubGraphQL(queryString)
-                .then(async (response) => {
+                .then((response) => {
                     if (response.status !== 200) {
                         return reject(ERROR_CODES.GITHUB_API_ERROR);
                     }
@@ -637,37 +655,119 @@ export default {
                         return reject(ERROR_CODES.GITHUB_API_ERROR);
 
                     // Check content in result
-                    console.log(response.data.data);
+                    let results = response.data.data.repository.refs.edges;
+                    results = results.map((el) => el.node);
+
+                    const pageInfo =
+                        response.data.data.repository.refs.pageInfo;
+
+                    resolve({ results, pageInfo });
                 })
-                .catch((err) =>
+                .catch((err) => {
+                    console.log(err);
                     reject(
                         err.response
                             ? ERROR_CODES.GITHUB_API_ERROR
                             : ERROR_CODES.UNKNOWN_ERROR
-                    )
-                );
+                    );
+                });
         });
     },
-    tagACommit: async function (tagName, tagMessage = null, commitSHA = null) {
-        const commit = commitSHA ? commitSHA : await this.getLastCommitSHA();
-        const tagMsg = tagMessage
-            ? tagMessage
-            : `New tag created for commit: ${commit}`;
+    /**
+     * Query all tags
+     * @ref: https://docs.github.com/en/graphql/reference/enums#reforderfield
+     * @returns {Array} array of tags
+     */
+    getAllTags: async function () {
+        let results = [];
+        let cursor = null;
+
+        try {
+            while (true) {
+                const { results: tags, pageInfo } = await this._getAllTags(
+                    cursor
+                );
+                results = [...results, ...tags];
+
+                if (!pageInfo.hasNextPage) break;
+
+                cursor = pageInfo.endCursor;
+            }
+
+            return results;
+        } catch (err) {
+            throw err;
+        }
+    },
+    /**
+     * Query a tag
+     * @param {String} tagName name of the tag
+     * @returns {Object} { tagName, target: { oid, commitUrl } }
+     */
+    getATag: async function (tagName) {
+        const tags = await this.getAllTags();
+
+        const tag = tags.find((el) => el.name === tagName);
+
+        if (tag) return tag;
+
+        throw ERROR_CODES.REF_NOT_EXISTED;
+    },
+    /**
+     * Create a tag by pointing to a commit
+     * @param {String} tagName name of the tag
+     * @param {String} commitSHA commit ID
+     * @returns {Promise} Tag object
+     */
+    tagACommit: async function (tagName, commitSHA = null) {
+        const sha = commitSHA ? commitSHA : await this.getLastCommitSHA();
 
         const data = {
-            tag: tagName,
-            message: tagMsg,
-            object: commit,
-            type: "commit",
+            ref: `refs/tags/${tagName}`,
+            sha,
         };
 
         return new Promise((resolve, reject) => {
-            GithubDB.post(`git/tags`, data)
+            GithubDB.post(`git/refs`, data)
                 .then((response) => {
                     resolve(response.data);
                 })
                 .catch((err) => {
-                    console.log(err);
+                    if (
+                        err.response?.status === 422 &&
+                        err.response?.data.message
+                    ) {
+                        return reject(ERROR_CODES.REF_EXISTED);
+                    }
+
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+    /**
+     * Delete a tag
+     * @param {String} tagName name of the tag
+     * @returns {Promise} 'Delete success'
+     */
+    deleteATag: function (tagName) {
+        return new Promise((resolve, reject) => {
+            GithubDB.delete(`git/refs/tags/${tagName}`)
+                .then((response) => {
+                    resolve("Delete Success");
+                })
+                .catch((err) => {
+                    if (
+                        err.response.data.message ===
+                            "Reference does not exist" &&
+                        err.response.status === 422
+                    ) {
+                        return reject(ERROR_CODES.REF_NOT_EXISTED);
+                    }
+
                     reject(
                         err.response
                             ? ERROR_CODES.GITHUB_API_ERROR
