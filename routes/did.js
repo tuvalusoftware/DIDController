@@ -107,6 +107,7 @@ router.route("/api/get-all-did").get(async (req, res) => {
  *                   $ref: '#/components/schemas/DID_Object'
  *
  */
+
 router.route("/api/get-did").get(async (req, res) => {
     const { companyName, fileName } = req.body;
 
@@ -299,6 +300,56 @@ router.route("/api/update-did").post(async (req, res) => {
 
         return res.status(200).json({ message: "Update success" });
     } catch (err) {
+        console.log(err);
+        return res.status(400).json(err);
+    }
+});
+
+/**
+ * @swagger
+ * /api/get-did:
+ *   get:
+ *     summary: Get DID document for a specific DID.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               did:
+ *                 type: string
+ *                 description: DID string syntax 'did:method:companyName:documentName:hash'
+ *                 example: 'did:tradetrust:Kukulu:example-contract:1233lnfkafhaksnfk1wkhf23a'
+ *     responses:
+ *       200:
+ *         description: DID object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/DID_Object'
+ *
+ */
+ router.route("/api/resolver").get(async (req, res) => {
+    const { did } = req.body;
+
+    try {
+        // Split DID 
+        const didComponents = did.split(":");
+        const companyName = didComponents[2];
+        const fileName = didComponents[3];
+
+        const branch = `DID_${companyName}`;
+        const lastCommitOfBranch = await GithubDB.getLastCommitSHA(branch);
+        const fileData = await GithubDB.getFile(fileName, lastCommitOfBranch);
+        const data = { name: fileName, content: JSON.parse(fileData.text) };
+
+        return res.status(200).json({ data });
+    }
+    catch (err) {
         console.log(err);
         return res.status(400).json(err);
     }
