@@ -225,7 +225,7 @@ router.route("/api/new-did").post(async (req, res) => {
 
     try {
         const newBranch = `DID_${companyName}`;
-        await GithubDB.createIfNotExist(newBranch);
+        await GithubDB.createBranchIfNotExist(newBranch);
 
         await GithubDB.createNewFile(
             fileName,
@@ -288,7 +288,7 @@ router.route("/api/update-did").post(async (req, res) => {
 
     try {
         const newBranch = `DID_${companyName}`;
-        await GithubDB.createIfNotExist(newBranch);
+        await GithubDB.createBranchIfNotExist(newBranch);
 
         await GithubDB.updateFile(
             fileName,
