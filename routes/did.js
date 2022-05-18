@@ -26,6 +26,7 @@ const router = express.Router();
  * /api/get-all-did:
  *   get:
  *     summary: Retrieve all the DID of a company.
+ *     tags: ["DID controller"]
  *     parameters:
  *       - in: header
  *         name: companyName
@@ -76,6 +77,7 @@ router.route("/api/get-all-did").get(async (req, res) => {
  * /api/get-did:
  *   get:
  *     summary: Retrieve one single DID.
+ *     tags: ["DID controller"]
  *     parameters:
  *       - in: header
  *         name: companyName
@@ -125,6 +127,7 @@ router.route("/api/get-did").get(async (req, res) => {
  * /api/delete-did:
  *   delete:
  *     summary: Delete one single DID.
+ *     tags: ["DID controller"]
  *     parameters:
  *       - in: header
  *         name: companyName
@@ -179,6 +182,7 @@ router.route("/api/delete-did").delete(async (req, res) => {
  * /api/new-did:
  *   post:
  *     summary: Create a new single DID for a company.
+ *     tags: ["DID controller"]
  *     requestBody:
  *       required: true
  *       content:
@@ -241,6 +245,7 @@ router.route("/api/new-did").post(async (req, res) => {
  * /api/update-did:
  *   post:
  *     summary: Update existed DID of a company.
+ *     tags: ["DID controller"]
  *     requestBody:
  *       required: true
  *       content:
