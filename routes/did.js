@@ -307,7 +307,7 @@ router.route("/api/update-did").post(async (req, res) => {
 
 /**
  * @swagger
- * /api/get-did:
+ * /api/resolver:
  *   get:
  *     summary: Get DID document for a specific DID.
  *     requestBody:
