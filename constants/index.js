@@ -57,6 +57,12 @@ const ERROR_CODES = {
         errorMessage: "Branch 'main' cannot be deleted.",
         cause: "Someone try to delete branch main",
     },
+    MISSING_PARAMETERS: {
+        errorCode: 1212,
+        errorMessage:
+            "Parameters in request body are missing. Please try again later.",
+        cause: "Post request.",
+    },
 };
 
 export { ERROR_CODES };

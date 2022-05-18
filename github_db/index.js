@@ -45,7 +45,7 @@ const GithubDB = {
  * @param {String} queryString A GraphQL query string
  * @returns {Promise} an Axios promise
  */
-const GithubGraphQL = (queryString) =>
+const executeGithubGraphql = (queryString) =>
     axios.post(gitGraphQLUrl, JSON.stringify({ query: queryString }), config);
 
 /**
@@ -174,7 +174,7 @@ export default {
             }
             `;
 
-            GithubGraphQL(queryString)
+            executeGithubGraphql(queryString)
                 .then((res) => {
                     if (res.data.errors) {
                         console.log(res.data.errors);
@@ -288,7 +288,7 @@ export default {
         `;
 
         return new Promise((resolve, reject) => {
-            GithubGraphQL(queryString)
+            executeGithubGraphql(queryString)
                 .then(async (response) => {
                     if (response.status !== 200) {
                         return reject(ERROR_CODES.GITHUB_API_ERROR);
@@ -363,7 +363,7 @@ export default {
         `;
 
         return new Promise((resolve, reject) => {
-            GithubGraphQL(queryAllFiles)
+            executeGithubGraphql(queryAllFiles)
                 .then((response) => {
                     if (response.status !== 200) {
                         return reject(ERROR_CODES.GITHUB_API_ERROR);
@@ -541,7 +541,7 @@ export default {
      * @param {String} branchName new branch's name
      * @returns {Promise} branch object { ref, object { sha } }
      */
-    createIfNotExist: async function (branchName) {
+    createBranchIfNotExist: async function (branchName) {
         const branches = await this.getAllBranches();
         const branch = branches.find((el) => el.name === branchName);
 
@@ -645,7 +645,7 @@ export default {
         `;
 
         return new Promise((resolve, reject) => {
-            GithubGraphQL(queryString)
+            executeGithubGraphql(queryString)
                 .then((response) => {
                     if (response.status !== 200) {
                         return reject(ERROR_CODES.GITHUB_API_ERROR);
