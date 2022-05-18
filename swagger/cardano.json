@@ -1,0 +1,53 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a mock server for Cardano Services.",
+        "version": "1.0.6",
+        "title": "Cardano Services (Mock server)"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "schemes": ["http", "https"],
+    "tags": [
+        {
+            "name": "cardano",
+            "description": "This is just an example"
+        }
+    ],
+    "paths": {
+        "/get-hash": {
+            "get": {
+                "summary": "Get a hash from Cardano service",
+                "description": "Returns a hash",
+                "operationId": "getHash",
+                "tags": ["cardano"],
+                "produces": ["application/json", "application/xml"],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "hash": {
+                                    "type": "string",
+                                    "description": "A hash",
+                                    "example": "this_is_an_example_hash"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "ApiResponse": {
+            "type": "object",
+            "properties": {
+                "code": { "type": "integer", "format": "int32" },
+                "type": { "type": "string" },
+                "message": { "type": "string" }
+            }
+        }
+    }
+}

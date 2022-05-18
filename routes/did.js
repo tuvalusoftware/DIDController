@@ -26,17 +26,14 @@ const router = express.Router();
  * /api/get-all-did:
  *   get:
  *     summary: Retrieve all the DID of a company.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               companyName:
- *                 type: string
- *                 description: Name of the company (user).
- *                 example: Kukulu
+ *     tags: ["DID controller"]
+ *     parameters:
+ *       - in: header
+ *         name: companyName
+ *         schema:
+ *           type: string
+ *           example: Kukulu
+ *         required: true
  *     responses:
  *       200:
  *         description: Array of all DID object
@@ -52,7 +49,7 @@ const router = express.Router();
  *
  */
 router.route("/api/get-all-did").get(async (req, res) => {
-    const { companyName } = req.body;
+    const companyName = req.header("companyName");
 
     try {
         const branch = `DID_${companyName}`;
@@ -80,21 +77,20 @@ router.route("/api/get-all-did").get(async (req, res) => {
  * /api/get-did:
  *   get:
  *     summary: Retrieve one single DID.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               companyName:
- *                 type: string
- *                 description: Name of the company (user).
- *                 example: Kukulu
- *               fileName:
- *                 type: string
- *                 description: DID string.
- *                 example: random_string
+ *     tags: ["DID controller"]
+ *     parameters:
+ *       - in: header
+ *         name: companyName
+ *         schema:
+ *           type: string
+ *           example: Kukulu
+ *         required: true
+ *       - in: header
+ *         name: fileName
+ *         schema:
+ *           type: string
+ *           example: random_did_string
+ *         required: true
  *     responses:
  *       200:
  *         description: DID object
@@ -109,7 +105,8 @@ router.route("/api/get-all-did").get(async (req, res) => {
  */
 
 router.route("/api/get-did").get(async (req, res) => {
-    const { companyName, fileName } = req.body;
+    const companyName = req.header("companyName");
+    const fileName = req.header("fileName");
 
     try {
         const branch = `DID_${companyName}`;
@@ -129,23 +126,22 @@ router.route("/api/get-did").get(async (req, res) => {
 /**
  * @swagger
  * /api/delete-did:
- *   post:
+ *   delete:
  *     summary: Delete one single DID.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               companyName:
- *                 type: string
- *                 description: Name of the company (user).
- *                 example: Kukulu
- *               fileName:
- *                 type: string
- *                 description: DID string.
- *                 example: random_string
+ *     tags: ["DID controller"]
+ *     parameters:
+ *       - in: header
+ *         name: companyName
+ *         schema:
+ *           type: string
+ *           example: Kukulu
+ *         required: true
+ *       - in: header
+ *         name: fileName
+ *         schema:
+ *           type: string
+ *           example: random_did_string
+ *         required: true
  *     responses:
  *       200:
  *         description: DID object
@@ -164,7 +160,8 @@ router.route("/api/get-did").get(async (req, res) => {
  *
  */
 router.route("/api/delete-did").delete(async (req, res) => {
-    const { companyName, fileName } = req.body;
+    const companyName = req.header("companyName");
+    const fileName = req.header("fileName");
 
     try {
         const branch = `DID_${companyName}`;
@@ -186,6 +183,7 @@ router.route("/api/delete-did").delete(async (req, res) => {
  * /api/new-did:
  *   post:
  *     summary: Create a new single DID for a company.
+ *     tags: ["DID controller"]
  *     requestBody:
  *       required: true
  *       content:
@@ -248,6 +246,7 @@ router.route("/api/new-did").post(async (req, res) => {
  * /api/update-did:
  *   post:
  *     summary: Update existed DID of a company.
+ *     tags: ["DID controller"]
  *     requestBody:
  *       required: true
  *       content:

@@ -14,7 +14,7 @@ const ERROR_CODES = {
     },
     FILE_EXISTED: {
         errorCode: 1203,
-        errorMessage: "File with the given name is already exist.",
+        errorMessage: "File with the given name already exist.",
         cause: "Create a file",
     },
     FILE_NOT_EXISTED: {
@@ -29,7 +29,7 @@ const ERROR_CODES = {
     },
     BRANCH_EXISTED: {
         errorCode: 1206,
-        errorMessage: "Branch with the given name is already exist.",
+        errorMessage: "Branch with the given name already exist.",
         cause: "Create/Checkout new branch",
     },
     BRANCH_NOT_EXISTED: {
@@ -37,13 +37,23 @@ const ERROR_CODES = {
         errorMessage: "Branch with the given name cannot be found.",
         cause: "Query a branch",
     },
-    DATA_NOT_CHANGE: {
+    REF_EXISTED: {
         errorCode: 1208,
+        errorMessage: "Reference is already exist.",
+        cause: "Create a tag. A tag with the same name already exist",
+    },
+    REF_NOT_EXISTED: {
+        errorCode: 1209,
+        errorMessage: "Reference cannot be found.",
+        cause: "Query/Delete a tag.",
+    },
+    DATA_NOT_CHANGE: {
+        errorCode: 1210,
         errorMessage: "Content of file has not changed.",
         cause: "Update a file",
     },
     DELETE_MAIN: {
-        errorCode: 1209,
+        errorCode: 1211,
         errorMessage: "Branch 'main' cannot be deleted.",
         cause: "Someone try to delete branch main",
     },
