@@ -144,10 +144,10 @@ router
  *           schema:
  *             type: object
  *             properties:
- *               document:
+ *               wrapDocument:
  *                 type: object
- *                 description: Javascript object of a file.
- *                 example: { name: 'fileName', buffer: '01010', size: 100 }
+ *                 description: Javascript object of a wrap document.
+ *                 example: { version: '...', data: '...', signature: '...' }
  *               companyName:
  *                 type: string
  *                 description: Company's name.
@@ -183,54 +183,20 @@ router
  *                      example: Missing parameters
  */
 router.route("/api/doc").post(async (req, res) => {
-    const { document, companyName } = req.body;
+    const { wrapDocument, companyName } = req.body;
 
     try {
-        const { buffer, name: fileName } = document;
-        const base64string = buffer.toString("base64");
-        const hashValue = keccak256(base64string).toString("hex");
+        const fileName = keccak256(JSON.stringify(wrapDocument)).toString(
+            "hex"
+        );
 
         const branchName = `DOC_${companyName}`;
         await GithubDB.createBranchIfNotExist(branchName);
         await GithubDB.createNewFile(
-            fileName,
-            base64string,
+            `${fileName}.json`,
+            wrapDocument,
             branchName,
-            `New Document from company ${companyName}`
-        );
-
-        const sampleData = {
-            version: "https://schema.openattestation.com/2.0/schema.json",
-            data: {
-                name: "UUIDV4:string:...", // filename
-                issuers: [
-                    {
-                        identityProof: {
-                            type: "UUIDV4:string:DID",
-                            location: "UUIDV4:string:fuixlabs.com",
-                        },
-                        did: "UUIDV4:string:....",
-                        tokenRegistry: "UUIDV4:string:...", // token policy address
-                        address: "UUIDV4:string:...",
-                    },
-                ],
-            },
-            signature: {
-                type: "SHA3MerkleProof",
-                targetHash:
-                    "11d456db211d68cc8a6eac5e293422dec669b54812e4975497d7099467335981117",
-                proof: [],
-                merkleRoot:
-                    "11d456db211d68cc8a6eac5e293422dec669b54812e4975497d7099467335987",
-            },
-        };
-
-        const { signature } = sampleData;
-        await GithubDB.createNewFile(
-            `${signature.targetHash}.json`,
-            sampleData,
-            branchName,
-            `New Wrap document from company ${companyName}`
+            `New Wrap Document from company ${companyName}`
         );
 
         res.status(200).json({
