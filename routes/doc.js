@@ -144,7 +144,7 @@ router
  *           schema:
  *             type: object
  *             properties:
- *               wrapDocument:
+ *               wrappedDocument:
  *                 type: object
  *                 description: Javascript object of a wrap document.
  *                 example: { version: '...', data: '...', signature: '...' }
@@ -183,10 +183,10 @@ router
  *                      example: Missing parameters
  */
 router.route("/api/doc").post(async (req, res) => {
-    const { wrapDocument, companyName } = req.body;
+    const { wrappedDocument, companyName } = req.body;
 
     try {
-        const fileName = keccak256(JSON.stringify(wrapDocument)).toString(
+        const fileName = keccak256(JSON.stringify(wrappedDocument)).toString(
             "hex"
         );
 
@@ -194,7 +194,7 @@ router.route("/api/doc").post(async (req, res) => {
         await GithubDB.createBranchIfNotExist(branchName);
         await GithubDB.createNewFile(
             `${fileName}.json`,
-            wrapDocument,
+            wrappedDocument,
             branchName,
             `New Wrap Document from company ${companyName}`
         );
@@ -202,6 +202,8 @@ router.route("/api/doc").post(async (req, res) => {
         res.status(200).json({
             data: { message: "Create document success" },
         });
+
+
     } catch (err) {
         console.log(err);
         return res.status(400).json(err);
