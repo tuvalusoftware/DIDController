@@ -134,6 +134,59 @@ router
 
 /**
  * @swagger
+ * /api/doc-exists:
+ *   post:
+ *     summary: Check if document with the given name already exists within the same company.
+ *     tags: ["Document controller"]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               companyName:
+ *                 type: string
+ *                 description: Name of the company (user).
+ *                 example: Kukulu
+ *               fileName:
+ *                 type: string
+ *                 description: Name of the document.
+ *                 example: random_string
+ *     responses:
+ *       200:
+ *         description: Return true/false on whether a file is existed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     isExisted:
+ *                       type: Boolean
+ *                       description: True if file is already existed, otherwise false.
+ *                       example: false
+ */
+router.route("/api/doc-exists").post(async (req, res) => {
+    const { fileName, companyName } = req.body;
+
+    try {
+        const branchName = `DOC_${companyName}`;
+        const isExisted = await GithubDB.isExistedFile(fileName, branchName);
+
+        res.status(200).json({
+            data: { isExisted },
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json(err);
+    }
+});
+
+/**
+ * @swagger
  * /api/doc:
  *   post:
  *     summary: Create a new document for a company.
@@ -175,6 +228,10 @@ router
  *                 type: string
  *                 description: Company's name.
  *                 example: Kukulu
+ *               fileName:
+ *                 type: string
+ *                 description: Name of the file (user's input).
+ *                 example: random_name
  *     responses:
  *       201:
  *         description: Return a success message if document is successfully created
@@ -206,32 +263,27 @@ router
  *                      example: Missing parameters
  */
 router.route("/api/doc").post(async (req, res) => {
-    const { wrappedDocument, companyName } = req.body;
+    const { wrappedDocument, fileName, companyName } = req.body;
 
     try {
-        const fileName = keccak256(JSON.stringify(wrappedDocument)).toString(
-            "hex"
-        );
-        console.log(fileName);
-
         const branchName = `DOC_${companyName}`;
         await GithubDB.createBranchIfNotExist(branchName);
 
         const ownerPublicKey = await mockCall();
-        const docHash = wrappedDocument.signature.targetHash;
 
         await GithubDB.createNewFile(
-            `${fileName}.json`,
+            `${fileName}.document`,
             wrappedDocument,
             branchName,
             `New Wrap Document from company ${companyName}`
         );
 
-        console.log("Created doc");
-
         await GithubDB.createNewFile(
-            `${fileName}_did.json`,
-            { ownerPublicKey, docHash },
+            `${fileName}.did`,
+            {
+                controller: ownerPublicKey,
+                did: `did:some_string:${companyName}:${ownerPublicKey}`,
+            },
             branchName,
             `DID for new document '${fileName}' from company ${companyName}`
         );

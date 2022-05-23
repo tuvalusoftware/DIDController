@@ -102,7 +102,6 @@ router.route("/api/get-all-did").get(async (req, res) => {
  *                   $ref: '#/components/schemas/DID_Object'
  *
  */
-
 router.route("/api/get-did").get(async (req, res) => {
     const companyName = req.header("companyName");
     const fileName = req.header("fileName");
@@ -181,7 +180,7 @@ router.route("/api/delete-did").delete(async (req, res) => {
  * @swagger
  * /api/new-did:
  *   post:
- *     summary: Create a new single DID for a company.
+ *     summary: Create a new single DID doc for a company.
  *     tags: ["DID controller"]
  *     requestBody:
  *       required: true
@@ -194,9 +193,9 @@ router.route("/api/delete-did").delete(async (req, res) => {
  *                 type: string
  *                 description: Name of the company (user).
  *                 example: Kukulu
- *               fileName:
+ *               publicKey:
  *                 type: string
- *                 description: DID string.
+ *                 description: Public Key of the user's wallet.
  *                 example: random_string
  *               content:
  *                 type: object
@@ -220,20 +219,22 @@ router.route("/api/delete-did").delete(async (req, res) => {
  *
  */
 router.route("/api/new-did").post(async (req, res) => {
-    const { companyName, fileName, content } = req.body;
+    const { companyName, publicKey, content } = req.body;
 
     try {
         const newBranch = `DID_${companyName}`;
         await GithubDB.createBranchIfNotExist(newBranch);
 
         await GithubDB.createNewFile(
-            fileName,
+            `${publicKey}.did`,
             content,
             newBranch,
-            `New company ${companyName}`
+            `New DID Doc of company "${companyName}"`
         );
 
-        return res.status(201).json({ message: "Success" });
+        return res
+            .status(201)
+            .json({ message: "New DID created successfully" });
     } catch (err) {
         console.log(err);
         return res.status(400).json(err);
@@ -290,10 +291,10 @@ router.route("/api/update-did").put(async (req, res) => {
         await GithubDB.createBranchIfNotExist(newBranch);
 
         await GithubDB.updateFile(
-            fileName,
+            `${fileName}.did`,
             content,
             newBranch,
-            `Update DID ${fileName} of company ${companyName}`
+            `Update DID "${fileName}" of company ${companyName}`
         );
 
         return res.status(200).json({ message: "Update success" });

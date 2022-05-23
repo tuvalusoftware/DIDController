@@ -2,10 +2,7 @@ import GithubDB from "./github_db/index.js";
 
 const main = async () => {
     try {
-        const sha = await GithubDB.getLastCommitSHA("DID_Kukulu");
-        console.log(sha);
-
-        const data = await GithubDB.getATag("test_release");
+        const data = await GithubDB.testing("random_string", "DID_Kukulu");
 
         console.log(data);
     } catch (err) {
