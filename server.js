@@ -7,7 +7,7 @@ import cors from "cors";
 
 import didRouter from "./routes/did.js";
 import docRouter from "./routes/doc.js";
-import cardanoRouter from "./routes/cardano.js";
+import mockServicesRouter from "./routes/mock_services.js";
 
 const require = createRequire(import.meta.url);
 const cardanoServices = require("./swagger/cardano.json");
@@ -20,7 +20,7 @@ app.use(cors({ origin: "*" }));
 // Route
 app.use(didRouter);
 app.use(docRouter);
-app.use(cardanoRouter);
+app.use(mockServicesRouter);
 
 // Swagger config
 const options = {

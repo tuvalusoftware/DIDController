@@ -4,6 +4,7 @@ import keccak256 from "keccak256";
 
 import GithubDB from "../github_db/index.js";
 import { ERROR_CODES } from "../constants/index.js";
+import { mockCall } from "../helpers/index.js";
 
 const router = express.Router();
 
@@ -144,10 +145,32 @@ router
  *           schema:
  *             type: object
  *             properties:
- *               wrapDocument:
+ *               wrappedDocument:
  *                 type: object
  *                 description: Javascript object of a wrap document.
- *                 example: { version: '...', data: '...', signature: '...' }
+ *                 example: {
+ *                            "version": "https://schema.openattestation.com/2.0/schema.json",
+ *                            "data": {
+ *                              "name": "UUIDV4:string:...",
+ *                              "issuers": [
+ *                              {
+ *                                  "identityProof": {
+ *                                  "type": "UUIDV4:string:DID",
+ *                                  "location": "UUIDV4:string:fuixlabs.com"
+ *                               },
+ *                               "did": "UUIDV4:string:....",
+ *                                "tokenRegistry": "UUIDV4:string:...",
+ *                                          "address": "UUIDV4:string:..."
+ *                                      }
+ *                                  ]
+ *                              },
+ *                              "signature": {
+ *                                   "type": "SHA3MerkleProof",
+ *                                   "targetHash": "11d456db211d68cc8a6eac5e293422dec669b54812e4975497d7099467335987",
+ *                                   "proof": [],
+ *                                    "merkleRoot": "11d456db211d68cc8a6eac5e293422dec669b54812e4975497d7099467335987"
+ *                               }
+ *                           }
  *               companyName:
  *                 type: string
  *                 description: Company's name.
@@ -183,20 +206,34 @@ router
  *                      example: Missing parameters
  */
 router.route("/api/doc").post(async (req, res) => {
-    const { wrapDocument, companyName } = req.body;
+    const { wrappedDocument, companyName } = req.body;
 
     try {
-        const fileName = keccak256(JSON.stringify(wrapDocument)).toString(
+        const fileName = keccak256(JSON.stringify(wrappedDocument)).toString(
             "hex"
         );
+        console.log(fileName);
 
         const branchName = `DOC_${companyName}`;
         await GithubDB.createBranchIfNotExist(branchName);
+
+        const ownerPublicKey = await mockCall();
+        const docHash = wrappedDocument.signature.targetHash;
+
         await GithubDB.createNewFile(
             `${fileName}.json`,
-            wrapDocument,
+            wrappedDocument,
             branchName,
             `New Wrap Document from company ${companyName}`
+        );
+
+        console.log("Created doc");
+
+        await GithubDB.createNewFile(
+            `${fileName}_did.json`,
+            { ownerPublicKey, docHash },
+            branchName,
+            `DID for new document '${fileName}' from company ${companyName}`
         );
 
         res.status(200).json({
