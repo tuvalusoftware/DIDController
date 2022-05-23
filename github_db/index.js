@@ -144,8 +144,6 @@ export default {
         return new Promise((resolve, reject) => {
             const fileExpr = filePath ? `path: "${filePath}"` : "";
             const pagination = cursor ? `after: "${cursor}"` : "";
-            const timeSince = `since: "2022-05-23T00:00:00+00:00"`;
-            const timeUntil = `until: "2022-05-24T00:00:00+00:00"`;
 
             const queryString = `
             {
@@ -153,7 +151,7 @@ export default {
                     branch: ref(qualifiedName: "${branchName}") {
                         target {
                             ... on Commit {
-                                history(first: ${deep}, ${fileExpr}, ${pagination}, ${timeSince}, ${timeUntil}) {
+                                history(first: ${deep}, ${fileExpr}, ${pagination}}) {
                                     totalCount
                                     edges {
                                         node {
@@ -973,21 +971,75 @@ export default {
         });
     },
 
-    testing: function (fileName = "", branchName = "main") {
+    testing: function (
+        deep = 5,
+        branchName = "main",
+        filePath = null,
+        cursor = null
+    ) {
         return new Promise((resolve, reject) => {
-            GithubDB.get(`contents/${fileName}?ref=${branchName}`)
-                .then((response) =>
-                    response.data ? resolve(true) : resolve(false)
-                )
-                .catch((err) => {
-                    if (err.response.status === 404) return resolve(false);
+            const fileExpr = filePath ? `path: "${filePath}"` : "";
+            const pagination = cursor ? `after: "${cursor}"` : "";
+            const timeSince = `since: "2022-05-23T00:00:00+00:00"`;
+            const timeUntil = `until: "2022-05-24T00:00:00+00:00"`;
 
+            const queryString = `
+            {
+                repository(owner: "${owner}", name: "${repo}") {
+                    branch: ref(qualifiedName: "${branchName}") {
+                        target {
+                            ... on Commit {
+                                history(first: ${deep}, ${fileExpr}, ${pagination}, ${timeSince}, ${timeUntil}) {
+                                    totalCount
+                                    edges {
+                                        node {
+                                            ... on Commit {
+                                                oid
+                                                message
+                                                committedDate 
+                                            }
+                                        }
+                                    }
+                                    pageInfo {
+                                        endCursor
+                                        hasNextPage
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            `;
+
+            executeGithubGraphql(queryString)
+                .then((res) => {
+                    if (res.data.errors) {
+                        console.log(res.data.errors);
+                        return reject(ERROR_CODES.GITHUB_API_ERROR);
+                    }
+
+                    if (!res.data.data.repository.branch) {
+                        return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
+                    }
+
+                    const { totalCount, pageInfo } =
+                        res.data.data.repository.branch.target.history;
+
+                    const branches =
+                        res.data.data.repository.branch.target.history.edges.map(
+                            (branch) => ({ ...branch.node })
+                        );
+
+                    resolve({ branches, totalCount, pageInfo });
+                })
+                .catch((err) =>
                     reject(
                         err.response
                             ? ERROR_CODES.GITHUB_API_ERROR
                             : ERROR_CODES.UNKNOWN_ERROR
-                    );
-                });
+                    )
+                );
         });
     },
 };
