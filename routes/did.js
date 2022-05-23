@@ -62,7 +62,6 @@ router.route("/api/get-all-did").get(async (req, res) => {
 
         const result = DID_strings.map((did) => ({
             name: did.name,
-            content: JSON.parse(did.object.text),
         }));
 
         return res.status(200).json({ data: result });
@@ -244,7 +243,7 @@ router.route("/api/new-did").post(async (req, res) => {
 /**
  * @swagger
  * /api/update-did:
- *   post:
+ *   put:
  *     summary: Update existed DID of a company.
  *     tags: ["DID controller"]
  *     requestBody:
@@ -283,7 +282,7 @@ router.route("/api/new-did").post(async (req, res) => {
  *                      example: Update success
  *
  */
-router.route("/api/update-did").post(async (req, res) => {
+router.route("/api/update-did").put(async (req, res) => {
     const { companyName, fileName, content } = req.body;
 
     try {

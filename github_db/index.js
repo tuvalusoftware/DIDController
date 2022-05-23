@@ -353,10 +353,10 @@ export default {
                                     text
                                     isBinary
                                     oid
-                                    }
                                 }
                             }
                         }
+                    }
                 }
             }
         }  
@@ -490,6 +490,7 @@ export default {
 
             this._updateContent(path, content, branch, commitMessage, fileSHA)
                 .then((response) => {
+                    console.log(response.data.content);
                     const { path, sha, size } = response.data.content;
                     return resolve({ path, sha, size });
                 })
@@ -704,14 +705,23 @@ export default {
      * @param {String} tagName name of the tag
      * @returns {Object} { tagName, target: { oid, commitUrl } }
      */
-    getATag: async function (tagName) {
-        const tags = await this.getAllTags();
+    getATag: function (tagName) {
+        return new Promise((resolve, reject) => {
+            GithubDB.get(`git/matching-refs/tags/${tagName}`)
+                .then((response) => {
+                    const { length } = response.data;
 
-        const tag = tags.find((el) => el.name === tagName);
-
-        if (tag) return tag;
-
-        throw ERROR_CODES.REF_NOT_EXISTED;
+                    if (!length) reject(ERROR_CODES.REF_NOT_EXISTED);
+                    resolve(response.data);
+                })
+                .catch((err) =>
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    )
+                );
+        });
     },
     /**
      * Create a tag by pointing to a commit
@@ -774,6 +784,185 @@ export default {
                             : ERROR_CODES.UNKNOWN_ERROR
                     );
                 });
+        });
+    },
+    /**
+     * Create a release by pointing to a commit
+     * @param {String} tagName name of the tag
+     * @param {String} commitSHA commit ID
+     * @returns {Promise} Release object
+     */
+    tagACommitAsRelease: async function (tagName, commitSHA = null) {
+        const sha = commitSHA ? commitSHA : await this.getLastCommitSHA();
+
+        const data = {
+            tag_name: tagName,
+            target_commitish: sha,
+            body: `Release at commit ${sha}`,
+        };
+
+        return new Promise((resolve, reject) => {
+            GithubDB.post(`releases`, data)
+                .then((response) => {
+                    resolve(response.data);
+                })
+                .catch((err) => {
+                    console.log(err.response.status);
+
+                    if (
+                        err.response?.status === 422 &&
+                        err.response?.data.message
+                    ) {
+                        return reject(ERROR_CODES.REF_EXISTED);
+                    }
+
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+    /**
+     * Create a release by its tag name
+     * @param {String} tagName name of the tag
+     * @returns {Promise} Release object
+     */
+    getARelease: function (tagName) {
+        return new Promise((resolve, reject) => {
+            GithubDB.get(`releases/tags/${tagName}`)
+                .then(({ data }) => {
+                    const {
+                        html_url,
+                        id,
+                        tag_name,
+                        target_commitish,
+                        body: releaseMsg,
+                        created_at,
+                    } = data;
+
+                    resolve({
+                        html_url,
+                        id,
+                        tag_name,
+                        target_commitish,
+                        releaseMsg,
+                        created_at,
+                    });
+                })
+                .catch((err) => {
+                    if (
+                        err.response?.status === 422 &&
+                        err.response?.data.message
+                    ) {
+                        return reject(ERROR_CODES.REF_EXISTED);
+                    }
+
+                    if (err.response.status === 404) {
+                        return reject(ERROR_CODES.REF_NOT_EXISTED);
+                    }
+
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+    /**
+     * Create all releases of the repo
+     * @returns {Promise} Release object
+     */
+    getAllReleases: function () {
+        return new Promise((resolve, reject) => {
+            GithubDB.get(`releases`)
+                .then(({ data }) => {
+                    const results = data.map((el) => {
+                        const {
+                            html_url,
+                            id,
+                            tag_name,
+                            target_commitish,
+                            body: releaseMsg,
+                            created_at,
+                        } = el;
+
+                        return {
+                            html_url,
+                            id,
+                            tag_name,
+                            target_commitish,
+                            releaseMsg,
+                            created_at,
+                        };
+                    });
+
+                    resolve(results);
+                })
+                .catch((err) => {
+                    if (
+                        err.response?.status === 422 &&
+                        err.response?.data.message
+                    ) {
+                        return reject(ERROR_CODES.REF_EXISTED);
+                    }
+
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+    /**
+     * Delete a tag
+     * @param {String} tagName name of the tag
+     * @returns {Promise} 'Delete success'
+     */
+    deleteARelease: async function (tagName) {
+        const { id: tagId } = await this.getARelease(tagName);
+
+        return new Promise((resolve, reject) => {
+            GithubDB.delete(`releases/${tagId}`)
+                .then((response) => {
+                    resolve("Delete release Success");
+                })
+                .catch((err) => {
+                    if (
+                        err.response.data.message ===
+                            "Reference does not exist" &&
+                        err.response.status === 422
+                    ) {
+                        return reject(ERROR_CODES.REF_NOT_EXISTED);
+                    }
+
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+    testing: function (tagName = "") {
+        return new Promise((resolve, reject) => {
+            GithubDB.get(`git/matching-refs/tags/${tagName}`)
+                .then((response) => {
+                    const { length } = response.data;
+
+                    if (!length) reject(ERROR_CODES.REF_NOT_EXISTED);
+                    resolve(response.data);
+                })
+                .catch((err) =>
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    )
+                );
         });
     },
 };
