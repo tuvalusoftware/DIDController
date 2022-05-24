@@ -40,12 +40,12 @@ const ERROR_CODES = {
     REF_EXISTED: {
         errorCode: 1208,
         errorMessage: "Reference is already exist.",
-        cause: "Create a tag. A tag with the same name already exist",
+        cause: "Create a tag/release. A tag with the same name already exist",
     },
     REF_NOT_EXISTED: {
         errorCode: 1209,
         errorMessage: "Reference cannot be found.",
-        cause: "Query/Delete a tag.",
+        cause: "Query/Delete a tag/release.",
     },
     DATA_NOT_CHANGE: {
         errorCode: 1210,

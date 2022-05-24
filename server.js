@@ -7,9 +7,10 @@ import cors from "cors";
 
 import didRouter from "./routes/did.js";
 import docRouter from "./routes/doc.js";
-import cardanoRouter from "./routes/cardano.js";
+import mockServicesRouter from "./routes/mock_services.js";
 
 const require = createRequire(import.meta.url);
+const services = require("./swagger/did_controller.json");
 const cardanoServices = require("./swagger/cardano.json");
 
 const app = express();
@@ -20,7 +21,7 @@ app.use(cors({ origin: "*" }));
 // Route
 app.use(didRouter);
 app.use(docRouter);
-app.use(cardanoRouter);
+app.use(mockServicesRouter);
 
 // Swagger config
 const options = {
@@ -40,9 +41,8 @@ const options = {
     apis: ["./routes/*.js"],
 };
 
-const githubProxySwaggerSpec = swaggerJsdoc(options);
 app.use("/api-docs", swaggerUiExpress.serve, (...args) =>
-    swaggerUiExpress.setup(githubProxySwaggerSpec)(...args)
+    swaggerUiExpress.setup(services)(...args)
 );
 
 app.use("/api-cardano", swaggerUiExpress.serve, (...args) =>

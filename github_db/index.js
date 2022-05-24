@@ -1,5 +1,8 @@
 import axios from "axios";
 import dotenv from "dotenv";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+dayjs.extend(customParseFormat);
 
 import { ERROR_CODES } from "../constants/index.js";
 
@@ -71,7 +74,6 @@ const getFileExtension = (filePath) =>
 
 export default {
     /**
-     *
      * @returns {Promise} All branches from a repo
      */
     getAllBranches: function () {
@@ -151,7 +153,7 @@ export default {
                     branch: ref(qualifiedName: "${branchName}") {
                         target {
                             ... on Commit {
-                                history(first: ${deep}, ${fileExpr}, ${pagination}) {
+                                history(first: ${deep}, ${fileExpr}, ${pagination}}) {
                                     totalCount
                                     edges {
                                         node {
@@ -266,6 +268,29 @@ export default {
         });
     },
     /**
+     * @description Check if file exists on repo
+     * @param {String} fileName name (path) of file
+     * @param {String} branchName name (default to main) of the branch
+     * @returns {String}
+     */
+    isExistedFile: function (fileName = "", branchName = "main") {
+        return new Promise((resolve, reject) => {
+            GithubDB.get(`contents/${fileName}?ref=${branchName}`)
+                .then((response) =>
+                    response.data ? resolve(true) : resolve(false)
+                )
+                .catch((err) => {
+                    if (err.response.status === 404) return resolve(false);
+
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+    /**
      * @description Return info of a file object
      * @param {String} filePath Path of the file
      * @param {String} commitSHA SHA of a commit, default to HEAD which is the last commit
@@ -353,10 +378,10 @@ export default {
                                     text
                                     isBinary
                                     oid
-                                    }
                                 }
                             }
                         }
+                    }
                 }
             }
         }  
@@ -490,6 +515,7 @@ export default {
 
             this._updateContent(path, content, branch, commitMessage, fileSHA)
                 .then((response) => {
+                    console.log(response.data.content);
                     const { path, sha, size } = response.data.content;
                     return resolve({ path, sha, size });
                 })
@@ -704,14 +730,23 @@ export default {
      * @param {String} tagName name of the tag
      * @returns {Object} { tagName, target: { oid, commitUrl } }
      */
-    getATag: async function (tagName) {
-        const tags = await this.getAllTags();
+    getATag: function (tagName) {
+        return new Promise((resolve, reject) => {
+            GithubDB.get(`git/matching-refs/tags/${tagName}`)
+                .then((response) => {
+                    const { length } = response.data;
 
-        const tag = tags.find((el) => el.name === tagName);
-
-        if (tag) return tag;
-
-        throw ERROR_CODES.REF_NOT_EXISTED;
+                    if (!length) reject(ERROR_CODES.REF_NOT_EXISTED);
+                    resolve(response.data);
+                })
+                .catch((err) =>
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    )
+                );
+        });
     },
     /**
      * Create a tag by pointing to a commit
@@ -768,6 +803,193 @@ export default {
                         return reject(ERROR_CODES.REF_NOT_EXISTED);
                     }
 
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+    /**
+     * Create a release by pointing to a commit
+     * @param {String} tagName name of the tag
+     * @param {String} commitSHA commit ID
+     * @returns {Promise} Release object
+     */
+    tagACommitAsRelease: async function (tagName, commitSHA = null) {
+        const sha = commitSHA ? commitSHA : await this.getLastCommitSHA();
+
+        const data = {
+            tag_name: tagName,
+            target_commitish: sha,
+            body: `Release at commit ${sha}`,
+        };
+
+        return new Promise((resolve, reject) => {
+            GithubDB.post(`releases`, data)
+                .then((response) => {
+                    resolve(response.data);
+                })
+                .catch((err) => {
+                    console.log(err.response.status);
+
+                    if (
+                        err.response?.status === 422 &&
+                        err.response?.data.message
+                    ) {
+                        return reject(ERROR_CODES.REF_EXISTED);
+                    }
+
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+    /**
+     * Create a release by its tag name
+     * @param {String} tagName name of the tag
+     * @returns {Promise} Release object
+     */
+    getARelease: function (tagName) {
+        return new Promise((resolve, reject) => {
+            GithubDB.get(`releases/tags/${tagName}`)
+                .then(({ data }) => {
+                    const {
+                        html_url,
+                        id,
+                        tag_name,
+                        target_commitish,
+                        body: releaseMsg,
+                        created_at,
+                    } = data;
+
+                    resolve({
+                        html_url,
+                        id,
+                        tag_name,
+                        target_commitish,
+                        releaseMsg,
+                        created_at,
+                    });
+                })
+                .catch((err) => {
+                    if (
+                        err.response?.status === 422 &&
+                        err.response?.data.message
+                    ) {
+                        return reject(ERROR_CODES.REF_EXISTED);
+                    }
+
+                    if (err.response.status === 404) {
+                        return reject(ERROR_CODES.REF_NOT_EXISTED);
+                    }
+
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+    /**
+     * Create all releases of the repo
+     * @returns {Promise} Release object
+     */
+    getAllReleases: function () {
+        return new Promise((resolve, reject) => {
+            GithubDB.get(`releases`)
+                .then(({ data }) => {
+                    const results = data.map((el) => {
+                        const {
+                            html_url,
+                            id,
+                            tag_name,
+                            target_commitish,
+                            body: releaseMsg,
+                            created_at,
+                        } = el;
+
+                        return {
+                            html_url,
+                            id,
+                            tag_name,
+                            target_commitish,
+                            releaseMsg,
+                            created_at,
+                        };
+                    });
+
+                    resolve(results);
+                })
+                .catch((err) => {
+                    if (
+                        err.response?.status === 422 &&
+                        err.response?.data.message
+                    ) {
+                        return reject(ERROR_CODES.REF_EXISTED);
+                    }
+
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+    /**
+     * Delete a tag
+     * @param {String} tagName name of the tag
+     * @returns {Promise} 'Delete success'
+     */
+    deleteARelease: async function (tagName) {
+        const { id: tagId } = await this.getARelease(tagName);
+
+        return new Promise((resolve, reject) => {
+            GithubDB.delete(`releases/${tagId}`)
+                .then((response) => {
+                    resolve("Delete release Success");
+                })
+                .catch((err) => {
+                    if (
+                        err.response.data.message ===
+                            "Reference does not exist" &&
+                        err.response.status === 422
+                    ) {
+                        return reject(ERROR_CODES.REF_NOT_EXISTED);
+                    }
+
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+
+    testing: async function (branchName = "main") {
+        const branch = await this.getBranchInfo(branchName);
+        const branchSHA = branch.commit.sha;
+
+        const since = dayjs("24/05/2022", "DD/MM/YYYY", true)
+            .toDate()
+            .toISOString();
+        const until = new Date().toISOString();
+
+        return new Promise((resolve, reject) => {
+            GithubDB.get(
+                `commits?sha=${branchSHA}&since=${since}&until=${until}`
+            )
+                .then((response) => {
+                    resolve(response.data);
+                })
+                .catch((err) => {
                     reject(
                         err.response
                             ? ERROR_CODES.GITHUB_API_ERROR

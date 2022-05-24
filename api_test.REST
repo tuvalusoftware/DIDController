@@ -1,10 +1,10 @@
 ###
-POST http://localhost:8080/api/new-did/ HTTP/1.1
+POST http://localhost:8080/api/did/ HTTP/1.1
 content-type: application/json
 
 {
     "companyName": "Kukulu",
-    "fileName": "ffff_gggg_hhhh_2222",
+    "publicKey": "ffff_gggg_hhhh_2222",
     "content": {
         "author": "Bao Bao",
         "dateCreated": "10-10-2021",

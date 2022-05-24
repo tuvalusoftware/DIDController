@@ -1,0 +1,406 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "DID Controller service",
+        "title": "DID Controller"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "schemes": ["http"],
+    "tags": [
+        {
+            "name": "DID",
+            "description": "CRUD for DID"
+        },
+        {
+            "name": "DOC",
+            "description": "CRUD for document"
+        }
+    ],
+    "paths": {
+        "/dids": {
+            "get": {
+                "tags": ["DID"],
+                "summary": "Retrieve an array of DIDs from a company.",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "type": "string",
+                        "example": "Kukulu"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return an array of DID object",
+                        "schema": {
+                            "type": "Array",
+                            "items": { "$ref": "#/definitions/DID_Object" }
+                        }
+                    },
+                    "404": { "description": "Do not exist" }
+                }
+            }
+        },
+        "/did": {
+            "get": {
+                "tags": ["DID"],
+                "summary": "Retrieve one single DID.",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "type": "string",
+                        "example": "Kukulu"
+                    },
+                    {
+                        "name": "publicKey",
+                        "in": "header",
+                        "description": "Public Key of the user's wallet.",
+                        "required": true,
+                        "type": "string",
+                        "example": "public_key"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return an DID object",
+                        "schema": {
+                            "$ref": "#/definitions/DID_Object"
+                        }
+                    },
+                    "404": { "description": "Do not exist" }
+                }
+            },
+            "post": {
+                "tags": ["DID"],
+                "summary": "Create new DID doc for a company.",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "companyName": {
+                                    "description": "Name of the company.",
+                                    "required": true,
+                                    "type": "string",
+                                    "example": "Kukulu"
+                                },
+                                "publicKey": {
+                                    "description": "Public Key of the user's wallet.",
+                                    "required": true,
+                                    "type": "string",
+                                    "example": "public_key"
+                                },
+                                "content": {
+                                    "description": "Content of the DID doc.",
+                                    "required": true,
+                                    "type": "object",
+                                    "example": {
+                                        "date": "10-10-2000",
+                                        "issuer": "123123abcd"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "schema": {
+                            "$ref": "#/definitions/SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["DID"],
+                "summary": "Update existed DID of a company.",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "companyName": {
+                                    "description": "Name of the company.",
+                                    "required": true,
+                                    "type": "string",
+                                    "example": "Kukulu"
+                                },
+                                "publicKey": {
+                                    "description": "Public Key of the user's wallet.",
+                                    "required": true,
+                                    "type": "string",
+                                    "example": "public_key"
+                                },
+                                "content": {
+                                    "description": "Content of the DID doc.",
+                                    "required": true,
+                                    "type": "object",
+                                    "example": {
+                                        "date": "10-10-2000",
+                                        "issuer": "123123abcd",
+                                        "updated": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Return an DID object",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["DID"],
+                "summary": "Delete existed DID of a company.",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "type": "string",
+                        "example": "Kukulu"
+                    },
+                    {
+                        "name": "publicKey",
+                        "in": "header",
+                        "description": "Public Key of the user's wallet.",
+                        "required": true,
+                        "type": "string",
+                        "example": "public_key"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/doc-exists": {
+            "get": {
+                "tags": ["DOC"],
+                "summary": "Check if document with the given name already exists within the same company.",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "type": "string",
+                        "example": "Kukulu"
+                    },
+                    {
+                        "name": "fileName",
+                        "in": "header",
+                        "description": "Name of the document (not include the file extension).",
+                        "required": true,
+                        "type": "string",
+                        "example": "document_name"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return true/false on whether a file is existed",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "isExisted": {
+                                    "description": "True if file is already existed, otherwise false.",
+                                    "required": true,
+                                    "type": "Boolean",
+                                    "example": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doc": {
+            "get": {
+                "tags": ["DOC"],
+                "summary": "Retrieve one single document from a company.",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "type": "string",
+                        "example": "Kukulu"
+                    },
+                    {
+                        "name": "fileName",
+                        "in": "header",
+                        "description": "Name of the document file.",
+                        "required": true,
+                        "type": "string",
+                        "example": "file_name"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return a wrapped document",
+                        "schema": {
+                            "$ref": "#/definitions/WrappedDocument"
+                        }
+                    },
+                    "404": { "description": "Do not exist" }
+                }
+            },
+            "post": {
+                "tags": ["DOC"],
+                "summary": "Create a new document for a company.",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "wrappedDocument": {
+                                    "description": "Content of a wrap document.",
+                                    "required": true,
+                                    "$ref": "#/definitions/WrappedDocument"
+                                },
+                                "companyName": {
+                                    "description": "Name of the company.",
+                                    "required": true,
+                                    "type": "string",
+                                    "example": "Kukulu"
+                                },
+                                "fileName": {
+                                    "description": "Name of the file.",
+                                    "required": true,
+                                    "type": "string",
+                                    "example": "file_name"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "schema": {
+                            "$ref": "#/definitions/SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["DOC"],
+                "summary": "Delete one existed document from a company.",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "type": "string",
+                        "example": "Kukulu"
+                    },
+                    {
+                        "name": "fileName",
+                        "in": "header",
+                        "description": "Name of the document file.",
+                        "required": true,
+                        "type": "string",
+                        "example": "file_name"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/SuccessResponse"
+                        }
+                    },
+                    "404": { "description": "Do not exist" }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "DID_Object": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the DID",
+                    "example": "public_key"
+                },
+                "content": {
+                    "type": "object",
+                    "description": "DID document in JSON format.",
+                    "example": {
+                        "date": "10-10-2000"
+                    }
+                }
+            }
+        },
+        "WrappedDocument": {
+            "type": "object",
+            "example": {
+                "version": "https://schema.openattestation.com/2.0/schema.json",
+                "data": {
+                    "name": "UUIDV4:string:...",
+                    "issuers": [
+                        {
+                            "identityProof": {
+                                "type": "UUIDV4:string:DID",
+                                "location": "UUIDV4:string:fuixlabs.com"
+                            },
+                            "did": "UUIDV4:string:....",
+                            "tokenRegistry": "UUIDV4:string:...",
+                            "address": "addr_test1qq53em6pdpswwc7mmeq50848emp4u7gmhp2dft4ud0lhar54000k46cgk82rmlfjysyxyvh9qkj7vtuc69ulgdypcnssjk3hur"
+                        }
+                    ]
+                },
+                "signature": {
+                    "type": "SHA3MerkleProof",
+                    "targetHash": "11d456db211d68cc8a6eac5e293422dec669b54812e4975497d7099467335987",
+                    "proof": [],
+                    "merkleRoot": "11d456db211d68cc8a6eac5e293422dec669b54812e4975497d7099467335987"
+                }
+            }
+        },
+        "SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": { "type": "string", "example": "Success" }
+            }
+        }
+    }
+}
