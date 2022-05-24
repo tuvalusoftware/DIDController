@@ -318,6 +318,37 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "tags": ["DOC"],
+                "summary": "Delete one existed document from a company.",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "type": "string",
+                        "example": "Kukulu"
+                    },
+                    {
+                        "name": "fileName",
+                        "in": "header",
+                        "description": "Name of the document file.",
+                        "required": true,
+                        "type": "string",
+                        "example": "file_name"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/SuccessResponse"
+                        }
+                    },
+                    "404": { "description": "Do not exist" }
+                }
             }
         }
     },

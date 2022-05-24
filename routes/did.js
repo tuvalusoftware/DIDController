@@ -59,7 +59,7 @@ router
             await GithubDB.deleteFile(
                 `${fileName}.did`,
                 branch,
-                `Delete DID "${fileName}" of company ${companyName}`
+                `DELETE: '${fileName}' DID of company ${companyName}`
             );
 
             return res.status(200).json({ message: "Delete success" });
@@ -79,7 +79,7 @@ router
                 `${fileName}.did`,
                 content,
                 newBranch,
-                `New DID Doc of company "${companyName}"`
+                `NEW: '${fileName}' DID Doc of company "${companyName}"`
             );
 
             return res
@@ -101,10 +101,10 @@ router
                 `${fileName}.did`,
                 content,
                 newBranch,
-                `Update DID "${fileName}" of company ${companyName}`
+                `UPDATE: '${fileName}' DID of company ${companyName}`
             );
 
-            return res.status(200).json({ message: "Update success" });
+            return res.status(200).json({ message: "Update DID successfully" });
         } catch (err) {
             console.log(err);
             return res.status(400).json(err);

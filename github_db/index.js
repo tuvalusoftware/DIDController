@@ -1,5 +1,8 @@
 import axios from "axios";
 import dotenv from "dotenv";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+dayjs.extend(customParseFormat);
 
 import { ERROR_CODES } from "../constants/index.js";
 
@@ -71,7 +74,6 @@ const getFileExtension = (filePath) =>
 
 export default {
     /**
-     *
      * @returns {Promise} All branches from a repo
      */
     getAllBranches: function () {
@@ -971,75 +973,29 @@ export default {
         });
     },
 
-    testing: function (
-        deep = 5,
-        branchName = "main",
-        filePath = null,
-        cursor = null
-    ) {
+    testing: async function (branchName = "main") {
+        const branch = await this.getBranchInfo(branchName);
+        const branchSHA = branch.commit.sha;
+
+        const since = dayjs("24/05/2022", "DD/MM/YYYY", true)
+            .toDate()
+            .toISOString();
+        const until = new Date().toISOString();
+
         return new Promise((resolve, reject) => {
-            const fileExpr = filePath ? `path: "${filePath}"` : "";
-            const pagination = cursor ? `after: "${cursor}"` : "";
-            const timeSince = `since: "2022-05-23T00:00:00+00:00"`;
-            const timeUntil = `until: "2022-05-24T00:00:00+00:00"`;
-
-            const queryString = `
-            {
-                repository(owner: "${owner}", name: "${repo}") {
-                    branch: ref(qualifiedName: "${branchName}") {
-                        target {
-                            ... on Commit {
-                                history(first: ${deep}, ${fileExpr}, ${pagination}, ${timeSince}, ${timeUntil}) {
-                                    totalCount
-                                    edges {
-                                        node {
-                                            ... on Commit {
-                                                oid
-                                                message
-                                                committedDate 
-                                            }
-                                        }
-                                    }
-                                    pageInfo {
-                                        endCursor
-                                        hasNextPage
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            `;
-
-            executeGithubGraphql(queryString)
-                .then((res) => {
-                    if (res.data.errors) {
-                        console.log(res.data.errors);
-                        return reject(ERROR_CODES.GITHUB_API_ERROR);
-                    }
-
-                    if (!res.data.data.repository.branch) {
-                        return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
-                    }
-
-                    const { totalCount, pageInfo } =
-                        res.data.data.repository.branch.target.history;
-
-                    const branches =
-                        res.data.data.repository.branch.target.history.edges.map(
-                            (branch) => ({ ...branch.node })
-                        );
-
-                    resolve({ branches, totalCount, pageInfo });
+            GithubDB.get(
+                `commits?sha=${branchSHA}&since=${since}&until=${until}`
+            )
+                .then((response) => {
+                    resolve(response.data);
                 })
-                .catch((err) =>
+                .catch((err) => {
                     reject(
                         err.response
                             ? ERROR_CODES.GITHUB_API_ERROR
                             : ERROR_CODES.UNKNOWN_ERROR
-                    )
-                );
+                    );
+                });
         });
     },
 };

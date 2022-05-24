@@ -59,7 +59,7 @@ router
                 `${fileName}.document`,
                 wrappedDocument,
                 branchName,
-                `New Wrap Document from company ${companyName}`
+                `NEW: '${fileName}' wrapped document from company ${companyName}`
             );
 
             await GithubDB.createNewFile(
@@ -69,12 +69,38 @@ router
                     did: `did:some_string:${companyName}:${ownerPublicKey}`,
                 },
                 branchName,
-                `DID for new document '${fileName}' from company ${companyName}`
+                `NEW: '${fileName}' DID for new document from company ${companyName}`
             );
 
             res.status(200).json({
                 data: { message: "Create document success" },
             });
+        } catch (err) {
+            console.log(err);
+            return res.status(400).json(err);
+        }
+    })
+    .delete(async (req, res) => {
+        const companyName = req.header("companyName");
+        const fileName = req.header("fileName");
+
+        try {
+            const branch = `DOC_${companyName}`;
+
+            await GithubDB.deleteFile(
+                `${fileName}.document`,
+                branch,
+                `DELETE: '${fileName}' document of doc company ${companyName}`
+            );
+            await GithubDB.deleteFile(
+                `${fileName}.did`,
+                branch,
+                `DELETE: '${fileName}' DID of doc company ${companyName}`
+            );
+
+            return res
+                .status(200)
+                .json({ message: "Delete document successfully" });
         } catch (err) {
             console.log(err);
             return res.status(400).json(err);
