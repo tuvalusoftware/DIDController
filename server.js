@@ -10,6 +10,7 @@ import docRouter from "./routes/doc.js";
 import mockServicesRouter from "./routes/mock_services.js";
 
 const require = createRequire(import.meta.url);
+const services = require("./swagger/did_controller.json");
 const cardanoServices = require("./swagger/cardano.json");
 
 const app = express();
@@ -40,9 +41,8 @@ const options = {
     apis: ["./routes/*.js"],
 };
 
-const githubProxySwaggerSpec = swaggerJsdoc(options);
 app.use("/api-docs", swaggerUiExpress.serve, (...args) =>
-    swaggerUiExpress.setup(githubProxySwaggerSpec)(...args)
+    swaggerUiExpress.setup(services)(...args)
 );
 
 app.use("/api-cardano", swaggerUiExpress.serve, (...args) =>
