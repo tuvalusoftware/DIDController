@@ -10,6 +10,7 @@ const repo = process.env.REPO_NAME;
 
 export default {
     /**
+     * @description Get the info of all branches from a repo
      * @returns {Promise} All branches from a repo
      */
     getAllBranches: function () {
@@ -28,7 +29,7 @@ export default {
         });
     },
     /**
-     *
+     * @description Get info of a branch
      * @param {String} branchName
      * @returns {Object} check if branch is exist and return the branch object
      */
@@ -45,7 +46,7 @@ export default {
         });
     },
     /**
-     * Check out to new branch
+     * @description Check out to new branch
      * @param {String} newBranchName new branch name
      * @param {String} fromBranch which branch to branch out from
      * @returns {Promise} branch object { ref, object { sha } }
@@ -79,7 +80,7 @@ export default {
         });
     },
     /**
-     * If branch exists, return its info, else create a new empty branch and return its info
+     * @description If branch exists, return its info, else create a new empty branch and return its info
      * @param {String} branchName new branch's name
      * @returns {Promise} branch object { ref, object { sha } }
      */
@@ -102,7 +103,7 @@ export default {
         });
     },
     /**
-     * Delete a branch, for security reason, branch "main" cannot be deleted
+     * @description Delete a branch, for security reason, branch "main" cannot be deleted
      * @param {String} branch Name of branch to delete
      * @returns {Promise} Success message
      */
@@ -122,6 +123,17 @@ export default {
                     );
                 });
         });
+    },
+    /**
+     * @description If branch exists, delete that branch
+     * @param {String} branchName new branch's name
+     */
+    deleteBranchIfExist: async function (branchName) {
+        const branches = await this.getAllBranches();
+        const branch = branches.find((el) => el.name === branchName);
+
+        if (!branch) return;
+        await this.deleteBranch(branchName);
     },
     /**
      * @description Return the last commit SHA (id) of a branch
@@ -146,7 +158,7 @@ export default {
         });
     },
     /**
-     *  Get a list of commits of a branch or a file, along with cursor info for pagination
+     * @description Get a list of commits of a branch or a file, along with cursor info for pagination
      * @param {Number} deep How far back to get commits
      * @param {String} branchName Name of the branch
      * @param {String} filePath If file path is provided, return the commit's history of that file only
@@ -223,7 +235,7 @@ export default {
         });
     },
     /**
-     *  Get a list of commits of a branch or a file
+     * @description Get a list of commits of a branch or a file
      * @param {Number} deep How far back to get commits
      * @param {String} branchName Name of the branch
      * @param {String} filePath If file path is provided, return the commit's history of that file only
@@ -544,7 +556,7 @@ export default {
         });
     },
     /**
-     * Delete a file
+     * @description Delete a file from a repo
      * @param {String} path
      * @param {String} branch
      * @param {String} commitMessage
@@ -576,7 +588,7 @@ export default {
         });
     },
     /**
-     * Query first 100 tags with GraphQL Github API
+     * @description Query first 100 tags with GraphQL Github API
      * @param {String} cursor element that the cursor point to after retrieve the last element
      * @ref: https://docs.github.com/en/graphql/reference/enums#reforderfield
      * @returns {Promise} An object contains list of tags, { endCursor, hasNextPage }
@@ -833,7 +845,7 @@ export default {
         });
     },
     /**
-     * Create all releases of the repo
+     * @description Create all releases of the repo
      * @returns {Promise} Release object
      */
     getAllReleases: function () {
@@ -879,7 +891,7 @@ export default {
         });
     },
     /**
-     * Delete a tag
+     * @description Delete a tag
      * @param {String} tagName name of the tag
      * @returns {Promise} 'Delete success'
      */

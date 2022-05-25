@@ -6,7 +6,10 @@
     "main": "index.js",
     "scripts": {
         "main": "npx nodemon main.js",
-        "server": "npx nodemon server.js"
+        "server": "npx nodemon server.js",
+        "test-did": "mocha ./test/did.test.js",
+        "test-doc": "mocha ./test/doc.test.js",
+        "test": "mocha"
     },
     "repository": {
         "type": "git",
@@ -32,6 +35,9 @@
         "swagger-ui-express": "^4.3.0"
     },
     "devDependencies": {
+        "chai": "^4.3.6",
+        "chai-http": "^4.3.0",
+        "mocha": "^10.0.0",
         "nodemon": "^2.0.16"
     }
 }

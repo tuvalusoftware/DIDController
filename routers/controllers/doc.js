@@ -1,4 +1,5 @@
 import GithubProxy from "../../db/github/index.js";
+import { mockCall } from "../../helpers/index.js";
 
 export default {
     isExist: async (req, res, next) => {
@@ -67,7 +68,7 @@ export default {
                 `NEW: '${fileName}' DID for new document from company ${companyName}`
             );
 
-            res.status(200).json({
+            res.status(201).json({
                 data: { message: "Create document success" },
             });
         } catch (err) {

@@ -30,3 +30,5 @@ const port = 9000;
 app.listen(port, (req, res) => {
     console.log(`Server is live on ${port}`);
 });
+
+export default app;

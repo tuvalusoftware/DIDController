@@ -164,7 +164,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Return an DID object",
                         "schema": {
                             "$ref": "#/definitions/SuccessResponse"
