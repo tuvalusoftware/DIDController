@@ -1,39 +1,34 @@
-import express from "express";
+import GithubProxy from "../../db/github/index.js";
 
-import GithubDB from "../github_db/index.js";
-import { mockCall } from "../helpers/index.js";
+export default {
+    isExist: async (req, res, next) => {
+        const companyName = req.header("companyName");
+        const fileName = req.header("fileName");
 
-const router = express.Router();
+        try {
+            const branchName = `DOC_${companyName}`;
+            const isExisted = await GithubProxy.isExistedFile(
+                `${fileName}.document`,
+                branchName
+            );
 
-router.route("/api/doc-exists").get(async (req, res) => {
-    const companyName = req.header("companyName");
-    const fileName = req.header("fileName");
-
-    try {
-        const branchName = `DOC_${companyName}`;
-        const isExisted = await GithubDB.isExistedFile(
-            `${fileName}.document`,
-            branchName
-        );
-
-        res.status(200).json({ isExisted });
-    } catch (err) {
-        console.log(err);
-        return res.status(400).json(err);
-    }
-});
-
-router
-    .route("/api/doc")
-    .get(async (req, res) => {
+            res.status(200).json({ isExisted });
+        } catch (err) {
+            console.log(err);
+            return res.status(400).json(err);
+        }
+    },
+    getDoc: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
 
         try {
             const branch = `DOC_${companyName}`;
-            const lastCommitOfBranch = await GithubDB.getLastCommitSHA(branch);
+            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+                branch
+            );
 
-            const fileData = await GithubDB.getFile(
+            const fileData = await GithubProxy.getFile(
                 `${fileName}.document`,
                 lastCommitOfBranch
             );
@@ -45,24 +40,24 @@ router
             console.log(err);
             return res.status(400).json(err);
         }
-    })
-    .post(async (req, res) => {
+    },
+    createNewDoc: async (req, res, next) => {
         const { wrappedDocument, fileName, companyName } = req.body;
 
         try {
             const branchName = `DOC_${companyName}`;
-            await GithubDB.createBranchIfNotExist(branchName);
+            await GithubProxy.createBranchIfNotExist(branchName);
 
             const ownerPublicKey = await mockCall();
 
-            await GithubDB.createNewFile(
+            await GithubProxy.createNewFile(
                 `${fileName}.document`,
                 wrappedDocument,
                 branchName,
                 `NEW: '${fileName}' wrapped document from company ${companyName}`
             );
 
-            await GithubDB.createNewFile(
+            await GithubProxy.createNewFile(
                 `${fileName}.did`,
                 {
                     controller: ownerPublicKey,
@@ -79,20 +74,20 @@ router
             console.log(err);
             return res.status(400).json(err);
         }
-    })
-    .delete(async (req, res) => {
+    },
+    deleteDoc: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
 
         try {
             const branch = `DOC_${companyName}`;
 
-            await GithubDB.deleteFile(
+            await GithubProxy.deleteFile(
                 `${fileName}.document`,
                 branch,
                 `DELETE: '${fileName}' document of doc company ${companyName}`
             );
-            await GithubDB.deleteFile(
+            await GithubProxy.deleteFile(
                 `${fileName}.did`,
                 branch,
                 `DELETE: '${fileName}' DID of doc company ${companyName}`
@@ -105,7 +100,5 @@ router
             console.log(err);
             return res.status(400).json(err);
         }
-    });
-
-
-export default router;
+    },
+};

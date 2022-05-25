@@ -14,7 +14,7 @@
     AUTH_TOKEN=<Github access token>
     ```
 
-1. Run server (server will run on port 8080)
+1. Run server (server will run on port 9000)
 
     ```
     npm run server
@@ -26,6 +26,6 @@
 
 You can view all the API by visiting the swagger UI after run the server.
 
-Here is the link to Github Proxy API [http://localhost:8080/api-docs/](http://localhost:8080/api-docs/#/)
+Here is the link to Github Proxy API [http://localhost:9000/api-docs/](http://localhost:9000/api-docs/#/)
 
-Here is the link to Cardano Service API (mock server) [http://localhost:8080/api-cardano/](http://localhost:8080/api-cardano/#/)
+Here is the link to Cardano Service API (mock server) [http://localhost:9000/api-cardano/](http://localhost:9000/api-cardano/#/)

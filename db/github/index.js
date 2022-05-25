@@ -1,76 +1,13 @@
-import axios from "axios";
 import dotenv from "dotenv";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat.js";
-dayjs.extend(customParseFormat);
-
-import { ERROR_CODES } from "../constants/index.js";
-
 dotenv.config();
 
-// Configurations
 const owner = process.env.REPO_OWNER;
 const repo = process.env.REPO_NAME;
-const token = process.env.AUTH_TOKEN;
 
-const gitDBUrl = `https://api.github.com/repos/${owner}/${repo}/`;
-const gitGraphQLUrl = `https://api.github.com/graphql`;
-
-const config = {
-    maxContentLength: Infinity,
-    maxBodyLength: Infinity,
-    headers: {
-        Accept: "application/vnd.github.v3+json",
-        Authorization: `token ${token}`,
-    },
-};
-
-const GithubDB = {
-    get(url) {
-        return axios.get(gitDBUrl + url, config);
-    },
-    post(url, data) {
-        return axios.post(gitDBUrl + url, data, config);
-    },
-    put(url, data) {
-        return axios.put(gitDBUrl + url, data, config);
-    },
-    patch(url, data) {
-        return axios.patch(gitDBUrl + url, data, config);
-    },
-    delete(url, data = {}) {
-        return axios.delete(gitDBUrl + url, { data, ...config });
-    },
-};
-
-/**
- * @description Make API call to the GraphQL Github API
- * @param {String} queryString A GraphQL query string
- * @returns {Promise} an Axios promise
- */
-const executeGithubGraphql = (queryString) =>
-    axios.post(gitGraphQLUrl, JSON.stringify({ query: queryString }), config);
-
-/**
- * @description Try to parse a string-typed data, if the string cannot be parsed, return itself
- * @param {String} dataString
- * @returns {String}
- */
-const tryParse = (dataString) => {
-    try {
-        return JSON.parse(dataString);
-    } catch (e) {
-        return dataString;
-    }
-};
-
-/**
- * @description Return the extension from a file path
- * @param {String} filePath Path to the file
- * @returns {String}
- */
-const getFileExtension = (filePath) =>
-    filePath.substring(filePath.lastIndexOf(".") + 1, filePath.length) || null;
+import GithubREST from "./rest.js";
+import GithubGraphQL from "./graphql.js";
+import { tryParse, getFileExtension, stringToDate } from "./utils.js";
+import { ERROR_CODES } from "../../constants/index.js";
 
 export default {
     /**
@@ -78,7 +15,7 @@ export default {
      */
     getAllBranches: function () {
         return new Promise((resolve, reject) => {
-            GithubDB.get(`branches`)
+            GithubREST.get(`branches`)
                 .then((response) => {
                     resolve(response.data);
                 })
@@ -109,15 +46,95 @@ export default {
         });
     },
     /**
+     * Check out to new branch
+     * @param {String} newBranchName new branch name
+     * @param {String} fromBranch which branch to branch out from
+     * @returns {Promise} branch object { ref, object { sha } }
+     */
+    checkoutNewBranch: async function (newBranchName, fromBranch = "main") {
+        const lastCommitSHA = await this.getLastCommitSHA(fromBranch);
+
+        return new Promise((resolve, reject) => {
+            const data = {
+                ref: `refs/heads/${newBranchName}`,
+                sha: lastCommitSHA,
+            };
+
+            GithubREST.post(`git/refs`, data)
+                .then((res) => {
+                    resolve(res.data);
+                })
+                .catch((err) => {
+                    if (err.response) {
+                        if (
+                            err.response.status === 422 &&
+                            err.response.data.message ===
+                                "Reference already exists"
+                        ) {
+                            return reject(ERROR_CODES.BRANCH_EXISTED);
+                        }
+
+                        return reject(ERROR_CODES.GITHUB_API_ERROR);
+                    }
+                });
+        });
+    },
+    /**
+     * If branch exists, return its info, else create a new empty branch and return its info
+     * @param {String} branchName new branch's name
+     * @returns {Promise} branch object { ref, object { sha } }
+     */
+    createBranchIfNotExist: async function (branchName) {
+        const branches = await this.getAllBranches();
+        const branch = branches.find((el) => el.name === branchName);
+
+        if (branch) return branch;
+
+        return new Promise((resolve, reject) => {
+            this.checkoutNewBranch(branchName, "empty_branch")
+                .then((data) => resolve(data))
+                .catch((err) =>
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    )
+                );
+        });
+    },
+    /**
+     * Delete a branch, for security reason, branch "main" cannot be deleted
+     * @param {String} branch Name of branch to delete
+     * @returns {Promise} Success message
+     */
+    deleteBranch: function (branch) {
+        return new Promise((resolve, reject) => {
+            if (branch === "main") return reject(ERROR_CODES.DELETE_MAIN);
+
+            GithubREST.delete(`git/refs/heads/${branch}`)
+                .then((response) => {
+                    resolve("Delete OK");
+                })
+                .catch((err) => {
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    );
+                });
+        });
+    },
+    /**
      * @description Return the last commit SHA (id) of a branch
      * @param {string} branch Name of the branch (default to main)
      * @returns {string}
      */
     getLastCommitSHA: function (branch = "main") {
         return new Promise((resolve, reject) => {
-            GithubDB.get(`git/ref/heads/${branch}`)
+            GithubREST.get(`git/ref/heads/${branch}`)
                 .then((response) => resolve(response.data.object.sha))
                 .catch((err) => {
+                    console.log(err);
                     if (err.response.status === 404) {
                         return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
                     }
@@ -176,7 +193,7 @@ export default {
             }
             `;
 
-            executeGithubGraphql(queryString)
+            GithubGraphQL.execute(queryString)
                 .then((res) => {
                     if (res.data.errors) {
                         console.log(res.data.errors);
@@ -250,24 +267,6 @@ export default {
         });
     },
     /**
-     * @description Return the content as a string (mostly base64 encoded) of file from repository
-     * @param {String} fileSHA SHA (id) string of a file
-     * @returns {String}
-     */
-    getBinaryContent: function (fileSHA) {
-        return new Promise((resolve, reject) => {
-            GithubDB.get(`git/blobs/${fileSHA}`)
-                .then((response) => resolve(response.data.content))
-                .catch((err) =>
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    )
-                );
-        });
-    },
-    /**
      * @description Check if file exists on repo
      * @param {String} fileName name (path) of file
      * @param {String} branchName name (default to main) of the branch
@@ -275,7 +274,7 @@ export default {
      */
     isExistedFile: function (fileName = "", branchName = "main") {
         return new Promise((resolve, reject) => {
-            GithubDB.get(`contents/${fileName}?ref=${branchName}`)
+            GithubREST.get(`contents/${fileName}?ref=${branchName}`)
                 .then((response) =>
                     response.data ? resolve(true) : resolve(false)
                 )
@@ -288,6 +287,24 @@ export default {
                             : ERROR_CODES.UNKNOWN_ERROR
                     );
                 });
+        });
+    },
+    /**
+     * @description Return the content as a string (mostly base64 encoded) of file from repository
+     * @param {String} fileSHA SHA (id) string of a file
+     * @returns {String}
+     */
+    getBinaryFile: function (fileSHA) {
+        return new Promise((resolve, reject) => {
+            GithubREST.get(`git/blobs/${fileSHA}`)
+                .then((response) => resolve(response.data.content))
+                .catch((err) =>
+                    reject(
+                        err.response
+                            ? ERROR_CODES.GITHUB_API_ERROR
+                            : ERROR_CODES.UNKNOWN_ERROR
+                    )
+                );
         });
     },
     /**
@@ -313,7 +330,7 @@ export default {
         `;
 
         return new Promise((resolve, reject) => {
-            executeGithubGraphql(queryString)
+            GithubGraphQL.execute(queryString)
                 .then(async (response) => {
                     if (response.status !== 200) {
                         return reject(ERROR_CODES.GITHUB_API_ERROR);
@@ -335,7 +352,7 @@ export default {
 
                         // Parse content to JS object if data is json
                         data.content = data.isBinary
-                            ? await this.getBinaryContent(data.oid)
+                            ? await this.getBinaryFile(data.oid)
                             : tryParse(data.text);
 
                         resolve(data);
@@ -362,7 +379,7 @@ export default {
         allowFolder = true,
         commitSHA = "HEAD"
     ) {
-        const queryAllFiles = `
+        const queryString = `
         query RepoFiles {
             repository(owner: "${owner}", name: "${repo}") {
                 object(expression: "${commitSHA}:${treePath}") {
@@ -388,7 +405,7 @@ export default {
         `;
 
         return new Promise((resolve, reject) => {
-            executeGithubGraphql(queryAllFiles)
+            GithubGraphQL.execute(queryString)
                 .then((response) => {
                     if (response.status !== 200) {
                         return reject(ERROR_CODES.GITHUB_API_ERROR);
@@ -452,7 +469,7 @@ export default {
 
         data = sha ? { ...data, sha } : data;
 
-        return GithubDB.put(`contents/${path}`, data);
+        return GithubREST.put(`contents/${path}`, data);
     },
     /**
      * @description Create and save a new file to Repo
@@ -515,7 +532,6 @@ export default {
 
             this._updateContent(path, content, branch, commitMessage, fileSHA)
                 .then((response) => {
-                    console.log(response.data.content);
                     const { path, sha, size } = response.data.content;
                     return resolve({ path, sha, size });
                 })
@@ -526,63 +542,6 @@ export default {
                             : ERROR_CODES.UNKNOWN_ERROR
                     );
                 });
-        });
-    },
-    /**
-     * Check out to new branch
-     * @param {String} newBranchName new branch name
-     * @param {String} fromBranch which branch to branch out from
-     * @returns {Promise} branch object { ref, object { sha } }
-     */
-    checkoutNewBranch: async function (newBranchName, fromBranch = "main") {
-        const lastCommitSHA = await this.getLastCommitSHA(fromBranch);
-
-        return new Promise((resolve, reject) => {
-            const data = {
-                ref: `refs/heads/${newBranchName}`,
-                sha: lastCommitSHA,
-            };
-
-            GithubDB.post(`git/refs`, data)
-                .then((res) => {
-                    resolve(res.data);
-                })
-                .catch((err) => {
-                    if (err.response) {
-                        if (
-                            err.response.status === 422 &&
-                            err.response.data.message ===
-                                "Reference already exists"
-                        ) {
-                            return reject(ERROR_CODES.BRANCH_EXISTED);
-                        }
-
-                        return reject(ERROR_CODES.GITHUB_API_ERROR);
-                    }
-                });
-        });
-    },
-    /**
-     * If branch exists, return its info, else create a new empty branch and return its info
-     * @param {String} branchName new branch's name
-     * @returns {Promise} branch object { ref, object { sha } }
-     */
-    createBranchIfNotExist: async function (branchName) {
-        const branches = await this.getAllBranches();
-        const branch = branches.find((el) => el.name === branchName);
-
-        if (branch) return branch;
-
-        return new Promise((resolve, reject) => {
-            this.checkoutNewBranch(branchName, "empty_branch")
-                .then((data) => resolve(data))
-                .catch((err) =>
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    )
-                );
         });
     },
     /**
@@ -605,32 +564,10 @@ export default {
                 sha: fileSHA,
             };
 
-            GithubDB.delete(`contents/${path}`, data)
+            GithubREST.delete(`contents/${path}`, data)
                 .then((response) => resolve(response.data))
                 .catch((err) => {
                     console.log(err);
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
-                });
-        });
-    },
-    /**
-     * Delete a branch, for security reason, branch "main" cannot be deleted
-     * @param {String} branch Name of branch to delete
-     * @returns {Promise} Success message
-     */
-    deleteBranch: function (branch) {
-        return new Promise((resolve, reject) => {
-            if (branch === "main") return reject(ERROR_CODES.DELETE_MAIN);
-
-            GithubDB.delete(`git/refs/heads/${branch}`)
-                .then((response) => {
-                    resolve("Delete OK");
-                })
-                .catch((err) => {
                     reject(
                         err.response
                             ? ERROR_CODES.GITHUB_API_ERROR
@@ -671,7 +608,7 @@ export default {
         `;
 
         return new Promise((resolve, reject) => {
-            executeGithubGraphql(queryString)
+            GithubGraphQL.execute(queryString)
                 .then((response) => {
                     if (response.status !== 200) {
                         return reject(ERROR_CODES.GITHUB_API_ERROR);
@@ -732,7 +669,7 @@ export default {
      */
     getATag: function (tagName) {
         return new Promise((resolve, reject) => {
-            GithubDB.get(`git/matching-refs/tags/${tagName}`)
+            GithubREST.get(`git/matching-refs/tags/${tagName}`)
                 .then((response) => {
                     const { length } = response.data;
 
@@ -763,7 +700,7 @@ export default {
         };
 
         return new Promise((resolve, reject) => {
-            GithubDB.post(`git/refs`, data)
+            GithubREST.post(`git/refs`, data)
                 .then((response) => {
                     resolve(response.data);
                 })
@@ -790,7 +727,7 @@ export default {
      */
     deleteATag: function (tagName) {
         return new Promise((resolve, reject) => {
-            GithubDB.delete(`git/refs/tags/${tagName}`)
+            GithubREST.delete(`git/refs/tags/${tagName}`)
                 .then((response) => {
                     resolve("Delete Success");
                 })
@@ -827,7 +764,7 @@ export default {
         };
 
         return new Promise((resolve, reject) => {
-            GithubDB.post(`releases`, data)
+            GithubREST.post(`releases`, data)
                 .then((response) => {
                     resolve(response.data);
                 })
@@ -856,7 +793,7 @@ export default {
      */
     getARelease: function (tagName) {
         return new Promise((resolve, reject) => {
-            GithubDB.get(`releases/tags/${tagName}`)
+            GithubREST.get(`releases/tags/${tagName}`)
                 .then(({ data }) => {
                     const {
                         html_url,
@@ -902,7 +839,7 @@ export default {
      */
     getAllReleases: function () {
         return new Promise((resolve, reject) => {
-            GithubDB.get(`releases`)
+            GithubREST.get(`releases`)
                 .then(({ data }) => {
                     const results = data.map((el) => {
                         const {
@@ -951,9 +888,9 @@ export default {
         const { id: tagId } = await this.getARelease(tagName);
 
         return new Promise((resolve, reject) => {
-            GithubDB.delete(`releases/${tagId}`)
+            GithubREST.delete(`releases/${tagId}`)
                 .then((response) => {
-                    resolve("Delete release Success");
+                    resolve("Delete release successfully");
                 })
                 .catch((err) => {
                     if (
@@ -977,13 +914,11 @@ export default {
         const branch = await this.getBranchInfo(branchName);
         const branchSHA = branch.commit.sha;
 
-        const since = dayjs("24/05/2022", "DD/MM/YYYY", true)
-            .toDate()
-            .toISOString();
+        const since = stringToDate("24/05/2022").toISOString();
         const until = new Date().toISOString();
 
         return new Promise((resolve, reject) => {
-            GithubDB.get(
+            GithubREST.get(
                 `commits?sha=${branchSHA}&since=${since}&until=${until}`
             )
                 .then((response) => {
