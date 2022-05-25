@@ -15,7 +15,7 @@ export default {
             res.status(200).json({ isExisted });
         } catch (err) {
             console.log(err);
-            return res.status(400).json(err);
+            return res.status(200).json(err);
         }
     },
     getDoc: async (req, res, next) => {
@@ -38,7 +38,7 @@ export default {
             return res.status(200).json(data);
         } catch (err) {
             console.log(err);
-            return res.status(400).json(err);
+            return res.status(200).json(err);
         }
     },
     createNewDoc: async (req, res, next) => {
@@ -72,7 +72,7 @@ export default {
             });
         } catch (err) {
             console.log(err);
-            return res.status(400).json(err);
+            return res.status(200).json(err);
         }
     },
     deleteDoc: async (req, res, next) => {
@@ -98,7 +98,7 @@ export default {
                 .json({ message: "Delete document successfully" });
         } catch (err) {
             console.log(err);
-            return res.status(400).json(err);
+            return res.status(200).json(err);
         }
     },
 };

@@ -1,13 +1,12 @@
 import dotenv from "dotenv";
 dotenv.config();
-
-const owner = process.env.REPO_OWNER;
-const repo = process.env.REPO_NAME;
-
 import GithubREST from "./rest.js";
 import GithubGraphQL from "./graphql.js";
 import { tryParse, getFileExtension, stringToDate } from "./utils.js";
 import { ERROR_CODES } from "../../constants/index.js";
+
+const owner = process.env.REPO_OWNER;
+const repo = process.env.REPO_NAME;
 
 export default {
     /**
