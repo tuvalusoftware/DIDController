@@ -7,6 +7,10 @@ export default {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
 
+        if (!companyName || !fileName) {
+            return res.status(400).json(ERROR_CODES.MISSING_PARAMETERS);
+        }
+
         try {
             const branchName = `DOC_${companyName}`;
             const isExisted = await GithubProxy.isExistedFile(
@@ -28,6 +32,10 @@ export default {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
 
+        if (!companyName || !fileName) {
+            return res.status(400).json(ERROR_CODES.MISSING_PARAMETERS);
+        }
+
         try {
             const branch = `DOC_${companyName}`;
             const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
@@ -48,6 +56,10 @@ export default {
     },
     createNewDoc: async (req, res, next) => {
         const { wrappedDocument, fileName, companyName } = req.body;
+
+        if (!companyName || !fileName) {
+            return res.status(400).json(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const branchName = `DOC_${companyName}`;
@@ -82,6 +94,10 @@ export default {
     deleteDoc: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
+
+        if (!companyName || !fileName) {
+            return res.status(400).json(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const branch = `DOC_${companyName}`;

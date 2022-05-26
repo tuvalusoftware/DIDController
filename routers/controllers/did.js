@@ -1,9 +1,14 @@
 import GithubProxy from "../../db/github/index.js";
+import { ERROR_CODES } from "../../constants/index.js";
 import Logger from "../../logger.js";
 
 export default {
     getAllDIDs: async (req, res, next) => {
         const companyName = req.header("companyName");
+
+        if (!companyName) {
+            return res.status(200).json(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const branch = `DID_${companyName}`;
@@ -34,6 +39,10 @@ export default {
         const companyName = req.header("companyName");
         const fileName = req.header("publicKey");
 
+        if (!companyName || !fileName) {
+            return res.status(200).json(ERROR_CODES.MISSING_PARAMETERS);
+        }
+
         try {
             const branch = `DID_${companyName}`;
             const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
@@ -60,6 +69,10 @@ export default {
     createNewDID: async (req, res, next) => {
         const { companyName, publicKey: fileName, content } = req.body;
 
+        if (!companyName || !fileName || !content) {
+            return res.status(400).json(ERROR_CODES.MISSING_PARAMETERS);
+        }
+
         try {
             const newBranch = `DID_${companyName}`;
             await GithubProxy.createBranchIfNotExist(newBranch);
@@ -85,6 +98,10 @@ export default {
     updateDID: async (req, res, next) => {
         const { companyName, publicKey: fileName, content } = req.body;
 
+        if (!companyName || !fileName || !content) {
+            return res.status(400).json(ERROR_CODES.MISSING_PARAMETERS);
+        }
+
         try {
             const newBranch = `DID_${companyName}`;
             await GithubProxy.createBranchIfNotExist(newBranch);
@@ -109,6 +126,10 @@ export default {
     deleteDID: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("publicKey");
+
+        if (!companyName || !fileName) {
+            return res.status(400).json(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const branch = `DID_${companyName}`;
