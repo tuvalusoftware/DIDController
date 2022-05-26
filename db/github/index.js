@@ -145,7 +145,6 @@ export default {
             GithubREST.get(`git/ref/heads/${branch}`)
                 .then((response) => resolve(response.data.object.sha))
                 .catch((err) => {
-                    console.log(err);
                     if (err.response.status === 404) {
                         return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
                     }

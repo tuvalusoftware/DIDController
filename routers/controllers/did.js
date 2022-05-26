@@ -21,7 +21,6 @@ export default {
 
             return res.status(200).json(result);
         } catch (err) {
-            console.log(err);
             return res.status(200).json(err);
         }
     },
@@ -44,7 +43,6 @@ export default {
 
             return res.status(200).json(data);
         } catch (err) {
-            console.log(err);
             return res.status(200).json(err);
         }
     },
@@ -66,7 +64,6 @@ export default {
                 .status(201)
                 .json({ message: "New DID created successfully" });
         } catch (err) {
-            console.log(err);
             return res.status(200).json(err);
         }
     },
@@ -86,7 +83,6 @@ export default {
 
             return res.status(200).json({ message: "Update DID successfully" });
         } catch (err) {
-            console.log(err);
             return res.status(200).json(err);
         }
     },
@@ -104,7 +100,6 @@ export default {
 
             return res.status(200).json({ message: "Delete success" });
         } catch (err) {
-            console.log(err);
             return res.status(400).json(err);
         }
     },

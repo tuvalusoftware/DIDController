@@ -15,7 +15,6 @@ export default {
 
             res.status(200).json({ isExisted });
         } catch (err) {
-            console.log(err);
             return res.status(200).json(err);
         }
     },
@@ -38,7 +37,6 @@ export default {
 
             return res.status(200).json(data);
         } catch (err) {
-            console.log(err);
             return res.status(200).json(err);
         }
     },
@@ -72,7 +70,6 @@ export default {
                 data: { message: "Create document success" },
             });
         } catch (err) {
-            console.log(err);
             return res.status(200).json(err);
         }
     },
@@ -98,7 +95,6 @@ export default {
                 .status(200)
                 .json({ message: "Delete document successfully" });
         } catch (err) {
-            console.log(err);
             return res.status(200).json(err);
         }
     },
