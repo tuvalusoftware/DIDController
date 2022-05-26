@@ -7,58 +7,62 @@ const ERROR_CODES = {
         errorCode: 1201,
         errorMessage: "Have-not-catch error given by github API.",
     },
-    CONFLICT_PUSH: {
+    BAD_CREDENTIALS: {
         errorCode: 1202,
+        errorMessage: "Github token is not provided or invalid.",
+    },
+    CONFLICT_PUSH: {
+        errorCode: 1203,
         errorMessage: "Asynchronous changes are pushed to the same branch.",
         cause: "Update/Create file",
     },
     FILE_EXISTED: {
-        errorCode: 1203,
+        errorCode: 1204,
         errorMessage: "File with the given name already exist.",
         cause: "Create a file",
     },
     FILE_NOT_EXISTED: {
-        errorCode: 1204,
+        errorCode: 1205,
         errorMessage: "File with the given name cannot be found.",
         cause: "Query a file",
     },
     FOLDER_NOT_EXISTED: {
-        errorCode: 1205,
+        errorCode: 1206,
         errorMessage: "Folder with the given name cannot be found.",
         cause: "Query a folder",
     },
     BRANCH_EXISTED: {
-        errorCode: 1206,
+        errorCode: 1207,
         errorMessage: "Branch with the given name already exist.",
         cause: "Create/Checkout new branch",
     },
     BRANCH_NOT_EXISTED: {
-        errorCode: 1207,
+        errorCode: 1208,
         errorMessage: "Branch with the given name cannot be found.",
         cause: "Query a branch",
     },
     REF_EXISTED: {
-        errorCode: 1208,
+        errorCode: 1209,
         errorMessage: "Reference is already exist.",
         cause: "Create a tag/release. A tag with the same name already exist",
     },
     REF_NOT_EXISTED: {
-        errorCode: 1209,
+        errorCode: 1210,
         errorMessage: "Reference cannot be found.",
         cause: "Query/Delete a tag/release.",
     },
     DATA_NOT_CHANGE: {
-        errorCode: 1210,
+        errorCode: 1211,
         errorMessage: "Content of file has not changed.",
         cause: "Update a file",
     },
     DELETE_MAIN: {
-        errorCode: 1211,
+        errorCode: 1212,
         errorMessage: "Branch 'main' cannot be deleted.",
         cause: "Someone try to delete branch main",
     },
     MISSING_PARAMETERS: {
-        errorCode: 1212,
+        errorCode: 1213,
         errorMessage:
             "Parameters in request body are missing. Please try again later.",
         cause: "Post request.",

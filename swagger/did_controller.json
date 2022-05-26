@@ -4,7 +4,7 @@
         "description": "DID Controller service",
         "title": "DID Controller"
     },
-    "host": "localhost:8080",
+    "host": "localhost:9000",
     "basePath": "/api",
     "schemes": ["http"],
     "tags": [
@@ -18,7 +18,7 @@
         }
     ],
     "paths": {
-        "/dids": {
+        "/did/all": {
             "get": {
                 "tags": ["DID"],
                 "summary": "Retrieve an array of DIDs from a company.",
@@ -37,7 +37,7 @@
                     "200": {
                         "description": "Return an array of DID object",
                         "schema": {
-                            "type": "Array",
+                            "type": "array",
                             "items": { "$ref": "#/definitions/DID_Object" }
                         }
                     },
@@ -164,7 +164,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Return an DID object",
                         "schema": {
                             "$ref": "#/definitions/SuccessResponse"
@@ -203,7 +203,7 @@
                 }
             }
         },
-        "/doc-exists": {
+        "/doc/exists": {
             "get": {
                 "tags": ["DOC"],
                 "summary": "Check if document with the given name already exists within the same company.",
