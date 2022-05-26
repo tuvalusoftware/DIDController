@@ -5,6 +5,7 @@ import swaggerUiExpress from "swagger-ui-express";
 import cors from "cors";
 
 import router from "./routers/index.js";
+import Logger from "./logger.js";
 
 const require = createRequire(import.meta.url);
 const services = require("./swagger/did_controller.json");
@@ -28,7 +29,7 @@ app.use("/api-cardano", swaggerUiExpress.serve, (...args) =>
 
 const port = 9000;
 app.listen(port, (req, res) => {
-    console.log(`Server is live on ${port}`);
+    Logger.info(`Server is live on port ${port}`);
 });
 
 export default app;

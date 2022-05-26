@@ -1,4 +1,5 @@
 import GithubProxy from "../../db/github/index.js";
+import Logger from "../../logger.js";
 import { mockCall } from "../../helpers/index.js";
 
 export default {
@@ -14,6 +15,11 @@ export default {
             );
 
             res.status(200).json({ isExisted });
+            Logger.apiInfo(
+                req,
+                res,
+                `Check the existence of '${fileName}' document from company ${companyName}`
+            );
         } catch (err) {
             return res.status(200).json(err);
         }
