@@ -1,8 +1,14 @@
 import GithubProxy from "../../db/github/index.js";
+import { ERROR_CODES } from "../../constants/index.js";
+import Logger from "../../logger.js";
 
 export default {
     getAllDIDs: async (req, res, next) => {
         const companyName = req.header("companyName");
+
+        if (!companyName) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const branch = `DID_${companyName}`;
@@ -19,15 +25,23 @@ export default {
                 name: did.name,
             }));
 
-            return res.status(200).json(result);
+            res.status(200).json(result);
+            Logger.apiInfo(
+                req,
+                res,
+                `Retrieve all DIDs from company ${companyName}`
+            );
         } catch (err) {
-            console.log(err);
-            return res.status(200).json(err);
+            next(err);
         }
     },
     getSingleDID: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("publicKey");
+
+        if (!companyName || !fileName) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const branch = `DID_${companyName}`;
@@ -42,14 +56,22 @@ export default {
 
             const data = { name: fileName, content: JSON.parse(fileData.text) };
 
-            return res.status(200).json(data);
+            res.status(200).json(data);
+            Logger.apiInfo(
+                req,
+                res,
+                `Retrieve DID '${fileName}' from company ${companyName}`
+            );
         } catch (err) {
-            console.log(err);
-            return res.status(200).json(err);
+            next(err);
         }
     },
     createNewDID: async (req, res, next) => {
         const { companyName, publicKey: fileName, content } = req.body;
+
+        if (!companyName || !fileName || !content) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const newBranch = `DID_${companyName}`;
@@ -62,37 +84,51 @@ export default {
                 `NEW: '${fileName}' DID Doc of company "${companyName}"`
             );
 
-            return res
-                .status(201)
-                .json({ message: "New DID created successfully" });
+            res.status(201).json({ message: "New DID created successfully" });
+            Logger.apiInfo(
+                req,
+                res,
+                `Create new DID with '${fileName}' from company ${companyName}`
+            );
         } catch (err) {
-            console.log(err);
-            return res.status(200).json(err);
+            next(err);
         }
     },
     updateDID: async (req, res, next) => {
         const { companyName, publicKey: fileName, content } = req.body;
 
+        if (!companyName || !fileName || !content) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
+
         try {
-            const newBranch = `DID_${companyName}`;
-            await GithubProxy.createBranchIfNotExist(newBranch);
+            const branch = `DID_${companyName}`;
+            await GithubProxy.getBranchInfo(branch);
 
             await GithubProxy.updateFile(
                 `${fileName}.did`,
                 content,
-                newBranch,
+                branch,
                 `UPDATE: '${fileName}' DID of company ${companyName}`
             );
 
-            return res.status(200).json({ message: "Update DID successfully" });
+            res.status(200).json({ message: "Update DID successfully" });
+            Logger.apiInfo(
+                req,
+                res,
+                `Update DID '${fileName}' from company ${companyName}`
+            );
         } catch (err) {
-            console.log(err);
-            return res.status(200).json(err);
+            next(err);
         }
     },
     deleteDID: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("publicKey");
+
+        if (!companyName || !fileName) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const branch = `DID_${companyName}`;
@@ -102,10 +138,14 @@ export default {
                 `DELETE: '${fileName}' DID of company ${companyName}`
             );
 
-            return res.status(200).json({ message: "Delete success" });
+            res.status(200).json({ message: "Delete success" });
+            Logger.apiInfo(
+                req,
+                res,
+                `Delete DID '${fileName}' from company ${companyName}`
+            );
         } catch (err) {
-            console.log(err);
-            return res.status(400).json(err);
+            next(err);
         }
     },
 };

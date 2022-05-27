@@ -1,10 +1,15 @@
 import GithubProxy from "../../db/github/index.js";
+import Logger from "../../logger.js";
 import { mockCall } from "../../helpers/index.js";
 
 export default {
     isExist: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
+
+        if (!companyName || !fileName) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const branchName = `DOC_${companyName}`;
@@ -14,14 +19,22 @@ export default {
             );
 
             res.status(200).json({ isExisted });
+            Logger.apiInfo(
+                req,
+                res,
+                `Check the existence of '${fileName}' document from company ${companyName}`
+            );
         } catch (err) {
-            console.log(err);
-            return res.status(200).json(err);
+            return next(err);
         }
     },
     getDoc: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
+
+        if (!companyName || !fileName) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const branch = `DOC_${companyName}`;
@@ -36,14 +49,22 @@ export default {
 
             const data = { content: JSON.parse(fileData.text) };
 
-            return res.status(200).json(data);
+            res.status(200).json(data);
+            Logger.apiInfo(
+                req,
+                res,
+                `Get document '${fileName}' from company ${companyName}`
+            );
         } catch (err) {
-            console.log(err);
-            return res.status(200).json(err);
+            next(err);
         }
     },
     createNewDoc: async (req, res, next) => {
         const { wrappedDocument, fileName, companyName } = req.body;
+
+        if (!companyName || !fileName) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const branchName = `DOC_${companyName}`;
@@ -71,14 +92,22 @@ export default {
             res.status(201).json({
                 data: { message: "Create document success" },
             });
+            Logger.apiInfo(
+                req,
+                res,
+                `Create new document '${fileName}' from company ${companyName}`
+            );
         } catch (err) {
-            console.log(err);
-            return res.status(200).json(err);
+            return next(err);
         }
     },
     deleteDoc: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
+
+        if (!companyName || !fileName) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
 
         try {
             const branch = `DOC_${companyName}`;
@@ -94,12 +123,14 @@ export default {
                 `DELETE: '${fileName}' DID of doc company ${companyName}`
             );
 
-            return res
-                .status(200)
-                .json({ message: "Delete document successfully" });
+            res.status(200).json({ message: "Delete document successfully" });
+            Logger.apiInfo(
+                req,
+                res,
+                `Delete document '${fileName}' from company ${companyName}`
+            );
         } catch (err) {
-            console.log(err);
-            return res.status(200).json(err);
+            next(err);
         }
     },
 };
