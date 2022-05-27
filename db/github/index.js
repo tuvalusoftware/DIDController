@@ -1,7 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
+
 import GithubREST from "./rest.js";
 import GithubGraphQL from "./graphql.js";
+import Logger from "../../logger.js";
 import { tryParse, getFileExtension, stringToDate } from "./utils.js";
 import { ERROR_CODES } from "../../constants/index.js";
 
@@ -20,11 +22,8 @@ export default {
                     resolve(response.data);
                 })
                 .catch((err) => {
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -74,7 +73,8 @@ export default {
                             return reject(ERROR_CODES.BRANCH_EXISTED);
                         }
 
-                        return reject(ERROR_CODES.GITHUB_API_ERROR);
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
                     }
                 });
         });
@@ -93,13 +93,10 @@ export default {
         return new Promise((resolve, reject) => {
             this.checkoutNewBranch(branchName, "empty_branch")
                 .then((data) => resolve(data))
-                .catch((err) =>
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    )
-                );
+                .catch((err) => {
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                });
         });
     },
     /**
@@ -116,11 +113,8 @@ export default {
                     resolve("Delete OK");
                 })
                 .catch((err) => {
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -145,14 +139,12 @@ export default {
             GithubREST.get(`git/ref/heads/${branch}`)
                 .then((response) => resolve(response.data.object.sha))
                 .catch((err) => {
-                    if (err.response.status === 404) {
+                    if (err.response?.status === 404) {
                         return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
                     }
-                    return reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -206,8 +198,8 @@ export default {
             GithubGraphQL.execute(queryString)
                 .then((res) => {
                     if (res.data.errors) {
-                        console.log(res.data.errors);
-                        return reject(ERROR_CODES.GITHUB_API_ERROR);
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
                     }
 
                     if (!res.data.data.repository.branch) {
@@ -224,13 +216,10 @@ export default {
 
                     resolve({ branches, totalCount, pageInfo });
                 })
-                .catch((err) =>
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    )
-                );
+                .catch((err) => {
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                });
         });
     },
     /**
@@ -268,11 +257,8 @@ export default {
 
                 resolve(results);
             } catch (err) {
-                return reject(
-                    err.response
-                        ? ERROR_CODES.GITHUB_API_ERROR
-                        : ERROR_CODES.UNKNOWN_ERROR
-                );
+                const errInfo = Logger.handleGithubError(err);
+                reject(errInfo);
             }
         });
     },
@@ -291,11 +277,8 @@ export default {
                 .catch((err) => {
                     if (err.response.status === 404) return resolve(false);
 
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -308,13 +291,10 @@ export default {
         return new Promise((resolve, reject) => {
             GithubREST.get(`git/blobs/${fileSHA}`)
                 .then((response) => resolve(response.data.content))
-                .catch((err) =>
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    )
-                );
+                .catch((err) => {
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                });
         });
     },
     /**
@@ -343,11 +323,14 @@ export default {
             GithubGraphQL.execute(queryString)
                 .then(async (response) => {
                     if (response.status !== 200) {
-                        return reject(ERROR_CODES.GITHUB_API_ERROR);
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
                     }
 
-                    if (!response.data.data)
-                        return reject(ERROR_CODES.GITHUB_API_ERROR);
+                    if (!response.data.data) {
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
+                    }
 
                     // Check content in result
                     if (response.data.data?.repository.object) {
@@ -368,13 +351,10 @@ export default {
                         resolve(data);
                     } else reject(ERROR_CODES.FILE_NOT_EXISTED);
                 })
-                .catch((err) =>
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    )
-                );
+                .catch((err) => {
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                });
         });
     },
     /**
@@ -418,7 +398,8 @@ export default {
             GithubGraphQL.execute(queryString)
                 .then((response) => {
                     if (response.status !== 200) {
-                        return reject(ERROR_CODES.GITHUB_API_ERROR);
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
                     }
 
                     const responseData = response.data.data.repository.object;
@@ -440,13 +421,10 @@ export default {
                         resolve(results);
                     }
                 })
-                .catch((err) =>
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    )
-                );
+                .catch((err) => {
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                });
         });
     },
     /**
@@ -503,16 +481,12 @@ export default {
                 })
                 .catch((err) => {
                     if (err.response) {
-                        // `\nStatus code: ${err.response.status}\nMessage: File ${path} is already exist\nAPI message: ${err.response.data.message}`
                         if (err.response.status === 422)
                             return reject(ERROR_CODES.FILE_EXISTED);
                     }
 
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -546,11 +520,8 @@ export default {
                     return resolve({ path, sha, size });
                 })
                 .catch((err) => {
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -577,12 +548,8 @@ export default {
             GithubREST.delete(`contents/${path}`, data)
                 .then((response) => resolve(response.data))
                 .catch((err) => {
-                    console.log(err);
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -621,11 +588,14 @@ export default {
             GithubGraphQL.execute(queryString)
                 .then((response) => {
                     if (response.status !== 200) {
-                        return reject(ERROR_CODES.GITHUB_API_ERROR);
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
                     }
 
-                    if (!response.data.data)
-                        return reject(ERROR_CODES.GITHUB_API_ERROR);
+                    if (!response.data.data) {
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
+                    }
 
                     // Check content in result
                     let results = response.data.data.repository.refs.edges;
@@ -637,12 +607,8 @@ export default {
                     resolve({ results, pageInfo });
                 })
                 .catch((err) => {
-                    console.log(err);
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -669,7 +635,8 @@ export default {
 
             return results;
         } catch (err) {
-            throw err;
+            const errInfo = Logger.handleGithubError(err);
+            throw errInfo;
         }
     },
     /**
@@ -686,13 +653,10 @@ export default {
                     if (!length) reject(ERROR_CODES.REF_NOT_EXISTED);
                     resolve(response.data);
                 })
-                .catch((err) =>
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    )
-                );
+                .catch((err) => {
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                });
         });
     },
     /**
@@ -722,11 +686,8 @@ export default {
                         return reject(ERROR_CODES.REF_EXISTED);
                     }
 
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -750,11 +711,8 @@ export default {
                         return reject(ERROR_CODES.REF_NOT_EXISTED);
                     }
 
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -779,8 +737,6 @@ export default {
                     resolve(response.data);
                 })
                 .catch((err) => {
-                    console.log(err.response.status);
-
                     if (
                         err.response?.status === 422 &&
                         err.response?.data.message
@@ -788,11 +744,8 @@ export default {
                         return reject(ERROR_CODES.REF_EXISTED);
                     }
 
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -835,11 +788,8 @@ export default {
                         return reject(ERROR_CODES.REF_NOT_EXISTED);
                     }
 
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -881,11 +831,8 @@ export default {
                         return reject(ERROR_CODES.REF_EXISTED);
                     }
 
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -911,11 +858,8 @@ export default {
                         return reject(ERROR_CODES.REF_NOT_EXISTED);
                     }
 
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },

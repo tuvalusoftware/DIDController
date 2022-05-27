@@ -8,7 +8,7 @@ export default {
         const fileName = req.header("fileName");
 
         if (!companyName || !fileName) {
-            return res.status(400).json(ERROR_CODES.MISSING_PARAMETERS);
+            return next(ERROR_CODES.MISSING_PARAMETERS);
         }
 
         try {
@@ -25,7 +25,7 @@ export default {
                 `Check the existence of '${fileName}' document from company ${companyName}`
             );
         } catch (err) {
-            return res.status(200).json(err);
+            return next(err);
         }
     },
     getDoc: async (req, res, next) => {
@@ -33,7 +33,7 @@ export default {
         const fileName = req.header("fileName");
 
         if (!companyName || !fileName) {
-            return res.status(400).json(ERROR_CODES.MISSING_PARAMETERS);
+            return next(ERROR_CODES.MISSING_PARAMETERS);
         }
 
         try {
@@ -49,16 +49,21 @@ export default {
 
             const data = { content: JSON.parse(fileData.text) };
 
-            return res.status(200).json(data);
+            res.status(200).json(data);
+            Logger.apiInfo(
+                req,
+                res,
+                `Get document '${fileName}' from company ${companyName}`
+            );
         } catch (err) {
-            return res.status(200).json(err);
+            next(err);
         }
     },
     createNewDoc: async (req, res, next) => {
         const { wrappedDocument, fileName, companyName } = req.body;
 
         if (!companyName || !fileName) {
-            return res.status(400).json(ERROR_CODES.MISSING_PARAMETERS);
+            return next(ERROR_CODES.MISSING_PARAMETERS);
         }
 
         try {
@@ -87,8 +92,13 @@ export default {
             res.status(201).json({
                 data: { message: "Create document success" },
             });
+            Logger.apiInfo(
+                req,
+                res,
+                `Create new document '${fileName}' from company ${companyName}`
+            );
         } catch (err) {
-            return res.status(200).json(err);
+            return next(err);
         }
     },
     deleteDoc: async (req, res, next) => {
@@ -96,7 +106,7 @@ export default {
         const fileName = req.header("fileName");
 
         if (!companyName || !fileName) {
-            return res.status(400).json(ERROR_CODES.MISSING_PARAMETERS);
+            return next(ERROR_CODES.MISSING_PARAMETERS);
         }
 
         try {
@@ -113,11 +123,14 @@ export default {
                 `DELETE: '${fileName}' DID of doc company ${companyName}`
             );
 
-            return res
-                .status(200)
-                .json({ message: "Delete document successfully" });
+            res.status(200).json({ message: "Delete document successfully" });
+            Logger.apiInfo(
+                req,
+                res,
+                `Delete document '${fileName}' from company ${companyName}`
+            );
         } catch (err) {
-            return res.status(200).json(err);
+            next(err);
         }
     },
 };

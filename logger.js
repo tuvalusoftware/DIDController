@@ -1,10 +1,11 @@
 import { createLogger, format, transports } from "winston";
+import { ERROR_CODES } from "./constants/index.js";
 
 const customLogLevel = (logLevel) => {
     return {
         error: "⛔️ ERROR",
         warn: "⚠️ WARN",
-        info: "ℹ️ INFO",
+        info: "🆕 INFO",
     }[logLevel];
 };
 
@@ -39,5 +40,26 @@ export default {
     },
     apiInfo(req, res, message) {
         logger.info(`[${req.method} - ${req.originalUrl}] ${message}`);
+    },
+    apiError(err, req, res) {
+        logger.error(`[${req.method} - ${req.originalUrl}] ${err.message}`);
+    },
+    handleGithubError(err) {
+        if (err.response) {
+            if (
+                err.response.status === 401 &&
+                err.response.data.message === "Bad credentials"
+            ) {
+                return ERROR_CODES.BAD_CREDENTIALS;
+            }
+
+            logger.error(
+                `Uncaught when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
+            );
+            return ERROR_CODES.GITHUB_API_ERROR;
+        } else {
+            logger.error(`Uncaught error: ${err.message}`);
+            return ERROR_CODES.UNKNOWN_ERROR;
+        }
     },
 };
