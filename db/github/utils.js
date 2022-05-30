@@ -39,7 +39,7 @@ const stringToDate = (dateStr) => {
  * @returns {Boolean} True if exists
  */
 const isExistsKey = (key, obj) => {
-    return obj?.key !== undefined;
+    return obj[key] !== undefined;
 };
 
 export { tryParse, getFileExtension, stringToDate, isExistsKey };

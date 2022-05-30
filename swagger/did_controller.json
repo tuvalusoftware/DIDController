@@ -4,7 +4,7 @@
         "description": "DID Controller service",
         "title": "DID Controller"
     },
-    "host": "localhost:9000",
+    "host": "localhost:8000",
     "basePath": "/api",
     "schemes": ["http"],
     "tags": [
@@ -108,8 +108,9 @@
                                     "required": true,
                                     "type": "object",
                                     "example": {
-                                        "date": "10-10-2000",
-                                        "issuer": "123123abcd"
+                                        "controller": "123abcd",
+                                        "id": "did:some_string:company:publicKey",
+                                        "date": "10-10-2000"
                                     }
                                 }
                             }
