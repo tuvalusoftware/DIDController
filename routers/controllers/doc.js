@@ -84,6 +84,8 @@ export default {
                 {
                     controller: ownerPublicKey,
                     did: `did:some_string:${companyName}:${ownerPublicKey}`,
+                    docController: ownerPublicKey,
+                    url: `${fileName}.document`,
                 },
                 branchName,
                 `NEW: '${fileName}' DID for new document from company ${companyName}`
