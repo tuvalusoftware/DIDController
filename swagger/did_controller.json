@@ -35,10 +35,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Return an array of DID object",
+                        "description": "Return an array of DID filename",
                         "schema": {
                             "type": "array",
-                            "items": { "$ref": "#/definitions/DID_Object" }
+                            "example": ["example1.did", "example2.did"]
                         }
                     },
                     "404": { "description": "Do not exist" }

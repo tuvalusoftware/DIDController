@@ -378,15 +378,6 @@ export default {
                             name
                             type
                             mode
-                            
-                            object {
-                                ... on Blob {
-                                    byteSize
-                                    text
-                                    isBinary
-                                    oid
-                                }
-                            }
                         }
                     }
                 }
