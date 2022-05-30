@@ -3,39 +3,49 @@ import chaiHttp from "chai-http";
 
 import GithubProxy from "../db/github/index.js";
 import server from "../server.js";
+import { ERROR_CODES } from "../constants/index.js";
 
 let should = chai.should();
+let expect = chai.expect;
 chai.use(chaiHttp);
 
 const TEST_BRANCH = "MOCHA_TESTING";
+const INVALID_DATA = {
+    companyName: TEST_BRANCH,
+    publicKey: "public_key_invalid",
+    content: {},
+};
 const TEST_DATA = {
     companyName: TEST_BRANCH,
     publicKey: "public_key",
     content: {
+        controller: "123abcd",
+        id: "did:some_string:company:publicKey",
         date: "10-10-2000",
-        issuer: "123123abcd",
     },
 };
 const TEST_DATA2 = {
     companyName: TEST_BRANCH,
     publicKey: "public_key_2",
     content: {
-        date: "10-10-2000",
-        issuer: "123123abcd",
+        controller: "345abcd",
+        id: "did:some_string:company:publicKey",
+        date: "10-10-2022",
     },
 };
 const UPDATED_DATA = {
     companyName: TEST_BRANCH,
     publicKey: "public_key_2",
     content: {
+        controller: "123abcd",
+        id: "did:some_string:company:publicKey",
         date: "10-10-2000",
-        issuer: "123123abcd",
         updated: true,
     },
 };
 
 describe("DID", function () {
-    this.timeout(10000);
+    this.timeout(0);
 
     before(async () => {
         await GithubProxy.deleteBranchIfExist(`DID_${TEST_BRANCH}`);
@@ -68,8 +78,11 @@ describe("DID", function () {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
                     res.body.should.have
-                        .property("errorMessage")
-                        .eql("File with the given name already exist.");
+                        .property("errorCode")
+                        .eql(ERROR_CODES.FILE_NAME_EXISTED.errorCode);
+                    res.body.should.have
+                        .property("message")
+                        .eql(ERROR_CODES.FILE_NAME_EXISTED.message);
 
                     done();
                 });
@@ -87,6 +100,22 @@ describe("DID", function () {
                     done();
                 });
         });
+
+        // Save DID with invalid content
+        it("it should return an 'invalid content' message", (done) => {
+            chai.request(server)
+                .post("/api/did")
+                .send(INVALID_DATA)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.DID_CONTENT_INVALID)
+                    );
+
+                    done();
+                });
+        });
     });
 
     describe("/GET get did", () => {
@@ -99,10 +128,9 @@ describe("DID", function () {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
-                    res.body.should.have.property("content");
                     res.body.should.have
-                        .property("name")
-                        .eql(TEST_DATA.publicKey);
+                        .property("content")
+                        .eql(TEST_DATA.content);
 
                     done();
                 });
@@ -117,6 +145,13 @@ describe("DID", function () {
                     res.should.have.status(200);
                     res.body.should.be.a("array");
                     res.body.length.should.be.eql(2);
+
+                    const nameArr = [TEST_DATA, TEST_DATA2].map(
+                        (data) => `${data.publicKey}.did`
+                    );
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(nameArr)
+                    );
 
                     done();
                 });
@@ -145,14 +180,13 @@ describe("DID", function () {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
-                    res.body.should.have.property("content");
+                    res.body.should.have
+                        .property("content")
+                        .eql(UPDATED_DATA.content);
                     res.body.should.have
                         .property("name")
                         .eql(TEST_DATA2.publicKey);
 
-                    res.body.content.should.have.property("updated").eql(true);
-
-                    if (err) console.log(err);
                     done();
                 });
         });
@@ -172,15 +206,18 @@ describe("DID", function () {
                 });
         });
 
-        // Get all DID
-        it("it should GET an array with length 1", (done) => {
+        // Get a single DID that not exist
+        it("it should return an error state that file not exists", (done) => {
             chai.request(server)
-                .get("/api/did/all")
-                .set("companyName", TEST_BRANCH)
+                .get("/api/did")
+                .set("companyName", TEST_DATA.companyName)
+                .set("publicKey", TEST_DATA.publicKey)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.should.be.a("array");
-                    res.body.length.should.be.eql(1);
+                    res.body.should.be.a("object");
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_NOT_FOUND)
+                    );
 
                     done();
                 });

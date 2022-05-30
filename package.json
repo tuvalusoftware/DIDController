@@ -6,10 +6,10 @@
     "main": "index.js",
     "scripts": {
         "main": "npx nodemon main.js",
-        "server": "npx nodemon server.js",
+        "start": "npx nodemon server.js",
         "test-did": "mocha ./test/did.test.js",
         "test-doc": "mocha ./test/doc.test.js",
-        "test": "mocha"
+        "test": "export NODE_ENV=test && mocha"
     },
     "repository": {
         "type": "git",
