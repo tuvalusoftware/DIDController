@@ -32,4 +32,14 @@ const stringToDate = (dateStr) => {
     return dayjs(dateStr, "DD/MM/YYYY", true).toDate();
 };
 
-export { tryParse, getFileExtension, stringToDate };
+/**
+ * @description Check if key exists in object
+ * @param {String} key value of a key
+ * @param {Object} obj An object
+ * @returns {Boolean} True if exists
+ */
+const isExistsKey = (key, obj) => {
+    return obj?.key !== undefined;
+};
+
+export { tryParse, getFileExtension, stringToDate, isExistsKey };

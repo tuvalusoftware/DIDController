@@ -81,6 +81,11 @@ const ERROR_CODES = {
         errorCode: 1216,
         message: "File/Public Key with the given value already exists.",
     },
+    DID_CONTENT_INVALID: {
+        errorCode: 1217,
+        message:
+            "Contents of DID doc miss some important keys. Please try again.",
+    },
 };
 
 export { ERROR_CODES };
