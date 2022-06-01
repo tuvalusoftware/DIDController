@@ -9,7 +9,8 @@
         "start": "npx nodemon server.js",
         "test-did": "mocha ./test/did.test.js",
         "test-doc": "mocha ./test/doc.test.js",
-        "test": "export NODE_ENV=test && mocha"
+        "test": "export NODE_ENV=test && mocha --exit",
+        "coverage": "nyc --all npm test"
     },
     "repository": {
         "type": "git",
@@ -38,7 +39,9 @@
     "devDependencies": {
         "chai": "^4.3.6",
         "chai-http": "^4.3.0",
+        "istanbul": "^0.4.5",
         "mocha": "^10.0.0",
-        "nodemon": "^2.0.16"
+        "nodemon": "^2.0.16",
+        "nyc": "^15.1.0"
     }
 }
