@@ -50,7 +50,7 @@ app.use("/api-cardano", swaggerUiExpress.serve, (...args) =>
     swaggerUiExpress.setup(cardanoServices)(...args)
 );
 
-const port = 8000;
+const port = 9000;
 app.listen(port, (req, res) => {
     Logger.info(`Server is live on port ${port}`);
 });
