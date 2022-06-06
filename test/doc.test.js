@@ -3,8 +3,10 @@ import chaiHttp from "chai-http";
 
 import GithubProxy from "../db/github/index.js";
 import server from "../server.js";
+import { ERROR_CODES } from "../constants/index.js";
 
 let should = chai.should();
+let expect = chai.expect;
 chai.use(chaiHttp);
 
 const TEST_BRANCH = "MOCHA_TESTING";
@@ -39,6 +41,8 @@ const TEST_DATA = {
     fileName: "file_name",
 };
 
+const EMPTY_DATA = {};
+
 describe("DOC", function () {
     this.timeout(10000);
 
@@ -61,6 +65,22 @@ describe("DOC", function () {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
                     res.body.should.have.property("isExisted").eql(false);
+
+                    done();
+                });
+        });
+
+        // Create new DOC with invalid data
+        it("it should return a error message as the post data is invalid", (done) => {
+            chai.request(server)
+                .post("/api/doc")
+                .send(EMPTY_DATA)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.MISSING_PARAMETERS)
+                    );
 
                     done();
                 });

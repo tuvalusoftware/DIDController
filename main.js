@@ -32,7 +32,16 @@ const main = async () => {
         // });
         // console.log(newFiles);
 
-        await GithubDB.deleteBranchIfExist("DID_MOCHA_TESTING");
+        // await GithubDB.deleteBranchIfExist("DID_MOCHA_TESTING");
+
+        const data = await GithubDB.checkoutNewBranch(
+            "branch_new",
+            "empty_branch"
+        );
+
+        console.log(data);
+
+        // await
     } catch (err) {
         console.log("ERROR from MAIN.JS: ", err);
     }
