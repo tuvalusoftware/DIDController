@@ -307,6 +307,26 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "exclude",
+                        "in": "query",
+                        "description": "Description for what to EXCLUDE the return value. If empty return both wrapped document and did document of the document.",
+                        "enum": ["doc", "did"],
+                        "example": "doc",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "did": {
+                                "value": "did",
+                                "summary": "Exclude the did document. Return value will only contains the wrapped document."
+                            },
+                            "max": {
+                                "value": "doc",
+                                "summary": "Exclude the wrapped document. Return value will only contains the did document."
+                            }
+                        }
                     }
                 ],
                 "responses": {
