@@ -113,4 +113,81 @@ describe("DOC", function () {
                 });
         });
     });
+
+    describe("/GET fetch document", () => {
+        it("it should return 'true' because file had been created", (done) => {
+            chai.request(server)
+                .get("/api/doc/exists")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", TEST_DATA.fileName)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+                    res.body.should.have.property("isExisted").eql(true);
+
+                    done();
+                });
+        });
+
+        it("it should GET both the wrapped document and the did doc of the document", (done) => {
+            chai.request(server)
+                .get("/api/doc")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", TEST_DATA.fileName)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+                    res.body.should.have
+                        .property("wrappedDoc")
+                        .eql(TEST_DATA.wrappedDocument);
+
+                    res.body.should.have.property("didDoc");
+                    res.body.didDoc.should.have.property("controller");
+                    res.body.didDoc.should.have.property("docController");
+                    res.body.didDoc.should.have
+                        .property("url")
+                        .eql(`${TEST_DATA.fileName}.document`);
+                    res.body.didDoc.should.have.property("did");
+
+                    done();
+                });
+        });
+
+        it("it should GET only the wrapped document as the flag indicates to exclude the did doc", (done) => {
+            chai.request(server)
+                .get("/api/doc?exclude=did")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", TEST_DATA.fileName)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+                    res.body.should.have
+                        .property("wrappedDoc")
+                        .eql(TEST_DATA.wrappedDocument);
+
+                    done();
+                });
+        });
+
+        it("it should GET only the did document of the wrapped document as the flag indicates to exclude the wrapped document", (done) => {
+            chai.request(server)
+                .get("/api/doc?exclude=doc")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", TEST_DATA.fileName)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    res.body.should.have.property("didDoc");
+                    res.body.didDoc.should.have.property("controller");
+                    res.body.didDoc.should.have.property("docController");
+                    res.body.didDoc.should.have
+                        .property("url")
+                        .eql(`${TEST_DATA.fileName}.document`);
+                    res.body.didDoc.should.have.property("did");
+
+                    done();
+                });
+        });
+    });
 });
