@@ -311,18 +311,21 @@
                     {
                         "name": "exclude",
                         "in": "query",
-                        "description": "Description for what to EXCLUDE the return value. If empty return both wrapped document and did document of the document.",
-                        "enum": ["doc", "did"],
-                        "example": "doc",
+                        "description": "Description for what to EXCLUDE in the return value",
+                        "enum": ["doc", "did", ""],
                         "schema": {
                             "type": "string"
                         },
                         "examples": {
+                            "empty": {
+                                "value": "",
+                                "summary": "Return both wrapped document and did document of the document."
+                            },
                             "did": {
                                 "value": "did",
                                 "summary": "Exclude the did document. Return value will only contains the wrapped document."
                             },
-                            "max": {
+                            "doc": {
                                 "value": "doc",
                                 "summary": "Exclude the wrapped document. Return value will only contains the did document."
                             }
@@ -335,7 +338,15 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/WrappedDocument"
+                                    "type": "object",
+                                    "properties": {
+                                        "wrappedDoc": {
+                                            "$ref": "#/components/schemas/WrappedDocument"
+                                        },
+                                        "didDoc": {
+                                            "$ref": "#/components/schemas/DID_Doc"
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -471,6 +482,27 @@
                         "targetHash": "11d456db211d68cc8a6eac5e293422dec669b54812e4975497d7099467335987",
                         "proof": [],
                         "merkleRoot": "11d456db211d68cc8a6eac5e293422dec669b54812e4975497d7099467335987"
+                    }
+                }
+            },
+            "DID_Doc": {
+                "type": "object",
+                "properties": {
+                    "did": {
+                        "type": "string",
+                        "example": "did:string:string:string"
+                    },
+                    "controller": {
+                        "type": "string",
+                        "example": "public_key"
+                    },
+                    "docController": {
+                        "type": "string",
+                        "example": "public_key"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "example": "fileName.document"
                     }
                 }
             },
