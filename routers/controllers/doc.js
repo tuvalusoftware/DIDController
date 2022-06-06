@@ -37,20 +37,38 @@ export default {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
 
+        const exclude = req.query.exclude || "none";
+
         try {
             const branch = `DOC_${companyName}`;
             const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
                 branch
             );
 
-            const fileData = await GithubProxy.getFile(
-                `${fileName}.document`,
-                lastCommitOfBranch
-            );
+            let returnValue = {};
 
-            const data = { content: JSON.parse(fileData.text) };
+            const wrappedDoc =
+                exclude !== "doc"
+                    ? await GithubProxy.getFile(
+                          `${fileName}.document`,
+                          lastCommitOfBranch
+                      )
+                    : null;
 
-            res.status(200).json(data);
+            wrappedDoc &&
+                (returnValue.wrappedDoc = JSON.parse(wrappedDoc.text));
+
+            const didDoc =
+                exclude !== "did"
+                    ? await GithubProxy.getFile(
+                          `${fileName}.did`,
+                          lastCommitOfBranch
+                      )
+                    : null;
+
+            didDoc && (returnValue.didDoc = JSON.parse(didDoc.text));
+
+            res.status(200).json(returnValue);
             Logger.apiInfo(
                 req,
                 res,
