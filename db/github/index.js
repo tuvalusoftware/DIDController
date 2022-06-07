@@ -110,7 +110,7 @@ export default {
 
             GithubREST.delete(`git/refs/heads/${branch}`)
                 .then((response) => {
-                    resolve("Delete OK");
+                    resolve(true);
                 })
                 .catch((err) => {
                     const errInfo = Logger.handleGithubError(err);

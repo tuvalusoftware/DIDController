@@ -7,8 +7,9 @@
     "scripts": {
         "main": "npx nodemon main.js",
         "start": "npx nodemon server.js",
-        "test-did": "export NODE_ENV=test && mocha ./test/did.test.js",
-        "test-doc": "export NODE_ENV=test && mocha ./test/doc.test.js",
+        "test-did": "export NODE_ENV=test && mocha ./test/did.test.js --exit",
+        "test-doc": "export NODE_ENV=test && mocha ./test/doc.test.js --exit",
+        "test-github": "export NODE_ENV=test && mocha ./test/github.test.js --exit",
         "test": "export NODE_ENV=test && mocha --exit",
         "coverage": "nyc --all npm test"
     },
