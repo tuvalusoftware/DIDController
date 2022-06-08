@@ -76,6 +76,14 @@ export default {
                 return ERROR_CODES.BAD_CREDENTIALS;
             }
 
+            if (
+                err.response.status === 409 &&
+                err.response.data.message.includes("is at") &&
+                err.response.data.message.includes("but expected")
+            ) {
+                return ERROR_CODES.CONFLICT_PUSH;
+            }
+
             infoLogger.error(
                 `Uncaught when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
             );
