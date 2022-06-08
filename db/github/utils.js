@@ -24,6 +24,30 @@ const getFileExtension = (filePath) =>
     filePath.substring(filePath.lastIndexOf(".") + 1, filePath.length) || null;
 
 /**
+ * @description Check if there is any same element between 2 arrays
+ * @param {Array} arr1
+ * @param {Array} arr2
+ * @returns {Boolean}
+ */
+const haveCommonElement = (arr1, arr2) => {
+    return arr1.some((element) => {
+        return arr2.includes(element);
+    });
+};
+
+/**
+ * @description Check if every element from a small array contains in a big array
+ * @param {Array} bigArr array with more element
+ * @param {Array} smallArr array with less elememt
+ * @returns {Boolean}
+ */
+const containAllElement = (bigArr, smallArr) => {
+    return smallArr.every((element) => {
+        return bigArr.includes(element);
+    });
+};
+
+/**
  * @description Convert a 'DD/MM/YYYY' string to a datetime object (the time will be at 0:00 AM)
  * @param {String} dateStr string with format "DD/MM/YYYY"
  * @returns {Date}
@@ -42,4 +66,11 @@ const isExistsKey = (key, obj) => {
     return obj[key] !== undefined;
 };
 
-export { tryParse, getFileExtension, stringToDate, isExistsKey };
+export {
+    containAllElement,
+    haveCommonElement,
+    tryParse,
+    getFileExtension,
+    stringToDate,
+    isExistsKey,
+};
