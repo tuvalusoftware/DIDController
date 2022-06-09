@@ -172,7 +172,7 @@ export default {
                     branch: ref(qualifiedName: "${branchName}") {
                         target {
                             ... on Commit {
-                                history(first: ${deep}, ${fileExpr}, ${pagination}}) {
+                                history(first: ${deep}, ${fileExpr}, ${pagination}) {
                                     totalCount
                                     edges {
                                         node {
@@ -198,8 +198,10 @@ export default {
             GithubGraphQL.execute(queryString)
                 .then((res) => {
                     if (res.data.errors) {
-                        const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
+                        const errInfo = Logger.handleGithubError(
+                            res.data.errors
+                        );
+                        return reject(errInfo);
                     }
 
                     if (!res.data.data.repository.branch) {
@@ -209,12 +211,12 @@ export default {
                     const { totalCount, pageInfo } =
                         res.data.data.repository.branch.target.history;
 
-                    const branches =
+                    const history =
                         res.data.data.repository.branch.target.history.edges.map(
-                            (branch) => ({ ...branch.node })
+                            (el) => ({ ...el.node })
                         );
 
-                    resolve({ branches, totalCount, pageInfo });
+                    resolve({ history, totalCount, pageInfo });
                 })
                 .catch((err) => {
                     const errInfo = Logger.handleGithubError(err);
@@ -241,14 +243,14 @@ export default {
 
             try {
                 while (numElements > 0) {
-                    const { branches, pageInfo } = await this._getCommitHistory(
+                    const { history, pageInfo } = await this._getCommitHistory(
                         numElements <= 100 ? numElements : 100,
                         branchName,
                         filePath,
                         cursor
                     );
 
-                    results = [...results, ...branches];
+                    results = [...results, ...history];
                     if (!pageInfo.hasNextPage) break;
 
                     cursor = pageInfo.endCursor;
@@ -257,8 +259,7 @@ export default {
 
                 resolve(results);
             } catch (err) {
-                const errInfo = Logger.handleGithubError(err);
-                reject(errInfo);
+                reject(err);
             }
         });
     },

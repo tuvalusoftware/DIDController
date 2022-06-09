@@ -91,9 +91,22 @@ export default {
                 `Uncaught when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
             );
             return ERROR_CODES.GITHUB_API_ERROR;
+        } else if (Array.isArray(err)) {
+            const errors = err;
+            errors.forEach((error) => {
+                infoLogger.error(
+                    `Uncaught when call Github API error: Error message: ${error.message}`
+                );
+                debugLogger.error(
+                    `Uncaught when call Github API error: ${JSON.stringify(
+                        error
+                    )}`
+                );
+            });
+            return ERROR_CODES.GITHUB_API_ERROR;
         } else {
-            infoLogger.error(`Uncaught error: ${err.message}`);
-            debugLogger.error(`Uncaught error: ${err.message}`);
+            infoLogger.error(`Uncaught error: ${JSON.stringify(err)}`);
+            debugLogger.error(`Uncaught error: ${JSON.stringify(err)}`);
             return ERROR_CODES.UNKNOWN_ERROR;
         }
     },
