@@ -4,4 +4,6 @@ logs/
 package-lock.json
 .env
 .DS_Store
-.nyc_output/
+
+# Coverage output folder
+coverage/ 
