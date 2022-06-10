@@ -40,7 +40,7 @@ const ERROR_CODES = {
     },
     REF_EXISTED: {
         errorCode: 1208,
-        message: "Reference is already exist.",
+        message: "Reference already exist.",
         cause: "Create a tag/release. A tag with the same name already exist",
     },
     REF_NOT_EXISTED: {
@@ -58,31 +58,40 @@ const ERROR_CODES = {
         message: "Branch 'main' cannot be deleted.",
         cause: "Someone try to delete branch main",
     },
-
-    // Server Error
-    UNKNOWN_ERROR: {
+    INVALID_REF_NAME: {
         errorCode: 1212,
+        message: "Name is invalid (should be like v0.0.1).",
+        cause: "Create a tag or a release",
+    },
+    INVALID_GIT_OBJECT_ID: {
+        errorCode: 1213,
+        message: "Git object ID provided is not valid.",
+    },
+
+    // Server Error (Human readable error messages)
+    UNKNOWN_ERROR: {
+        errorCode: 10001,
         message: "Something went wrong!",
     },
     MISSING_PARAMETERS: {
-        errorCode: 1213,
+        errorCode: 10002,
         message:
             "Parameters in request body or header are missing. Please try again later.",
     },
     COMPANY_NOT_FOUND: {
-        errorCode: 1214,
+        errorCode: 10003,
         message: "Company with the given name cannot be found.",
     },
     FILE_NOT_FOUND: {
-        errorCode: 1215,
+        errorCode: 10004,
         message: "File/Public Key with the given value cannot be found.",
     },
     FILE_NAME_EXISTED: {
-        errorCode: 1216,
+        errorCode: 10005,
         message: "File/Public Key with the given value already exists.",
     },
     DID_CONTENT_INVALID: {
-        errorCode: 1217,
+        errorCode: 10006,
         message:
             "Contents of DID doc miss some important keys. Please try again.",
     },

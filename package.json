@@ -11,7 +11,7 @@
         "test-doc": "export NODE_ENV=test && mocha ./test/doc.test.js --exit",
         "test-github": "export NODE_ENV=test && mocha ./test/github/**.test.js --exit",
         "test": "export NODE_ENV=test && mocha --recursive --exit",
-        "coverage": "c8 --check-coverage npm test"
+        "coverage": "c8 --check-coverage --lines 85 npm test"
     },
     "repository": {
         "type": "git",

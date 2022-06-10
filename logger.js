@@ -93,9 +93,27 @@ export default {
 
             if (
                 err.response?.status === 422 &&
-                err.response?.data.message.includes("is not a valid name")
+                err.response?.data.message.includes("is not a valid ref name")
             ) {
                 return ERROR_CODES.INVALID_REF_NAME;
+            }
+
+            if (
+                err.response?.status === 422 &&
+                err.response?.data.message.includes("Invalid request") &&
+                err.response?.data.message.includes("For 'properties/sha'") &&
+                err.response?.data.message.includes("is not a string")
+            ) {
+                return ERROR_CODES.INVALID_GIT_OBJECT_ID;
+            }
+
+            if (
+                err.response?.status === 422 &&
+                err.response?.data.message.includes(
+                    "At least 40 characters are required; only 13 were supplied"
+                )
+            ) {
+                return ERROR_CODES.INVALID_GIT_OBJECT_ID;
             }
 
             infoLogger.error(
