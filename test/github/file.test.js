@@ -242,7 +242,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
         });
     });
 
-    describe("Check for commit history of a branch", () => {
+    describe("Check for commit history", () => {
         it("it should return the commit history of a branch in newest to oldest order", async () => {
             const data = await GithubProxy.getCommitHistory(
                 5,
