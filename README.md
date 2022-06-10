@@ -24,6 +24,6 @@
 
 ## All The API
 
-You can view all the API by visiting the swagger UI after run the server.
+You can view all the API by visiting the swagger UI after start the server.
 
-Here is the link to Github Proxy API [http://localhost:8000/api-docs/](http://localhost:8000/api-docs/#/)
+Here is the link to Github Proxy API [http://localhost:9000/api-docs/](http://localhost:9000/api-docs/#/)
