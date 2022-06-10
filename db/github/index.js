@@ -12,6 +12,24 @@ const repo = process.env.REPO_NAME;
 
 export default {
     /**
+     *
+     * @param {String} sha Git Object Id (could be blob, tree, commit)
+     * @param {String} type Type of git object (default to 'blob')
+     * @returns {Object} Information of a git object
+     */
+    get: function (sha, type = "blob") {
+        return new Promise((resolve, reject) => {
+            GithubREST.get(`git/${type}s/${sha}`)
+                .then((response) => {
+                    resolve(response.data);
+                })
+                .catch((err) => {
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                });
+        });
+    },
+    /**
      * @description Get the info of all branches from a repo
      * @returns {Promise} All branches from a repo
      */
@@ -34,14 +52,24 @@ export default {
      */
     getBranchInfo: function (branchName = "main") {
         return new Promise((resolve, reject) => {
-            this.getAllBranches().then((branches) => {
-                const branch =
-                    branches.find((br) => br.name === branchName) || null;
+            GithubREST.get(`branches/${branchName}`)
+                .then((response) => {
+                    const { name, commit } = response.data;
+                    resolve({ name, commit });
+                })
+                .catch((err) => {
+                    if (err.response) {
+                        if (
+                            err.response.status === 404 &&
+                            err.response.data.message === "Branch not found"
+                        ) {
+                            return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
+                        }
+                    }
 
-                return branch
-                    ? resolve(branch)
-                    : reject(ERROR_CODES.BRANCH_NOT_EXISTED);
-            });
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                });
         });
     },
     /**
@@ -61,7 +89,13 @@ export default {
 
             GithubREST.post(`git/refs`, data)
                 .then((res) => {
-                    resolve(res.data);
+                    const { ref, object: commit } = res.data;
+
+                    if (ref.includes(newBranchName)) {
+                        return resolve({ name: newBranchName, commit });
+                    }
+
+                    throw ERROR_CODES.GITHUB_API_ERROR;
                 })
                 .catch((err) => {
                     if (err.response) {
@@ -72,10 +106,10 @@ export default {
                         ) {
                             return reject(ERROR_CODES.BRANCH_EXISTED);
                         }
-
-                        const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
                     }
+
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -323,14 +357,9 @@ export default {
         return new Promise((resolve, reject) => {
             GithubGraphQL.execute(queryString)
                 .then(async (response) => {
-                    if (response.status !== 200) {
+                    if (response.status !== 200 || !response.data.data) {
                         const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
-                    }
-
-                    if (!response.data.data) {
-                        const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
+                        return reject(errInfo);
                     }
 
                     // Check content in result
@@ -643,7 +672,7 @@ export default {
                     const { length } = response.data;
 
                     if (!length) reject(ERROR_CODES.REF_NOT_EXISTED);
-                    resolve(response.data);
+                    resolve(response.data[0]);
                 })
                 .catch((err) => {
                     const errInfo = Logger.handleGithubError(err);
@@ -654,12 +683,10 @@ export default {
     /**
      * Create a tag by pointing to a commit
      * @param {String} tagName name of the tag
-     * @param {String} commitSHA commit ID
+     * @param {String} sha git object id (could be commit, blob, tree)
      * @returns {Promise} Tag object
      */
-    tagACommit: async function (tagName, commitSHA = null) {
-        const sha = commitSHA ? commitSHA : await this.getLastCommitSHA();
-
+    tag: async function (tagName, sha) {
         const data = {
             ref: `refs/tags/${tagName}`,
             sha,
@@ -671,13 +698,6 @@ export default {
                     resolve(response.data);
                 })
                 .catch((err) => {
-                    if (
-                        err.response?.status === 422 &&
-                        err.response?.data.message
-                    ) {
-                        return reject(ERROR_CODES.REF_EXISTED);
-                    }
-
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);
                 });

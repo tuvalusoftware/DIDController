@@ -66,11 +66,8 @@ describe("GITHUB INTERACTION --- Branch", function () {
         it("it should create a new branch and return its info", async () => {
             const data = await GithubProxy.checkoutNewBranch(MAIN_TEST_BRANCH);
 
-            expect(data)
-                .to.have.property("ref")
-                .equal(`refs/heads/${MAIN_TEST_BRANCH}`);
-            expect(data).to.have.property("url");
-            expect(data).to.have.property("object");
+            expect(data).to.have.property("name").equal(MAIN_TEST_BRANCH);
+            expect(data).to.have.property("commit");
         });
 
         it("it should return an array with all branches including the newly created branch", async () => {
