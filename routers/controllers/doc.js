@@ -41,7 +41,7 @@ export default {
 
         try {
             const branch = `DOC_${companyName}`;
-            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 branch
             );
 

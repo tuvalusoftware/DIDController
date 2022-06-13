@@ -17,7 +17,7 @@ export default {
 
         try {
             const branch = `DID_${companyName}`;
-            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 branch
             );
             const DID_strings = await GithubProxy.getFilesOfTree(
@@ -48,7 +48,7 @@ export default {
 
         try {
             const branch = `DID_${companyName}`;
-            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 branch
             );
 

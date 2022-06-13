@@ -79,7 +79,7 @@ export default {
      * @returns {Promise} branch object { ref, object { sha } }
      */
     checkoutNewBranch: async function (newBranchName, fromBranch = "main") {
-        const lastCommitSHA = await this.getLastCommitSHA(fromBranch);
+        const lastCommitSHA = await this.getBranchLastCommitSHA(fromBranch);
 
         return new Promise((resolve, reject) => {
             const data = {
@@ -168,7 +168,7 @@ export default {
      * @param {string} branch Name of the branch (default to main)
      * @returns {string}
      */
-    getLastCommitSHA: function (branch = "main") {
+    getBranchLastCommitSHA: function (branch = "main") {
         return new Promise((resolve, reject) => {
             GithubREST.get(`git/ref/heads/${branch}`)
                 .then((response) => resolve(response.data.object.sha))
@@ -525,7 +525,7 @@ export default {
         branch = "main",
         commitMessage = "New Update Commit"
     ) {
-        const lastCommitOfBranch = await this.getLastCommitSHA(branch);
+        const lastCommitOfBranch = await this.getBranchLastCommitSHA(branch);
         const { oid: fileSHA, content: oldContent } = await this.getFile(
             path,
             lastCommitOfBranch
@@ -554,7 +554,7 @@ export default {
      * @returns {Promise}
      */
     deleteFile: async function (path, branch = "main", commitMessage = null) {
-        const lastCommitOfBranch = await this.getLastCommitSHA(branch);
+        const lastCommitOfBranch = await this.getBranchLastCommitSHA(branch);
         const { oid: fileSHA } = await this.getFile(path, lastCommitOfBranch);
 
         return new Promise((resolve, reject) => {
@@ -735,7 +735,7 @@ export default {
      * @returns {Promise} Release object
      */
     tagACommitAsRelease: async function (tagName, commitSHA = null) {
-        const sha = commitSHA ? commitSHA : await this.getLastCommitSHA();
+        const sha = commitSHA ? commitSHA : await this.getBranchLastCommitSHA();
 
         const data = {
             tag_name: tagName,

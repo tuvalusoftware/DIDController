@@ -79,7 +79,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
         });
 
         it("it should get each file with the same content", async () => {
-            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 MAIN_TEST_BRANCH
             );
 
@@ -105,7 +105,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
         });
 
         it("it should get an array of files contains the files info", async () => {
-            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 MAIN_TEST_BRANCH
             );
             const files = await GithubProxy.getFilesOfTree(
@@ -138,7 +138,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
         });
 
         it("it should get a file with the updated content", async () => {
-            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 MAIN_TEST_BRANCH
             );
             const data = await GithubProxy.getFile(
@@ -204,7 +204,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
         });
 
         it("it should saved at least 1 file to the github", async () => {
-            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 MAIN_TEST_BRANCH
             );
             const files = await GithubProxy.getFilesOfTree(
@@ -229,7 +229,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
         });
 
         it("it should have no file with same name on github", async () => {
-            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 MAIN_TEST_BRANCH
             );
             const files = await GithubProxy.getFilesOfTree(

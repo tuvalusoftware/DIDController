@@ -30,7 +30,7 @@ const main = async () => {
         // const branch = await GithubDB.createBranchIfNotExist("my_branch");
         // console.log(branch);
         // const sha = branch.object.sha;
-        const sha = await GithubDB.getLastCommitSHA();
+        const sha = await GithubDB.getBranchLastCommitSHA();
         const tag = await GithubDB.tag("test_tag Quoc Bao", sha);
         console.log(tag);
         // const tags = await GithubDB.getAllTags();
