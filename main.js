@@ -30,9 +30,8 @@ const main = async () => {
         // const branch = await GithubDB.createBranchIfNotExist("my_branch");
         // console.log(branch);
         // const sha = branch.object.sha;
-        const sha = await GithubDB.getBranchLastCommitSHA();
-        const tag = await GithubDB.tag("test_tag Quoc Bao", sha);
-        console.log(tag);
+        // const sha = await GithubDB.getBranchLastCommitSHA();
+        // const tag = await GithubDB.tag("test_tag Quoc Bao", sha);
         // const tags = await GithubDB.getAllTags();
         // for (let tag of tags) {
         //     await GithubDB.deleteATag(tag.name);
@@ -45,6 +44,13 @@ const main = async () => {
 
         // const data1 = await GithubDB.createBranchIfNotExist("main2");
         // console.log(data1);
+
+        const sha = await GithubDB.getBranchLastCommitSHA();
+        const release = await GithubDB.tagCommitAsRelease(
+            "asdf fasdf asdf@@@",
+            "Message wft",
+            sha
+        );
     } catch (err) {
         console.log("ERROR from MAIN.JS: ", err);
     }

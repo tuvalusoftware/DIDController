@@ -746,31 +746,44 @@ export default {
     /**
      * Create a release by pointing to a commit
      * @param {String} tagName name of the tag
+     * @param {String} message message for the release
      * @param {String} commitSHA commit ID
      * @returns {Promise} Release object
      */
-    tagACommitAsRelease: async function (tagName, commitSHA = null) {
+    tagCommitAsRelease: async function (
+        tagName,
+        message = null,
+        commitSHA = null
+    ) {
         const sha = commitSHA ? commitSHA : await this.getBranchLastCommitSHA();
 
         const data = {
             tag_name: tagName,
             target_commitish: sha,
-            body: `Release at commit ${sha}`,
+            body: message ? message : `Release at commit ${sha}`,
         };
 
         return new Promise((resolve, reject) => {
             GithubREST.post(`releases`, data)
-                .then((response) => {
-                    resolve(response.data);
+                .then(({ data }) => {
+                    const {
+                        html_url,
+                        id,
+                        tag_name,
+                        target_commitish,
+                        body,
+                        created_at,
+                    } = data;
+                    resolve({
+                        html_url,
+                        id,
+                        tag_name,
+                        target_commitish,
+                        body,
+                        created_at,
+                    });
                 })
                 .catch((err) => {
-                    if (
-                        err.response?.status === 422 &&
-                        err.response?.data.message
-                    ) {
-                        return reject(ERROR_CODES.REF_EXISTED);
-                    }
-
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);
                 });
@@ -790,7 +803,7 @@ export default {
                         id,
                         tag_name,
                         target_commitish,
-                        body: releaseMsg,
+                        body,
                         created_at,
                     } = data;
 
@@ -799,7 +812,7 @@ export default {
                         id,
                         tag_name,
                         target_commitish,
-                        releaseMsg,
+                        body,
                         created_at,
                     });
                 })
@@ -821,7 +834,7 @@ export default {
         });
     },
     /**
-     * @description Create all releases of the repo
+     * @description Get all releases of the repo
      * @returns {Promise} Release object
      */
     getAllReleases: function () {
@@ -834,7 +847,7 @@ export default {
                             id,
                             tag_name,
                             target_commitish,
-                            body: releaseMsg,
+                            body,
                             created_at,
                         } = el;
 
@@ -843,7 +856,7 @@ export default {
                             id,
                             tag_name,
                             target_commitish,
-                            releaseMsg,
+                            body,
                             created_at,
                         };
                     });
@@ -868,7 +881,7 @@ export default {
      * @param {String} tagName name of the tag
      * @returns {Promise} 'Delete success'
      */
-    deleteARelease: async function (tagName) {
+    deleteRelease: async function (tagName) {
         const { id: tagId } = await this.getARelease(tagName);
 
         return new Promise((resolve, reject) => {
