@@ -2,6 +2,7 @@ import chai from "chai";
 
 import GithubProxy from "../../db/github/index.js";
 import { MAIN_TEST_BRANCH } from "./constant.js";
+import { containAllElement, haveCommonElement } from "../../db/github/utils.js";
 import { ERROR_CODES } from "../../constants/index.js";
 
 let expect = chai.expect;
@@ -16,6 +17,9 @@ const FILE = {
 
 const TAG1 = {
     name: "my_tag1",
+};
+const TAG2 = {
+    name: "my_tag2",
 };
 
 const INVALID_TAG = {
@@ -34,6 +38,7 @@ describe("GITHUB INTERACTION --- Tag", function () {
 
         try {
             await GithubProxy.deleteATag(TAG1.name);
+            await GithubProxy.deleteATag(TAG2.name);
         } catch (err) {}
     });
 
@@ -62,12 +67,37 @@ describe("GITHUB INTERACTION --- Tag", function () {
                 .to.have.property("sha")
                 .equal(data.sha);
         });
+
+        it("it should update a file and tag that commit", async () => {
+            const data = await GithubProxy.updateFile(
+                FILE.name,
+                { ...FILE.content, updated: true },
+                MAIN_TEST_BRANCH,
+                COMMIT_MESSAGE
+            );
+
+            expect(data).to.have.property("path").equal(FILE.name);
+            expect(data).to.have.property("sha");
+            expect(data).to.have.property("size");
+
+            const { oid: sha } = await GithubProxy.getLatestCommit(
+                MAIN_TEST_BRANCH,
+                FILE.name
+            );
+
+            const tag = await GithubProxy.tag(TAG2.name, sha);
+            expect(tag).to.have.property("ref").equal(`refs/tags/${TAG2.name}`);
+            expect(tag)
+                .to.have.property("object")
+                .to.have.property("sha")
+                .equal(sha);
+        });
     });
 
     describe("Tag something invalidly", () => {
         it("it should return an 'already existed' error as a tag with the same name has already existed", async () => {
             try {
-                const commitSHA = await GithubProxy.getLastCommitSHA();
+                const commitSHA = await GithubProxy.getBranchLastCommitSHA();
                 await GithubProxy.tag(TAG1.name, commitSHA);
             } catch (err) {
                 expect(err).equal(ERROR_CODES.REF_EXISTED);
@@ -76,7 +106,7 @@ describe("GITHUB INTERACTION --- Tag", function () {
 
         it("it should return an 'invalid tag name' error as the provided name is invalid", async () => {
             try {
-                const commitSHA = await GithubProxy.getLastCommitSHA();
+                const commitSHA = await GithubProxy.getBranchLastCommitSHA();
                 await GithubProxy.tag(INVALID_TAG.name, commitSHA);
             } catch (err) {
                 expect(err).equal(ERROR_CODES.INVALID_REF_NAME);
@@ -92,12 +122,14 @@ describe("GITHUB INTERACTION --- Tag", function () {
         });
     });
 
-    describe("Get a tag and its file", () => {
-        it("Get all tags should include the new tag", async () => {
+    describe("Get tags and their targets", () => {
+        it("Get all tags should include the new tags", async () => {
             const tags = await GithubProxy.getAllTags();
             const tagNames = tags.map((el) => el.name);
 
-            expect(tagNames.includes(TAG1.name)).equal(true);
+            expect(containAllElement(tagNames, [TAG1.name, TAG2.name])).equal(
+                true
+            );
         });
 
         it("it should get a tag successfully and its file", async () => {
@@ -106,11 +138,64 @@ describe("GITHUB INTERACTION --- Tag", function () {
             expect(tag).to.have.property("object").to.have.property("sha");
 
             const gitObjectId = tag.object.sha;
-            const file = await GithubProxy.get(gitObjectId);
+            const file = await GithubProxy.get(gitObjectId, "blob");
             const { content } = file;
             let buff = Buffer.from(content, "base64");
             let contentString = buff.toString("ascii");
             expect(contentString).equal(JSON.stringify(FILE.content));
+        });
+
+        it("it should get a tag successfully and its commit info", async () => {
+            const tag = await GithubProxy.getATag(TAG2.name);
+            expect(tag).to.have.property("ref").equal(`refs/tags/${TAG2.name}`);
+            expect(tag).to.have.property("object").to.have.property("sha");
+
+            const gitObjectId = tag.object.sha;
+            const { message: commitMsg } = await GithubProxy.get(
+                gitObjectId,
+                "commit"
+            );
+            expect(commitMsg).equal(COMMIT_MESSAGE);
+        });
+
+        it("it should still get the file via tag even tho file is deleted", async () => {
+            await GithubProxy.deleteFile(FILE.name, MAIN_TEST_BRANCH);
+
+            const tag = await GithubProxy.getATag(TAG2.name);
+            expect(tag).to.have.property("ref").equal(`refs/tags/${TAG2.name}`);
+            expect(tag).to.have.property("object").to.have.property("sha");
+
+            const gitObjectId = tag.object.sha;
+            const { sha } = await GithubProxy.get(gitObjectId, "commit");
+
+            const fileInfo = await GithubProxy.getFile(FILE.name, sha);
+            expect(fileInfo.text).equal(
+                JSON.stringify({ ...FILE.content, updated: true })
+            );
+        });
+    });
+
+    describe("Delete tags", () => {
+        it("it should delete tag successfully", async () => {
+            await GithubProxy.deleteATag(TAG1.name);
+            await GithubProxy.deleteATag(TAG2.name);
+        });
+
+        it("it should return an 'not found' error as tag was deleted", async () => {
+            try {
+                await GithubProxy.getATag(TAG1.name);
+            } catch (err) {
+                expect(err).equal(ERROR_CODES.REF_NOT_EXISTED);
+            }
+        });
+
+        it("No file with the same name should be found when get all tags", async () => {
+            const tags = await GithubProxy.getAllTags();
+            const tagNames = tags.map((el) => el.name);
+
+            expect(haveCommonElement(tagNames, [TAG1.name, TAG2.name])).equal(
+                false
+            );
         });
     });
 });

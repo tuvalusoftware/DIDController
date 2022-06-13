@@ -176,7 +176,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
             expect(isExist).equal(true);
         });
 
-        it("it should return 'false' as file dose not exist", async () => {
+        it("it should return 'false' as file does not exist", async () => {
             const isExist = await GithubProxy.isExistedFile(
                 NOT_EXIST_FILE_NAME,
                 MAIN_TEST_BRANCH
@@ -273,6 +273,69 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
             expect(JSON.stringify(commitMessages)).equal(
                 JSON.stringify(fileCommits.reverse())
             );
+        });
+
+        it("it should return the latest commit info of a file", async () => {
+            const commit = await GithubProxy.getLatestCommit(
+                MAIN_TEST_BRANCH,
+                TEST_FILE_NAME
+            );
+
+            expect(commit.message).equal(COMMIT_MESSAGES[4]);
+        });
+    });
+
+    describe("Get different version of file by commit", () => {
+        it("it should return 'false' as file was deleted", async () => {
+            const isExist = await GithubProxy.isExistedFile(
+                TEST_FILE_NAME,
+                MAIN_TEST_BRANCH
+            );
+            expect(isExist).equal(false);
+        });
+
+        it("it should get the file content when it first saved using the first commit", async () => {
+            const data = await GithubProxy.getCommitHistory(
+                100,
+                MAIN_TEST_BRANCH,
+                TEST_FILE_NAME
+            );
+            const firstCommit = data.find(
+                (el) => el.message === COMMIT_MESSAGES[0]
+            );
+
+            const file = await GithubProxy.getFile(
+                TEST_FILE_NAME,
+                firstCommit.oid
+            );
+
+            expect(file)
+                .to.have.property("text")
+                .equal(JSON.stringify(EXAMPLE_DATA));
+            expect(file).to.have.property("oid");
+            expect(file).to.have.property("text");
+        });
+
+        it("it should get the file content when it updated using the second commit", async () => {
+            const data = await GithubProxy.getCommitHistory(
+                100,
+                MAIN_TEST_BRANCH,
+                TEST_FILE_NAME
+            );
+            const firstCommit = data.find(
+                (el) => el.message === COMMIT_MESSAGES[2]
+            );
+
+            const file = await GithubProxy.getFile(
+                TEST_FILE_NAME,
+                firstCommit.oid
+            );
+
+            expect(file)
+                .to.have.property("text")
+                .equal(JSON.stringify(UPDATE_EXAMPLE_DATA));
+            expect(file).to.have.property("oid");
+            expect(file).to.have.property("text");
         });
     });
 });
