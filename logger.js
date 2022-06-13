@@ -100,6 +100,29 @@ export default {
 
             if (
                 err.response?.status === 422 &&
+                err.response?.data.message === "Validation Failed"
+            ) {
+                if (Array.isArray(err.response.data.errors)) {
+                    for (let error of err.response.data.errors) {
+                        if (
+                            error.resource === "Release" &&
+                            error.message === "tag_name is not a valid tag"
+                        ) {
+                            return ERROR_CODES.INVALID_REF_NAME;
+                        }
+
+                        if (
+                            error.resource === "Release" &&
+                            error.code === "already_exists"
+                        ) {
+                            return ERROR_CODES.REF_EXISTED;
+                        }
+                    }
+                }
+            }
+
+            if (
+                err.response?.status === 422 &&
                 err.response?.data.message.includes("Invalid request") &&
                 err.response?.data.message.includes("For 'properties/sha'") &&
                 err.response?.data.message.includes("is not a string")
