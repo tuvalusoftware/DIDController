@@ -298,6 +298,21 @@ export default {
         });
     },
     /**
+     * @description Get the latest commit of a file
+     * @param {String} branchName Name of the branch (default to 'main')
+     * @param {String} filePath
+     * @returns {Promise} Latest commit object
+     */
+    getLatestCommit: function (branchName = "main", filePath) {
+        return new Promise((resolve, reject) => {
+            this.getCommitHistory(1, branchName, filePath)
+                .then((response) => {
+                    resolve(response[0]);
+                })
+                .catch((err) => reject(err));
+        });
+    },
+    /**
      * @description Check if file exists on repo
      * @param {String} fileName name (path) of file
      * @param {String} branchName name (default to main) of the branch
