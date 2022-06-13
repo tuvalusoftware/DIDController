@@ -94,7 +94,7 @@ describe("GITHUB INTERACTION --- Tag", function () {
         });
     });
 
-    describe("Tag something invalidly", () => {
+    describe("Tag with invalid params", () => {
         it("it should return an 'already existed' error as a tag with the same name has already existed", async () => {
             try {
                 const commitSHA = await GithubProxy.getBranchLastCommitSHA();
@@ -165,10 +165,9 @@ describe("GITHUB INTERACTION --- Tag", function () {
             expect(tag).to.have.property("ref").equal(`refs/tags/${TAG2.name}`);
             expect(tag).to.have.property("object").to.have.property("sha");
 
-            const gitObjectId = tag.object.sha;
-            const { sha } = await GithubProxy.get(gitObjectId, "commit");
+            const commitId = tag.object.sha;
 
-            const fileInfo = await GithubProxy.getFile(FILE.name, sha);
+            const fileInfo = await GithubProxy.getFile(FILE.name, commitId);
             expect(fileInfo.text).equal(
                 JSON.stringify({ ...FILE.content, updated: true })
             );
@@ -189,7 +188,7 @@ describe("GITHUB INTERACTION --- Tag", function () {
             }
         });
 
-        it("No file with the same name should be found when get all tags", async () => {
+        it("No tag with the same name should be found when get all tags", async () => {
             const tags = await GithubProxy.getAllTags();
             const tagNames = tags.map((el) => el.name);
 
