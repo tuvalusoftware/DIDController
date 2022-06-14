@@ -1,7 +1,7 @@
 import GithubProxy from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import { mockCall } from "../../helpers/index.js";
-import { ERROR_CODES } from "../../constants/index.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 export default {
     isExist: async (req, res, next) => {
@@ -41,7 +41,7 @@ export default {
 
         try {
             const branch = `DOC_${companyName}`;
-            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 branch
             );
 
@@ -111,7 +111,7 @@ export default {
             );
 
             res.status(201).json({
-                data: { message: "Create document success" },
+                data: { message: SUCCESS_CODES.SAVE_SUCCESS },
             });
             Logger.apiInfo(
                 req,
@@ -144,7 +144,7 @@ export default {
                 `DELETE: '${fileName}' DID of doc company ${companyName}`
             );
 
-            res.status(200).json({ message: "Delete document successfully" });
+            res.status(200).json({ message: SUCCESS_CODES.DELETE_SUCCESS });
             Logger.apiInfo(
                 req,
                 res,

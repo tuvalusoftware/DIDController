@@ -84,6 +84,61 @@ export default {
                 return ERROR_CODES.CONFLICT_PUSH;
             }
 
+            if (
+                err.response?.status === 422 &&
+                err.response?.data.message === "Reference already exists"
+            ) {
+                return ERROR_CODES.REF_EXISTED;
+            }
+
+            if (
+                err.response?.status === 422 &&
+                err.response?.data.message.includes("is not a valid ref name")
+            ) {
+                return ERROR_CODES.INVALID_REF_NAME;
+            }
+
+            if (
+                err.response?.status === 422 &&
+                err.response?.data.message === "Validation Failed"
+            ) {
+                if (Array.isArray(err.response.data.errors)) {
+                    for (let error of err.response.data.errors) {
+                        if (
+                            error.resource === "Release" &&
+                            error.message === "tag_name is not a valid tag"
+                        ) {
+                            return ERROR_CODES.INVALID_REF_NAME;
+                        }
+
+                        if (
+                            error.resource === "Release" &&
+                            error.code === "already_exists"
+                        ) {
+                            return ERROR_CODES.REF_EXISTED;
+                        }
+                    }
+                }
+            }
+
+            if (
+                err.response?.status === 422 &&
+                err.response?.data.message.includes("Invalid request") &&
+                err.response?.data.message.includes("For 'properties/sha'") &&
+                err.response?.data.message.includes("is not a string")
+            ) {
+                return ERROR_CODES.INVALID_GIT_OBJECT_ID;
+            }
+
+            if (
+                err.response?.status === 422 &&
+                err.response?.data.message.includes(
+                    "At least 40 characters are required; only 13 were supplied"
+                )
+            ) {
+                return ERROR_CODES.INVALID_GIT_OBJECT_ID;
+            }
+
             infoLogger.error(
                 `Uncaught when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
             );
@@ -91,9 +146,26 @@ export default {
                 `Uncaught when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
             );
             return ERROR_CODES.GITHUB_API_ERROR;
-        } else {
-            infoLogger.error(`Uncaught error: ${err.message}`);
-            debugLogger.error(`Uncaught error: ${err.message}`);
+        }
+        // Array of errors return by Github GraphQL API
+        else if (Array.isArray(err)) {
+            const errors = err;
+            errors.forEach((error) => {
+                infoLogger.error(
+                    `Uncaught when call Github API error: Error message: ${error.message}`
+                );
+                debugLogger.error(
+                    `Uncaught when call Github API error: ${JSON.stringify(
+                        error
+                    )}`
+                );
+            });
+            return ERROR_CODES.GITHUB_API_ERROR;
+        }
+        // Other unexpected errors
+        else {
+            infoLogger.error(`Uncaught error: ${JSON.stringify(err)}`);
+            debugLogger.error(`Uncaught error: ${JSON.stringify(err)}`);
             return ERROR_CODES.UNKNOWN_ERROR;
         }
     },

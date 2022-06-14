@@ -3,7 +3,7 @@ import chaiHttp from "chai-http";
 
 import GithubProxy from "../db/github/index.js";
 import server from "../server.js";
-import { ERROR_CODES } from "../constants/index.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../constants/index.js";
 
 let should = chai.should();
 let expect = chai.expect;
@@ -55,7 +55,6 @@ describe("DOC", function () {
     });
 
     describe("/POST create new document", () => {
-        // Check if doc with the same name exist
         it("it should return 'false' because file not create", (done) => {
             chai.request(server)
                 .get("/api/doc/exists")
@@ -70,7 +69,6 @@ describe("DOC", function () {
                 });
         });
 
-        // Create new DOC with invalid data
         it("it should return a error message as the post data is invalid", (done) => {
             chai.request(server)
                 .post("/api/doc")
@@ -86,7 +84,6 @@ describe("DOC", function () {
                 });
         });
 
-        // Create new DOC
         it("it should return a success message", (done) => {
             chai.request(server)
                 .post("/api/doc")
@@ -98,7 +95,6 @@ describe("DOC", function () {
                 });
         });
 
-        // Check if doc with the same name exist
         it("it should return 'true'", (done) => {
             chai.request(server)
                 .get("/api/doc/exists")
@@ -185,6 +181,38 @@ describe("DOC", function () {
                         .property("url")
                         .eql(`${TEST_DATA.fileName}.document`);
                     res.body.didDoc.should.have.property("did");
+
+                    done();
+                });
+        });
+    });
+
+    describe("/DELETE delete document from a branch", () => {
+        it("it should return a 'success' message", (done) => {
+            chai.request(server)
+                .delete("/api/doc")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", TEST_DATA.fileName)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+                    res.body.should.have
+                        .property("message")
+                        .eql(SUCCESS_CODES.DELETE_SUCCESS);
+
+                    done();
+                });
+        });
+
+        it("it should return 'false' because file has been deleted", (done) => {
+            chai.request(server)
+                .get("/api/doc/exists")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", TEST_DATA.fileName)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+                    res.body.should.have.property("isExisted").eql(false);
 
                     done();
                 });

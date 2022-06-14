@@ -1,5 +1,5 @@
 import GithubProxy from "../../db/github/index.js";
-import { ERROR_CODES } from "../../constants/index.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 import { isExistsKey } from "../../db/github/utils.js";
 import Logger from "../../logger.js";
 
@@ -17,7 +17,7 @@ export default {
 
         try {
             const branch = `DID_${companyName}`;
-            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 branch
             );
             const DID_strings = await GithubProxy.getFilesOfTree(
@@ -48,7 +48,7 @@ export default {
 
         try {
             const branch = `DID_${companyName}`;
-            const lastCommitOfBranch = await GithubProxy.getLastCommitSHA(
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 branch
             );
 
@@ -90,7 +90,7 @@ export default {
                 `NEW: '${fileName}' DID Doc of company "${companyName}"`
             );
 
-            res.status(201).json({ message: "New DID created successfully" });
+            res.status(201).json({ message: SUCCESS_CODES.SAVE_SUCCESS });
             Logger.apiInfo(
                 req,
                 res,
@@ -118,7 +118,7 @@ export default {
                 `UPDATE: '${fileName}' DID of company ${companyName}`
             );
 
-            res.status(200).json({ message: "Update DID successfully" });
+            res.status(200).json({ message: SUCCESS_CODES.UPDATE_SUCCESS });
             Logger.apiInfo(
                 req,
                 res,
@@ -144,7 +144,7 @@ export default {
                 `DELETE: '${fileName}' DID of company ${companyName}`
             );
 
-            res.status(200).json({ message: "Delete success" });
+            res.status(200).json({ message: SUCCESS_CODES.DELETE_SUCCESS });
             Logger.apiInfo(
                 req,
                 res,

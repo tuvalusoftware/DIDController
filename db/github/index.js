@@ -4,13 +4,31 @@ dotenv.config();
 import GithubREST from "./rest.js";
 import GithubGraphQL from "./graphql.js";
 import Logger from "../../logger.js";
-import { tryParse, getFileExtension, stringToDate } from "./utils.js";
-import { ERROR_CODES } from "../../constants/index.js";
+import { tryParse, getFileExtension } from "./utils.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 const owner = process.env.REPO_OWNER;
 const repo = process.env.REPO_NAME;
 
 export default {
+    /**
+     *
+     * @param {String} sha Git Object Id (could be blob, tree, commit)
+     * @param {String} type Type of git object (default to 'blob')
+     * @returns {Object} Information of a git object
+     */
+    get: function (sha, type = "blob") {
+        return new Promise((resolve, reject) => {
+            GithubREST.get(`git/${type}s/${sha}`)
+                .then((response) => {
+                    resolve(response.data);
+                })
+                .catch((err) => {
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                });
+        });
+    },
     /**
      * @description Get the info of all branches from a repo
      * @returns {Promise} All branches from a repo
@@ -34,14 +52,24 @@ export default {
      */
     getBranchInfo: function (branchName = "main") {
         return new Promise((resolve, reject) => {
-            this.getAllBranches().then((branches) => {
-                const branch =
-                    branches.find((br) => br.name === branchName) || null;
+            GithubREST.get(`branches/${branchName}`)
+                .then((response) => {
+                    const { name, commit } = response.data;
+                    resolve({ name, commit });
+                })
+                .catch((err) => {
+                    if (err.response) {
+                        if (
+                            err.response.status === 404 &&
+                            err.response.data.message === "Branch not found"
+                        ) {
+                            return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
+                        }
+                    }
 
-                return branch
-                    ? resolve(branch)
-                    : reject(ERROR_CODES.BRANCH_NOT_EXISTED);
-            });
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                });
         });
     },
     /**
@@ -51,7 +79,7 @@ export default {
      * @returns {Promise} branch object { ref, object { sha } }
      */
     checkoutNewBranch: async function (newBranchName, fromBranch = "main") {
-        const lastCommitSHA = await this.getLastCommitSHA(fromBranch);
+        const lastCommitSHA = await this.getBranchLastCommitSHA(fromBranch);
 
         return new Promise((resolve, reject) => {
             const data = {
@@ -61,7 +89,13 @@ export default {
 
             GithubREST.post(`git/refs`, data)
                 .then((res) => {
-                    resolve(res.data);
+                    const { ref, object: commit } = res.data;
+
+                    if (ref.includes(newBranchName)) {
+                        return resolve({ name: newBranchName, commit });
+                    }
+
+                    throw ERROR_CODES.GITHUB_API_ERROR;
                 })
                 .catch((err) => {
                     if (err.response) {
@@ -72,10 +106,10 @@ export default {
                         ) {
                             return reject(ERROR_CODES.BRANCH_EXISTED);
                         }
-
-                        const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
                     }
+
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
                 });
         });
     },
@@ -109,8 +143,8 @@ export default {
             if (branch === "main") return reject(ERROR_CODES.DELETE_MAIN);
 
             GithubREST.delete(`git/refs/heads/${branch}`)
-                .then((response) => {
-                    resolve(true);
+                .then((_) => {
+                    resolve(SUCCESS_CODES.DELETE_SUCCESS);
                 })
                 .catch((err) => {
                     const errInfo = Logger.handleGithubError(err);
@@ -134,7 +168,7 @@ export default {
      * @param {string} branch Name of the branch (default to main)
      * @returns {string}
      */
-    getLastCommitSHA: function (branch = "main") {
+    getBranchLastCommitSHA: function (branch = "main") {
         return new Promise((resolve, reject) => {
             GithubREST.get(`git/ref/heads/${branch}`)
                 .then((response) => resolve(response.data.object.sha))
@@ -172,7 +206,7 @@ export default {
                     branch: ref(qualifiedName: "${branchName}") {
                         target {
                             ... on Commit {
-                                history(first: ${deep}, ${fileExpr}, ${pagination}}) {
+                                history(first: ${deep}, ${fileExpr}, ${pagination}) {
                                     totalCount
                                     edges {
                                         node {
@@ -198,8 +232,10 @@ export default {
             GithubGraphQL.execute(queryString)
                 .then((res) => {
                     if (res.data.errors) {
-                        const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
+                        const errInfo = Logger.handleGithubError(
+                            res.data.errors
+                        );
+                        return reject(errInfo);
                     }
 
                     if (!res.data.data.repository.branch) {
@@ -209,12 +245,12 @@ export default {
                     const { totalCount, pageInfo } =
                         res.data.data.repository.branch.target.history;
 
-                    const branches =
+                    const history =
                         res.data.data.repository.branch.target.history.edges.map(
-                            (branch) => ({ ...branch.node })
+                            (el) => ({ ...el.node })
                         );
 
-                    resolve({ branches, totalCount, pageInfo });
+                    resolve({ history, totalCount, pageInfo });
                 })
                 .catch((err) => {
                     const errInfo = Logger.handleGithubError(err);
@@ -241,14 +277,14 @@ export default {
 
             try {
                 while (numElements > 0) {
-                    const { branches, pageInfo } = await this._getCommitHistory(
+                    const { history, pageInfo } = await this._getCommitHistory(
                         numElements <= 100 ? numElements : 100,
                         branchName,
                         filePath,
                         cursor
                     );
 
-                    results = [...results, ...branches];
+                    results = [...results, ...history];
                     if (!pageInfo.hasNextPage) break;
 
                     cursor = pageInfo.endCursor;
@@ -257,9 +293,23 @@ export default {
 
                 resolve(results);
             } catch (err) {
-                const errInfo = Logger.handleGithubError(err);
-                reject(errInfo);
+                reject(err);
             }
+        });
+    },
+    /**
+     * @description Get the latest commit of a file
+     * @param {String} branchName Name of the branch (default to 'main')
+     * @param {String} filePath
+     * @returns {Promise} Latest commit object
+     */
+    getLatestCommit: function (branchName = "main", filePath) {
+        return new Promise((resolve, reject) => {
+            this.getCommitHistory(1, branchName, filePath)
+                .then((response) => {
+                    resolve(response[0]);
+                })
+                .catch((err) => reject(err));
         });
     },
     /**
@@ -322,14 +372,9 @@ export default {
         return new Promise((resolve, reject) => {
             GithubGraphQL.execute(queryString)
                 .then(async (response) => {
-                    if (response.status !== 200) {
+                    if (response.status !== 200 || !response.data.data) {
                         const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
-                    }
-
-                    if (!response.data.data) {
-                        const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
+                        return reject(errInfo);
                     }
 
                     // Check content in result
@@ -495,7 +540,7 @@ export default {
         branch = "main",
         commitMessage = "New Update Commit"
     ) {
-        const lastCommitOfBranch = await this.getLastCommitSHA(branch);
+        const lastCommitOfBranch = await this.getBranchLastCommitSHA(branch);
         const { oid: fileSHA, content: oldContent } = await this.getFile(
             path,
             lastCommitOfBranch
@@ -524,7 +569,7 @@ export default {
      * @returns {Promise}
      */
     deleteFile: async function (path, branch = "main", commitMessage = null) {
-        const lastCommitOfBranch = await this.getLastCommitSHA(branch);
+        const lastCommitOfBranch = await this.getBranchLastCommitSHA(branch);
         const { oid: fileSHA } = await this.getFile(path, lastCommitOfBranch);
 
         return new Promise((resolve, reject) => {
@@ -537,7 +582,7 @@ export default {
             };
 
             GithubREST.delete(`contents/${path}`, data)
-                .then((response) => resolve(response.data))
+                .then((response) => resolve(SUCCESS_CODES.DELETE_SUCCESS))
                 .catch((err) => {
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);
@@ -642,7 +687,7 @@ export default {
                     const { length } = response.data;
 
                     if (!length) reject(ERROR_CODES.REF_NOT_EXISTED);
-                    resolve(response.data);
+                    resolve(response.data[0]);
                 })
                 .catch((err) => {
                     const errInfo = Logger.handleGithubError(err);
@@ -653,12 +698,10 @@ export default {
     /**
      * Create a tag by pointing to a commit
      * @param {String} tagName name of the tag
-     * @param {String} commitSHA commit ID
+     * @param {String} sha git object id (could be commit, blob, tree)
      * @returns {Promise} Tag object
      */
-    tagACommit: async function (tagName, commitSHA = null) {
-        const sha = commitSHA ? commitSHA : await this.getLastCommitSHA();
-
+    tag: async function (tagName, sha) {
         const data = {
             ref: `refs/tags/${tagName}`,
             sha,
@@ -670,13 +713,6 @@ export default {
                     resolve(response.data);
                 })
                 .catch((err) => {
-                    if (
-                        err.response?.status === 422 &&
-                        err.response?.data.message
-                    ) {
-                        return reject(ERROR_CODES.REF_EXISTED);
-                    }
-
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);
                 });
@@ -690,8 +726,8 @@ export default {
     deleteATag: function (tagName) {
         return new Promise((resolve, reject) => {
             GithubREST.delete(`git/refs/tags/${tagName}`)
-                .then((response) => {
-                    resolve("Delete Success");
+                .then((_) => {
+                    resolve(SUCCESS_CODES.DELETE_SUCCESS);
                 })
                 .catch((err) => {
                     if (
@@ -710,31 +746,44 @@ export default {
     /**
      * Create a release by pointing to a commit
      * @param {String} tagName name of the tag
+     * @param {String} message message for the release
      * @param {String} commitSHA commit ID
      * @returns {Promise} Release object
      */
-    tagACommitAsRelease: async function (tagName, commitSHA = null) {
-        const sha = commitSHA ? commitSHA : await this.getLastCommitSHA();
+    tagCommitAsRelease: async function (
+        tagName,
+        message = null,
+        commitSHA = null
+    ) {
+        const sha = commitSHA ? commitSHA : await this.getBranchLastCommitSHA();
 
         const data = {
             tag_name: tagName,
             target_commitish: sha,
-            body: `Release at commit ${sha}`,
+            body: message ? message : `Release at commit ${sha}`,
         };
 
         return new Promise((resolve, reject) => {
             GithubREST.post(`releases`, data)
-                .then((response) => {
-                    resolve(response.data);
+                .then(({ data }) => {
+                    const {
+                        html_url,
+                        id,
+                        tag_name,
+                        target_commitish,
+                        body,
+                        created_at,
+                    } = data;
+                    resolve({
+                        html_url,
+                        id,
+                        tag_name,
+                        target_commitish,
+                        body,
+                        created_at,
+                    });
                 })
                 .catch((err) => {
-                    if (
-                        err.response?.status === 422 &&
-                        err.response?.data.message
-                    ) {
-                        return reject(ERROR_CODES.REF_EXISTED);
-                    }
-
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);
                 });
@@ -754,7 +803,7 @@ export default {
                         id,
                         tag_name,
                         target_commitish,
-                        body: releaseMsg,
+                        body,
                         created_at,
                     } = data;
 
@@ -763,7 +812,7 @@ export default {
                         id,
                         tag_name,
                         target_commitish,
-                        releaseMsg,
+                        body,
                         created_at,
                     });
                 })
@@ -785,7 +834,7 @@ export default {
         });
     },
     /**
-     * @description Create all releases of the repo
+     * @description Get all releases of the repo
      * @returns {Promise} Release object
      */
     getAllReleases: function () {
@@ -798,7 +847,7 @@ export default {
                             id,
                             tag_name,
                             target_commitish,
-                            body: releaseMsg,
+                            body,
                             created_at,
                         } = el;
 
@@ -807,7 +856,7 @@ export default {
                             id,
                             tag_name,
                             target_commitish,
-                            releaseMsg,
+                            body,
                             created_at,
                         };
                     });
@@ -832,13 +881,13 @@ export default {
      * @param {String} tagName name of the tag
      * @returns {Promise} 'Delete success'
      */
-    deleteARelease: async function (tagName) {
+    deleteRelease: async function (tagName) {
         const { id: tagId } = await this.getARelease(tagName);
 
         return new Promise((resolve, reject) => {
             GithubREST.delete(`releases/${tagId}`)
-                .then((response) => {
-                    resolve("Delete release successfully");
+                .then((_) => {
+                    resolve(SUCCESS_CODES.DELETE_SUCCESS);
                 })
                 .catch((err) => {
                     if (
@@ -851,30 +900,6 @@ export default {
 
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);
-                });
-        });
-    },
-
-    testing: async function (branchName = "main") {
-        const branch = await this.getBranchInfo(branchName);
-        const branchSHA = branch.commit.sha;
-
-        const since = stringToDate("24/05/2022").toISOString();
-        const until = new Date().toISOString();
-
-        return new Promise((resolve, reject) => {
-            GithubREST.get(
-                `commits?sha=${branchSHA}&since=${since}&until=${until}`
-            )
-                .then((response) => {
-                    resolve(response.data);
-                })
-                .catch((err) => {
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
                 });
         });
     },

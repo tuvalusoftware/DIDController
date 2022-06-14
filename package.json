@@ -9,9 +9,9 @@
         "start": "npx nodemon server.js",
         "test-did": "export NODE_ENV=test && mocha ./test/did.test.js --exit",
         "test-doc": "export NODE_ENV=test && mocha ./test/doc.test.js --exit",
-        "test-github": "export NODE_ENV=test && mocha ./test/github.test.js --exit",
-        "test": "export NODE_ENV=test && mocha --exit",
-        "coverage": "nyc --all npm test"
+        "test-github": "export NODE_ENV=test && mocha ./test/github/**.test.js --exit",
+        "test": "export NODE_ENV=test && mocha --recursive --exit",
+        "coverage": "c8 --check-coverage --lines 85 npm test"
     },
     "repository": {
         "type": "git",
@@ -32,17 +32,15 @@
         "dotenv": "^16.0.0",
         "express": "^4.18.1",
         "keccak256": "^1.0.6",
-        "multer": "^1.4.4",
         "swagger-jsdoc": "5.0.1",
         "swagger-ui-express": "^4.3.0",
         "winston": "^3.7.2"
     },
     "devDependencies": {
+        "c8": "^7.11.3",
         "chai": "^4.3.6",
         "chai-http": "^4.3.0",
-        "istanbul": "^0.4.5",
         "mocha": "^10.0.0",
-        "nodemon": "^2.0.16",
-        "nyc": "^15.1.0"
+        "nodemon": "^2.0.16"
     }
 }
