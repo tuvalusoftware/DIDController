@@ -4,8 +4,8 @@ dotenv.config();
 import GithubREST from "./rest.js";
 import GithubGraphQL from "./graphql.js";
 import Logger from "../../logger.js";
-import { tryParse, getFileExtension, stringToDate } from "./utils.js";
-import { ERROR_CODES } from "../../constants/index.js";
+import { tryParse, getFileExtension } from "./utils.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 const owner = process.env.REPO_OWNER;
 const repo = process.env.REPO_NAME;
@@ -143,8 +143,8 @@ export default {
             if (branch === "main") return reject(ERROR_CODES.DELETE_MAIN);
 
             GithubREST.delete(`git/refs/heads/${branch}`)
-                .then((response) => {
-                    resolve(true);
+                .then((_) => {
+                    resolve(SUCCESS_CODES.DELETE_SUCCESS);
                 })
                 .catch((err) => {
                     const errInfo = Logger.handleGithubError(err);
@@ -582,7 +582,7 @@ export default {
             };
 
             GithubREST.delete(`contents/${path}`, data)
-                .then((response) => resolve(response.data))
+                .then((response) => resolve(SUCCESS_CODES.DELETE_SUCCESS))
                 .catch((err) => {
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);
@@ -726,8 +726,8 @@ export default {
     deleteATag: function (tagName) {
         return new Promise((resolve, reject) => {
             GithubREST.delete(`git/refs/tags/${tagName}`)
-                .then((response) => {
-                    resolve("Delete Success");
+                .then((_) => {
+                    resolve(SUCCESS_CODES.DELETE_SUCCESS);
                 })
                 .catch((err) => {
                     if (
@@ -886,8 +886,8 @@ export default {
 
         return new Promise((resolve, reject) => {
             GithubREST.delete(`releases/${tagId}`)
-                .then((response) => {
-                    resolve("Delete release successfully");
+                .then((_) => {
+                    resolve(SUCCESS_CODES.DELETE_SUCCESS);
                 })
                 .catch((err) => {
                     if (
@@ -900,30 +900,6 @@ export default {
 
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);
-                });
-        });
-    },
-
-    testing: async function (branchName = "main") {
-        const branch = await this.getBranchInfo(branchName);
-        const branchSHA = branch.commit.sha;
-
-        const since = stringToDate("24/05/2022").toISOString();
-        const until = new Date().toISOString();
-
-        return new Promise((resolve, reject) => {
-            GithubREST.get(
-                `commits?sha=${branchSHA}&since=${since}&until=${until}`
-            )
-                .then((response) => {
-                    resolve(response.data);
-                })
-                .catch((err) => {
-                    reject(
-                        err.response
-                            ? ERROR_CODES.GITHUB_API_ERROR
-                            : ERROR_CODES.UNKNOWN_ERROR
-                    );
                 });
         });
     },

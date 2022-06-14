@@ -3,7 +3,7 @@ import chaiHttp from "chai-http";
 
 import GithubProxy from "../db/github/index.js";
 import server from "../server.js";
-import { ERROR_CODES } from "../constants/index.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../constants/index.js";
 
 let should = chai.should();
 let expect = chai.expect;
@@ -198,7 +198,7 @@ describe("DOC", function () {
                     res.body.should.be.a("object");
                     res.body.should.have
                         .property("message")
-                        .eql("Delete document successfully");
+                        .eql(SUCCESS_CODES.DELETE_SUCCESS);
 
                     done();
                 });

@@ -3,7 +3,7 @@ import chai from "chai";
 import GithubProxy from "../../db/github/index.js";
 import { containAllElement } from "../../db/github/utils.js";
 import { MAIN_TEST_BRANCH } from "./constant.js";
-import { ERROR_CODES } from "../../constants/index.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 let expect = chai.expect;
 
@@ -89,8 +89,8 @@ describe("GITHUB INTERACTION --- Branch", function () {
 
     describe("Delete branch", () => {
         it("it should return 'true' as branch is successfully deleted", async () => {
-            const isSuccess = await GithubProxy.deleteBranch(MAIN_TEST_BRANCH);
-            expect(isSuccess).equal(true);
+            const response = await GithubProxy.deleteBranch(MAIN_TEST_BRANCH);
+            expect(response).equal(SUCCESS_CODES.DELETE_SUCCESS);
         });
 
         it("it should return an array with all branches without the deleted branch", async () => {
