@@ -309,10 +309,10 @@
                         }
                     },
                     {
-                        "name": "exclude",
+                        "name": "only",
                         "in": "query",
-                        "description": "Description for what to EXCLUDE in the return value",
-                        "enum": ["doc", "did", ""],
+                        "description": "Description for what to INCLUDE in the return value",
+                        "enums": ["doc", "did", ""],
                         "schema": {
                             "type": "string"
                         },
@@ -323,11 +323,11 @@
                             },
                             "did": {
                                 "value": "did",
-                                "summary": "Exclude the did document. Return value will only contains the wrapped document."
+                                "summary": "Include only the did document. Return value will only contains the did document."
                             },
                             "doc": {
                                 "value": "doc",
-                                "summary": "Exclude the wrapped document. Return value will only contains the did document."
+                                "summary": "Include only the wrapped document. Return value will only contains the wrapped document."
                             }
                         }
                     }
