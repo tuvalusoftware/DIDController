@@ -67,6 +67,11 @@ const ERROR_CODES = {
         errorCode: 1213,
         message: "Git object ID provided is not valid.",
     },
+    INVALID_WRAPPED_DOCUMENT: {
+        errorCode: 1214,
+        message:
+            "Invalid wrapped document. Could not find the owner's address.",
+    },
 
     // Server Error (Human readable error messages)
     UNKNOWN_ERROR: {
