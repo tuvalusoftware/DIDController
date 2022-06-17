@@ -21,7 +21,7 @@ app.use(cors({ origin: "*" }));
 router(app);
 
 // Handle global err
-app.use((err, req, res, next) => {
+app.use((err, req, res, _) => {
     let returnError;
     switch (err.errorCode) {
         case 1203:
@@ -45,8 +45,8 @@ app.use("/api-docs", swaggerUiExpress.serve, (...args) =>
     swaggerUiExpress.setup(services)(...args)
 );
 
-const port = 9000;
-app.listen(port, (req, res) => {
+const port = process.env.NODE_ENV !== "test" ? 9000 : 9001;
+app.listen(port, (_) => {
     Logger.info(`Server is live on port ${port}`);
 });
 
