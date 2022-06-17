@@ -40,15 +40,14 @@ export default {
 
         try {
             const branch = `DOC_${companyName}`;
-            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
-                branch
-            );
+            const branchLastCommitSHA =
+                await GithubProxy.getBranchLastCommitSHA(branch);
 
             // Get did document only
             if (only === "did") {
                 const didDoc = await GithubProxy.getFile(
                     `${fileName}.did`,
-                    lastCommitOfBranch
+                    branchLastCommitSHA
                 );
                 Logger.apiInfo(
                     req,
@@ -61,7 +60,7 @@ export default {
             else if (only === "doc") {
                 const wrappedDoc = await GithubProxy.getFile(
                     `${fileName}.document`,
-                    lastCommitOfBranch
+                    branchLastCommitSHA
                 );
                 Logger.apiInfo(
                     req,
@@ -75,9 +74,9 @@ export default {
                 const [wrappedDoc, didDoc] = await Promise.all([
                     GithubProxy.getFile(
                         `${fileName}.document`,
-                        lastCommitOfBranch
+                        branchLastCommitSHA
                     ),
-                    GithubProxy.getFile(`${fileName}.did`, lastCommitOfBranch),
+                    GithubProxy.getFile(`${fileName}.did`, branchLastCommitSHA),
                 ]);
                 Logger.apiInfo(
                     req,
@@ -93,6 +92,51 @@ export default {
             next(err);
         }
     },
+    getDocsByUser: async (req, res, next) => {
+        const companyName = req.header("companyName");
+        const ownerPublicKey = req.header("publicKey");
+
+        if (!companyName || !ownerPublicKey) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
+
+        try {
+            const branch = `DOC_${companyName}`;
+            const branchLastCommitSHA =
+                await GithubProxy.getBranchLastCommitSHA(branch);
+
+            // Get all files from the given company
+            const files = await GithubProxy.getFilesOfTree(
+                "",
+                false,
+                branchLastCommitSHA
+            );
+
+            // Check the did doc for the document with the owner public key as the controller
+            const didDocs = files.filter((el) => el.name.includes(".did"));
+            const getDidDocContentOperations = didDocs.map((el) =>
+                GithubProxy.getFile(el.name, branchLastCommitSHA)
+            );
+            const didDocsInfo = await Promise.all(getDidDocContentOperations);
+            const ownerDocumentNames = didDocsInfo.filter(
+                (el) => el.content.docController === ownerPublicKey
+            );
+
+            if (ownerDocumentNames.length === 0)
+                return res.status(200).json([]);
+
+            // Get all owner documents
+            const getWrappedDocOperations = ownerDocumentNames.map((el) =>
+                GithubProxy.getFile(el.content.url, branchLastCommitSHA)
+            );
+            const documents = await Promise.all(getWrappedDocOperations);
+            const results = documents.map((el) => el.content);
+
+            return res.status(200).json(results);
+        } catch (err) {
+            next(err);
+        }
+    },
     createNewDoc: async (req, res, next) => {
         const { wrappedDocument, fileName, companyName } = req.body;
 
@@ -104,9 +148,11 @@ export default {
             const branchName = `DOC_${companyName}`;
             await GithubProxy.createBranchIfNotExist(branchName);
 
+            // Get owner public key from the wrapped document
             const ownerPublicKey = wrappedDocument.data.issuers[0].address;
             if (!ownerPublicKey) throw ERROR_CODES.INVALID_WRAPPED_DOCUMENT;
 
+            // Save wrapped document
             await GithubProxy.createNewFile(
                 `${fileName}.document`,
                 wrappedDocument,
@@ -114,6 +160,7 @@ export default {
                 `NEW: '${fileName}' wrapped document from company ${companyName}`
             );
 
+            // Save the did doc for the wrapped document
             await GithubProxy.createNewFile(
                 `${fileName}.did`,
                 {

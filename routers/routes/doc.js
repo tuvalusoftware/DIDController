@@ -11,4 +11,6 @@ router
     .post(docController.createNewDoc)
     .delete(docController.deleteDoc);
 
+router.route("/user").get(docController.getDocsByUser);
+
 export default router;
