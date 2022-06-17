@@ -407,13 +407,26 @@ export default {
      * @param {String} treePath folder's path (default to an empty string - which mean the root folder of a repo)
      * @param {Boolean} allowFolder if true, the returns result will also include nested folder (default to true)
      * @param {String} commitSHA SHA of a commit, default to HEAD which is the last commit
+     * @param {Boolean} includeContent if true, the returns result will also include the content of each file
      * @returns {Array} Array of files (or folders)' info in a tree path
      */
     getFilesOfTree: function (
         treePath = "",
         allowFolder = true,
-        commitSHA = "HEAD"
+        commitSHA = "HEAD",
+        includeContent = false
     ) {
+        const includeContentQuery = includeContent
+            ? `object {
+            ... on Blob {
+                byteSize
+                text
+                isBinary
+                oid
+            }
+        }`
+            : "";
+
         const queryString = `
         query RepoFiles {
             repository(owner: "${owner}", name: "${repo}") {
@@ -423,6 +436,8 @@ export default {
                             name
                             type
                             mode
+
+                            ${includeContentQuery}
                         }
                     }
                 }
@@ -433,9 +448,11 @@ export default {
         return new Promise((resolve, reject) => {
             GithubGraphQL.execute(queryString)
                 .then((response) => {
-                    if (response.status !== 200) {
-                        const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
+                    if (response.data.errors) {
+                        const errInfo = Logger.handleGithubError(
+                            response.data.errors
+                        );
+                        return reject(errInfo);
                     }
 
                     const responseData = response.data.data.repository.object;
@@ -446,7 +463,7 @@ export default {
                                 Object.prototype) ||
                         !responseData
                     )
-                        reject(ERROR_CODES.FOLDER_EXISTED);
+                        reject(ERROR_CODES.FOLDER_NOT_EXISTED);
                     else {
                         const results = allowFolder
                             ? responseData.entries
@@ -623,14 +640,11 @@ export default {
         return new Promise((resolve, reject) => {
             GithubGraphQL.execute(queryString)
                 .then((response) => {
-                    if (response.status !== 200) {
-                        const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
-                    }
-
-                    if (!response.data.data) {
-                        const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
+                    if (response.data.errors) {
+                        const errInfo = Logger.handleGithubError(
+                            response.data.errors
+                        );
+                        return reject(errInfo);
                     }
 
                     // Check content in result
