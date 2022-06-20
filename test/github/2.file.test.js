@@ -9,6 +9,7 @@ let expect = chai.expect;
 
 const TEST_FILE_NAME = "file_name_for_testing.json";
 const TEST_FILE_NAME2 = "file_name_for_testing2.json";
+const TEST_FILE_NAME3 = "file_name_for_testing3.json";
 const TEST_FILES = [
     "file_name_for_testing100.json",
     "file_name_for_testing200.json",
@@ -336,6 +337,44 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
                 .equal(JSON.stringify(UPDATE_EXAMPLE_DATA));
             expect(file).to.have.property("oid");
             expect(file).to.have.property("text");
+        });
+    });
+
+    describe("Get all versions of a file through its commits", () => {
+        const VERSIONS = [1, 2, 3, 4, 5].map((el) => ({
+            ...EXAMPLE_DATA,
+            update: `This is the ${el} updated`,
+        }));
+
+        it("it should create and save file successfully", async () => {
+            await GithubProxy.createBranchIfNotExist(MAIN_TEST_BRANCH);
+            await GithubProxy.createNewFile(
+                TEST_FILE_NAME3,
+                EXAMPLE_DATA,
+                MAIN_TEST_BRANCH
+            );
+        });
+
+        it("it should update and save file successfully for a number of times", async () => {
+            for (let content of VERSIONS) {
+                await GithubProxy.updateFile(
+                    TEST_FILE_NAME3,
+                    content,
+                    MAIN_TEST_BRANCH
+                );
+            }
+        });
+
+        it("it should get the all the version of a file", async () => {
+            const { total, history } = await GithubProxy.getFileHistory(
+                TEST_FILE_NAME3,
+                MAIN_TEST_BRANCH
+            );
+
+            expect(total).equal(VERSIONS.length + 1);
+            expect(JSON.stringify(history)).equal(
+                JSON.stringify([...VERSIONS.reverse(), EXAMPLE_DATA])
+            );
         });
     });
 });

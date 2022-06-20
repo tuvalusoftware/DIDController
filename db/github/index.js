@@ -403,6 +403,42 @@ export default {
         });
     },
     /**
+     * @description Return different version of a file through its commit
+     * @param {String} filePath Path of the file
+     * @param {String} branchName name of the branch that contains the file
+     * @returns {Promise}
+     */
+    getFileHistory: async function (filePath, branchName = "main") {
+        let commits = [];
+        let total = 0;
+        let cursor = null;
+        const commitsPerQuery = 100;
+
+        while (true) {
+            const { history, totalCount, pageInfo } =
+                await this._getCommitHistory(
+                    commitsPerQuery,
+                    branchName,
+                    filePath,
+                    cursor
+                );
+
+            commits = [...commits, ...history];
+            total = totalCount;
+            if (!pageInfo.hasNextPage) break;
+
+            cursor = pageInfo.endCursor;
+        }
+
+        const getFileOperations = commits.map((el) =>
+            this.getFile(filePath, el.oid)
+        );
+
+        const data = await Promise.all(getFileOperations);
+        const fileHistory = data.map((el) => el.content);
+        return { total, history: fileHistory };
+    },
+    /**
      * @description Return all files from a folder of a repo
      * @param {String} treePath folder's path (default to an empty string - which mean the root folder of a repo)
      * @param {Boolean} allowFolder if true, the returns result will also include nested folder (default to true)
