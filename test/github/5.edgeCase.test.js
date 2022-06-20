@@ -57,7 +57,7 @@ describe("GITHUB INTERACTION --- Other edge cases", function () {
     });
 
     describe("Save multiple files to multiple branches at the same time", () => {
-        it("it should create and save successfully", async () => {
+        it("it should create and save all files and branches successfully", async () => {
             const operations = TEST_BRANCHES.map((el) => saveFileToBranch(el));
             await Promise.all(operations);
         });
@@ -69,8 +69,8 @@ describe("GITHUB INTERACTION --- Other edge cases", function () {
         });
 
         it("it should say that all new files exist", async () => {
-            const operations = TEST_BRANCHES.map((el) =>
-                GithubProxy.isExistedFile(FILE.name, el)
+            const operations = TEST_BRANCHES.map((branchName) =>
+                GithubProxy.isExistedFile(FILE.name, branchName)
             );
             const [exist1, exist2, exist3] = await Promise.all(operations);
 

@@ -283,6 +283,61 @@
                 }
             }
         },
+        "/doc/history": {
+            "get": {
+                "tags": ["DOC"],
+                "summary": "Retrieve all history of a file.",
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "example": "Kukulu",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fileName",
+                        "in": "header",
+                        "description": "Name of the document (not include the file extension).",
+                        "required": true,
+                        "example": "document_name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return an object contains total of file editions and file contents.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "total": {
+                                                "type": "Number",
+                                                "example": 4
+                                            },
+                                            "history": {
+                                                "type": "array",
+                                                "items": {
+                                                    "$ref": "#/components/schemas/WrappedDocument"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/doc/user": {
             "get": {
                 "tags": ["DOC"],
