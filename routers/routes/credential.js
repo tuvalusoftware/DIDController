@@ -3,6 +3,9 @@ import credentialController from "../controllers/credential.js";
 
 const router = express.Router();
 
-router.route("/").post(credentialController.saveCredential);
+router
+    .route("/")
+    .get(credentialController.getCredentialsByPublicKey)
+    .post(credentialController.saveCredential);
 
 export default router;

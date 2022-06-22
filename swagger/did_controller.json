@@ -542,6 +542,50 @@
             }
         },
         "/credential": {
+            "get": {
+                "tags": ["CREDENTIAL"],
+                "summary": "Retrieve a list of credentials issuer from an user.",
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "example": "Kukulu",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "publicKey",
+                        "in": "header",
+                        "description": "Public key of an user.",
+                        "required": true,
+                        "example": "public_key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return a list of credential",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Credential"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Do not exist"
+                    }
+                }
+            },
             "post": {
                 "tags": ["CREDENTIAL"],
                 "summary": "Save a credential.",
