@@ -4,7 +4,7 @@ dotenv.config();
 import GithubREST from "./rest.js";
 import GithubGraphQL from "./graphql.js";
 import Logger from "../../logger.js";
-import { tryParse, getFileExtension } from "./utils.js";
+import { tryParse, getFileExtension } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 const owner = process.env.REPO_OWNER;

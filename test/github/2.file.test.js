@@ -1,7 +1,7 @@
 import chai from "chai";
 
 import GithubProxy from "../../db/github/index.js";
-import { haveCommonElement, containAllElement } from "../../db/github/utils.js";
+import { haveCommonElement, containAllElement } from "../../utils/index.js";
 import { MAIN_TEST_BRANCH, COMMIT_MESSAGES } from "./constant.js";
 import { ERROR_CODES } from "../../constants/index.js";
 

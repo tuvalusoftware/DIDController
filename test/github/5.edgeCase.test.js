@@ -1,7 +1,7 @@
 import chai from "chai";
 
 import GithubProxy from "../../db/github/index.js";
-import { containAllElement } from "../../db/github/utils.js";
+import { containAllElement } from "../../utils/index.js";
 
 let expect = chai.expect;
 

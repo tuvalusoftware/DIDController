@@ -66,6 +66,17 @@ const isExistsKey = (key, obj) => {
     return obj[key] !== undefined;
 };
 
+/**
+ * @description Validate if a set of keys exist in an object
+ * @param {Array} keys array of keys
+ * @param {Object} obj
+ * @returns {Boolean}
+ */
+const validateObject = (keys, obj) => {
+    const isValid = keys.every((el) => isExistsKey(el, obj));
+    return isValid;
+};
+
 export {
     containAllElement,
     haveCommonElement,
@@ -73,4 +84,5 @@ export {
     getFileExtension,
     stringToDate,
     isExistsKey,
+    validateObject,
 };

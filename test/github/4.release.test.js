@@ -2,7 +2,7 @@ import chai from "chai";
 
 import GithubProxy from "../../db/github/index.js";
 import { MAIN_TEST_BRANCH } from "./constant.js";
-import { containAllElement, haveCommonElement } from "../../db/github/utils.js";
+import { containAllElement, haveCommonElement } from "../../utils/index.js";
 import { ERROR_CODES } from "../../constants/index.js";
 
 let expect = chai.expect;
