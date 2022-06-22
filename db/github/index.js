@@ -316,7 +316,7 @@ export default {
      * @description Check if file exists on repo
      * @param {String} fileName name (path) of file
      * @param {String} branchName name (default to main) of the branch
-     * @returns {String}
+     * @returns {Boolean}
      */
     isExistedFile: function (fileName = "", branchName = "main") {
         return new Promise((resolve, reject) => {
@@ -325,7 +325,11 @@ export default {
                     response.data ? resolve(true) : resolve(false)
                 )
                 .catch((err) => {
-                    if (err.response.status === 404) return resolve(false);
+                    if (
+                        err.response.status === 404 &&
+                        err.response.data.message === "Not Found"
+                    )
+                        return resolve(false);
 
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);

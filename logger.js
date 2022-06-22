@@ -85,6 +85,15 @@ export default {
             }
 
             if (
+                err.response.status === 404 &&
+                err.response.data.message.includes(
+                    "No commit found for the ref"
+                )
+            ) {
+                return ERROR_CODES.BRANCH_NOT_EXISTED;
+            }
+
+            if (
                 err.response.status === 409 &&
                 err.response.data.message.includes("is at") &&
                 err.response.data.message.includes("but expected")
