@@ -1,5 +1,6 @@
 import GithubProxy from "../../db/github/index.js";
 import Logger from "../../logger.js";
+import { extractOwnerPKFromDID } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 export default {
@@ -149,8 +150,10 @@ export default {
             await GithubProxy.createBranchIfNotExist(branchName);
 
             // Get owner public key from the wrapped document
-            const ownerPublicKey = wrappedDocument.data.issuers[0].address;
-            if (!ownerPublicKey) throw ERROR_CODES.INVALID_WRAPPED_DOCUMENT;
+            const ownerDID = wrappedDocument.data.issuers[0].address;
+            if (!ownerDID) throw ERROR_CODES.INVALID_WRAPPED_DOCUMENT;
+
+            const ownerPublicKey = extractOwnerPKFromDID(ownerDID);
 
             // Save wrapped document
             await GithubProxy.createNewFile(

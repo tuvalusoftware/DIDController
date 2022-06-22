@@ -98,7 +98,12 @@ const ERROR_CODES = {
     DID_CONTENT_INVALID: {
         errorCode: 10006,
         message:
-            "Contents of DID doc miss some important keys. Please try again.",
+            "Content of DID doc miss some important fields. Please try again.",
+    },
+    CREDENTIAL_CONTENT_INVALID: {
+        errorCode: 10007,
+        message:
+            "Content of credential is missing important fields. Please try again",
     },
 };
 

@@ -77,6 +77,16 @@ const validateObject = (keys, obj) => {
     return isValid;
 };
 
+/**
+ * @description Extract the owner public key from an user's did
+ * @param {String} didString DID of the owner
+ * @returns {String} owner public key
+ */
+const extractOwnerPKFromDID = (didString) => {
+    const fields = didString.split(":");
+    return fields[fields.length - 1];
+};
+
 export {
     containAllElement,
     haveCommonElement,
@@ -85,4 +95,5 @@ export {
     stringToDate,
     isExistsKey,
     validateObject,
+    extractOwnerPKFromDID,
 };
