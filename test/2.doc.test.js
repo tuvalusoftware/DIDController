@@ -10,6 +10,10 @@ let expect = chai.expect;
 chai.use(chaiHttp);
 
 const TEST_BRANCH = "MOCHA_TESTING";
+
+const NOT_EXIST_BRANCH = "BRANCH___INVALID";
+const NOT_EXIST_FILE = "FILE__NOT__EXIST";
+
 const TEST_DATA = {
     wrappedDocument: {
         data: {
@@ -105,20 +109,6 @@ describe("DOC", function () {
     });
 
     describe("/POST create new document", () => {
-        it("it should return 'false' because file not create", (done) => {
-            chai.request(server)
-                .get("/api/doc/exists")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", TEST_DATA.fileName)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a("object");
-                    res.body.should.have.property("isExisted").eql(false);
-
-                    done();
-                });
-        });
-
         it("it should return a error message as the post data is invalid", (done) => {
             chai.request(server)
                 .post("/api/doc")
@@ -144,8 +134,40 @@ describe("DOC", function () {
                     done();
                 });
         });
+    });
 
-        it("it should return 'true'", (done) => {
+    describe("/GET check if document exists", () => {
+        it("it should return a 'not found' error as the company name is invalid", (done) => {
+            chai.request(server)
+                .get("/api/doc/exists")
+                .set("companyName", NOT_EXIST_BRANCH)
+                .set("fileName", NOT_EXIST_FILE)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return 'false' as file does not exist", (done) => {
+            chai.request(server)
+                .get("/api/doc/exists")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", NOT_EXIST_FILE)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+                    res.body.should.have.property("isExisted").eql(false);
+                    done();
+                });
+        });
+
+        it("it should return 'true' as the file does exist", (done) => {
             chai.request(server)
                 .get("/api/doc/exists")
                 .set("companyName", TEST_DATA.companyName)
