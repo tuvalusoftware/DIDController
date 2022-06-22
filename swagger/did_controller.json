@@ -23,6 +23,10 @@
         {
             "name": "DOC",
             "description": "CRUD for document"
+        },
+        {
+            "name": "CREDENTIAL",
+            "description": "CRUD for credential"
         }
     ],
     "paths": {
@@ -536,6 +540,49 @@
                     }
                 }
             }
+        },
+        "/credential": {
+            "post": {
+                "tags": ["CREDENTIAL"],
+                "summary": "Save a credential.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "companyName": {
+                                        "description": "Name of the company.",
+                                        "type": "string",
+                                        "example": "Kukulu"
+                                    },
+                                    "publicKey": {
+                                        "description": "Public key of the issuer.",
+                                        "type": "string",
+                                        "example": "owner_public_key"
+                                    },
+                                    "credential": {
+                                        "$ref": "#/components/schemas/Credential"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -610,6 +657,50 @@
                     "fileName": {
                         "type": "string",
                         "example": "fileName.document"
+                    }
+                }
+            },
+            "Credential": {
+                "type": "object",
+                "properties": {
+                    "issuer": {
+                        "type": "string",
+                        "description": "Public key of the issuer"
+                    },
+                    "subject": {
+                        "type": "string",
+                        "description": "Public key of the the other subject"
+                    },
+                    "credentialSubject": {
+                        "type": "object",
+                        "description": "Description of the subject for the credential.",
+                        "properties": {
+                            "object": {
+                                "type": "string",
+                                "description": "DID of an object (wrapped document)"
+                            },
+                            "action": {
+                                "type": "object",
+                                "description": "An object with an code to describe the action in the credential"
+                            }
+                        }
+                    },
+                    "signature": {
+                        "type": "string",
+                        "description": "Signature of the issuer"
+                    }
+                },
+                "example": {
+                    "issuer": "owner_public_key",
+                    "subject": "other_public_key",
+                    "credentialSubject": {
+                        "object": "an_wrapped_doc_did",
+                        "action": { "code": 3000, "value": "changeHolderShip" }
+                    },
+                    "signature": "12345678986543234567qwertytwq231234567876543sdfghgfds",
+                    "metadata": {
+                        "dateCreated": "22/06/2022",
+                        "some_fields": "some_data"
                     }
                 }
             },

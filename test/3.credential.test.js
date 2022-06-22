@@ -20,23 +20,31 @@ const TEST_DATA = {
     },
 };
 const CREDENTIAL_DATA = {
-    issuer: TEST_PUBLICKEY,
+    issuer: "owner_public_key",
     subject: "other_public_key",
     credentialSubject: {
-        object: "wrapped_doc_did",
-        action: "changeOwnerShip",
+        object: "an_wrapped_doc_did",
+        action: { code: 3000, value: "changeOwnerShip" },
     },
-    signature: "12345678986543234567qwertytwq",
+    signature: "12345678986543234567qwertytwq231234567876543sdfghgfds",
+    metadata: {
+        dateCreated: "22/06/2022",
+        some_fields: "some_data",
+    },
 };
 
 const CREDENTIAL_DATA2 = {
     issuer: TEST_PUBLICKEY,
     subject: "other_public_key",
     credentialSubject: {
-        object: "wrapped_doc_did",
-        action: "changeHolderShip",
+        object: "an_wrapped_doc_did",
+        action: { code: 3000, value: "changeHolderShip" },
     },
-    signature: "12345678986543234567qwertytwq",
+    signature: "12345678986543234567qwertytwq231234567876543sdfghgfds",
+    metadata: {
+        dateCreated: "22/06/2022",
+        some_fields: "some_data",
+    },
 };
 
 const INVALID_CREDENTIAL = {

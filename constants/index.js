@@ -93,7 +93,7 @@ const ERROR_CODES = {
     },
     FILE_NAME_EXISTED: {
         errorCode: 10005,
-        message: "File/Public Key with the given value already exists.",
+        message: "File or Public Key with the given value already exists.",
     },
     DID_CONTENT_INVALID: {
         errorCode: 10006,
