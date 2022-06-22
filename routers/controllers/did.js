@@ -1,11 +1,7 @@
 import GithubProxy from "../../db/github/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
-import { isExistsKey } from "../../db/github/utils.js";
+import { validateObject } from "../../utils/index.js";
 import Logger from "../../logger.js";
-
-const verifyContent = (content) => {
-    return isExistsKey("controller", content) && isExistsKey("id", content);
-};
 
 export default {
     getAllDIDs: async (req, res, next) => {
@@ -80,7 +76,7 @@ export default {
             const newBranch = `DID_${companyName}`;
             await GithubProxy.createBranchIfNotExist(newBranch);
 
-            if (!verifyContent(content))
+            if (!validateObject(["controller", "id"], content))
                 return next(ERROR_CODES.DID_CONTENT_INVALID);
 
             await GithubProxy.createNewFile(

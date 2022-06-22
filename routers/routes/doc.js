@@ -11,7 +11,6 @@ router
     .post(docController.createNewDoc)
     .delete(docController.deleteDoc);
 
-router.route("/history").get(docController.getDocHistory);
 router.route("/user").get(docController.getDocsByUser);
 
 export default router;

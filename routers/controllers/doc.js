@@ -92,25 +92,6 @@ export default {
             next(err);
         }
     },
-    getDocHistory: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("fileName");
-
-        if (!companyName || !fileName) {
-            return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
-
-        try {
-            const branch = `DOC_${companyName}`;
-            const data = await GithubProxy.getFileHistory(
-                `${fileName}.document`,
-                branch
-            );
-            return res.status(200).json(data);
-        } catch (err) {
-            next(err);
-        }
-    },
     getDocsByUser: async (req, res, next) => {
         const companyName = req.header("companyName");
         const ownerPublicKey = req.header("publicKey");
