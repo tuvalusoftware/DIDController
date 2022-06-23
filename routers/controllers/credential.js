@@ -56,7 +56,7 @@ export default {
             return next(ERROR_CODES.CREDENTIAL_CONTENT_INVALID);
 
         try {
-            // Catch if file exists
+            // Catch error if file does not exist
             const branch = `DID_${companyName}`;
             const isPublicKeyExist = await GithubProxy.isExistedFile(
                 `${publicKey}.did`,

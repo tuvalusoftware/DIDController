@@ -20,7 +20,7 @@ const TEST_DATA = {
     },
 };
 const CREDENTIAL_DATA = {
-    issuer: "owner_public_key",
+    issuer: TEST_PUBLICKEY,
     subject: "other_public_key",
     credentialSubject: {
         object: "an_wrapped_doc_did",
@@ -35,7 +35,7 @@ const CREDENTIAL_DATA = {
 
 const CREDENTIAL_DATA2 = {
     issuer: TEST_PUBLICKEY,
-    subject: "other_public_key",
+    subject: "other_public_key2",
     credentialSubject: {
         object: "an_wrapped_doc_did",
         action: { code: 3000, value: "changeHolderShip" },
@@ -150,7 +150,7 @@ describe("CREDENTIAL", function () {
             chai.request(server)
                 .post("/api/credential")
                 .send({
-                    publicKey: "hello",
+                    publicKey: "invalid_public_key",
                     companyName: TEST_BRANCH,
                     credential: CREDENTIAL_DATA2,
                 })
@@ -171,7 +171,7 @@ describe("CREDENTIAL", function () {
                 .post("/api/credential")
                 .send({
                     publicKey: TEST_PUBLICKEY,
-                    companyName: "fasdfsadfasdfd",
+                    companyName: "invalid_branch",
                     credential: CREDENTIAL_DATA2,
                 })
                 .end((err, res) => {
@@ -180,6 +180,80 @@ describe("CREDENTIAL", function () {
 
                     expect(JSON.stringify(res.body)).equal(
                         JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+    });
+
+    describe("/GET get credentials of an user", () => {
+        it("it should return a 'missing params' error as the required params are not provided", (done) => {
+            chai.request(server)
+                .get("/api/credential")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.MISSING_PARAMETERS)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'not found' error as the public key is invalid", (done) => {
+            chai.request(server)
+                .get("/api/credential")
+                .set("companyName", TEST_DATA.companyName)
+                .set("publicKey", "invalid_public_key")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'not found' error as the company name is invalid", (done) => {
+            chai.request(server)
+                .get("/api/credential")
+                .set("companyName", "invalid_branch")
+                .set("publicKey", TEST_PUBLICKEY)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a an array of credentials", (done) => {
+            chai.request(server)
+                .get("/api/credential")
+                .set("companyName", TEST_BRANCH)
+                .set("publicKey", TEST_PUBLICKEY)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.an("array");
+                    res.body.length.should.be.eql(2);
+
+                    const savedCredentials = [
+                        CREDENTIAL_DATA,
+                        CREDENTIAL_DATA2,
+                    ];
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(savedCredentials)
                     );
 
                     done();
