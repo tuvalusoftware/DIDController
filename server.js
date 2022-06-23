@@ -22,15 +22,16 @@ router(app);
 
 // Handle global err
 app.use((err, req, res, _) => {
+    // Convert github errors to human readable errors
     let returnError;
-    switch (err.errorCode) {
-        case 1203:
+    switch (err) {
+        case ERROR_CODES.BLOB_EXISTED:
             returnError = ERROR_CODES.FILE_EXISTED;
             break;
-        case 1204:
+        case ERROR_CODES.BLOB_NOT_EXISTED:
             returnError = ERROR_CODES.FILE_NOT_FOUND;
             break;
-        case 1207:
+        case ERROR_CODES.BRANCH_NOT_EXISTED:
             returnError = ERROR_CODES.COMPANY_NOT_FOUND;
             break;
         default:
@@ -41,9 +42,11 @@ app.use((err, req, res, _) => {
     res.status(200).json(returnError);
 });
 
+/* c8 ignore start */
 app.use("/api-docs", swaggerUiExpress.serve, (...args) =>
     swaggerUiExpress.setup(services)(...args)
 );
+/* c8 ignore stop */
 
 const port = process.env.NODE_ENV !== "test" ? 9000 : 9001;
 app.listen(port, (_) => {

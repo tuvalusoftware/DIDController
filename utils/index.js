@@ -38,7 +38,7 @@ const haveCommonElement = (arr1, arr2) => {
 /**
  * @description Check if every element from a small array contains in a big array
  * @param {Array} bigArr array with more element
- * @param {Array} smallArr array with less elememt
+ * @param {Array} smallArr array with less element
  * @returns {Boolean}
  */
 const containAllElement = (bigArr, smallArr) => {

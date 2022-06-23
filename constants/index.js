@@ -108,8 +108,8 @@ const ERROR_CODES = {
 };
 
 const SUCCESS_CODES = {
-    SAVE_SUCCESS: "Successfully Saved ",
-    UPDATE_SUCCESS: "Successfully Updated ",
+    SAVE_SUCCESS: "Successfully Saved",
+    UPDATE_SUCCESS: "Successfully Updated",
     DELETE_SUCCESS: "Successfully Deleted",
 };
 export { ERROR_CODES, SUCCESS_CODES };
