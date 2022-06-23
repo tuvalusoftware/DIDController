@@ -9,8 +9,12 @@ router
     .route("/")
     .get(docController.getDoc)
     .post(docController.createNewDoc)
+    .put(docController.changeDidDocController)
     .delete(docController.deleteDoc);
 
 router.route("/user").get(docController.getDocsByUser);
+router
+    .route("/changeOwnershipOrHoldershipOrBoth")
+    .put(docController.changeDidDocController);
 
 export default router;

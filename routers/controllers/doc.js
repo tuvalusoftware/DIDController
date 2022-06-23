@@ -1,6 +1,6 @@
 import GithubProxy from "../../db/github/index.js";
 import Logger from "../../logger.js";
-import { extractOwnerPKFromDID } from "../../utils/index.js";
+import { extractOwnerPKFromDID, validateObject } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 export default {
@@ -186,6 +186,43 @@ export default {
             );
         } catch (err) {
             return next(err);
+        }
+    },
+    changeDidDocController: async (req, res, next) => {
+        const { didDoc, fileName, companyName } = req.body;
+
+        if (!companyName || !fileName || !didDoc) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
+
+        if (
+            !validateObject(
+                ["controller", "did", "url", "owner", "holder"],
+                didDoc
+            )
+        )
+            return next(ERROR_CODES.DID_DOC_CONTENT_INVALID);
+
+        try {
+            const branch = `DOC_${companyName}`;
+
+            await GithubProxy.updateFile(
+                `${fileName}.did`,
+                didDoc,
+                branch,
+                `UPDATE: '${fileName}' did document of company ${companyName}`
+            );
+
+            res.status(200).json({
+                data: { message: SUCCESS_CODES.UPDATE_SUCCESS },
+            });
+            Logger.apiInfo(
+                req,
+                res,
+                `Update the did doc of '${fileName}' document from company ${companyName}`
+            );
+        } catch (err) {
+            next(err);
         }
     },
     deleteDoc: async (req, res, next) => {

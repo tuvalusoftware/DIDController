@@ -385,6 +385,48 @@
                 }
             }
         },
+        "/doc/changeOwnershipOrHoldershipOrBoth": {
+            "put": {
+                "tags": ["DOC"],
+                "summary": "Update did document of the wrappedDocument.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "didDoc": {
+                                        "$ref": "#/components/schemas/DID_Doc"
+                                    },
+                                    "companyName": {
+                                        "description": "Name of the company.",
+                                        "type": "string",
+                                        "example": "Kukulu"
+                                    },
+                                    "fileName": {
+                                        "description": "Name of the file.",
+                                        "type": "string",
+                                        "example": "file_name"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/doc": {
             "get": {
                 "tags": ["DOC"],
@@ -488,7 +530,46 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["DOC"],
+                "summary": "Update did document of the wrappedDocument.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "didDoc": {
+                                        "$ref": "#/components/schemas/DID_Doc"
+                                    },
+                                    "companyName": {
+                                        "description": "Name of the company.",
+                                        "type": "string",
+                                        "example": "Kukulu"
+                                    },
+                                    "fileName": {
+                                        "description": "Name of the file.",
+                                        "type": "string",
+                                        "example": "file_name"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -686,21 +767,30 @@
             "DID_Doc": {
                 "type": "object",
                 "properties": {
+                    "controller": {
+                        "type": "array",
+                        "example": ["owner_public_key", "holder_public_key"],
+                        "description": "Holds the public key of users that has control over the did doc"
+                    },
                     "did": {
                         "type": "string",
-                        "example": "did:string:string:string"
+                        "description": "DID of the did doc",
+                        "example": "did:<company_name>:<owner_pk>:<holder_pk>"
                     },
-                    "controller": {
+                    "owner": {
                         "type": "string",
-                        "example": "public_key"
+                        "description": "public key of the document owner",
+                        "example": "holder_public_key"
                     },
-                    "docController": {
+                    "holder": {
                         "type": "string",
-                        "example": "public_key"
+                        "description": "public key of the document holder",
+                        "example": "owner_public_key"
                     },
-                    "fileName": {
+                    "url": {
                         "type": "string",
-                        "example": "fileName.document"
+                        "description": "URL to the document file",
+                        "example": "document_name.document"
                     }
                 }
             },
@@ -750,6 +840,7 @@
             },
             "SuccessResponse": {
                 "type": "object",
+                "description": "Return a success message",
                 "properties": {
                     "message": {
                         "type": "string",

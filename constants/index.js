@@ -105,6 +105,11 @@ const ERROR_CODES = {
         message:
             "Content of credential is missing important fields. Please try again",
     },
+    DID_DOC_CONTENT_INVALID: {
+        errorCode: 10007,
+        message:
+            "Content of the did document is missing important fields. Please try again",
+    },
 };
 
 const SUCCESS_CODES = {
