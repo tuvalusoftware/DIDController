@@ -220,11 +220,12 @@ describe("DOC", function () {
 
                     res.body.should.have.property("didDoc");
                     res.body.didDoc.should.have.property("controller");
-                    res.body.didDoc.should.have.property("docController");
+                    res.body.didDoc.should.have.property("owner");
+                    res.body.didDoc.should.have.property("holder");
+                    res.body.didDoc.should.have.property("did");
                     res.body.didDoc.should.have
                         .property("url")
                         .eql(`${TEST_DATA.fileName}.document`);
-                    res.body.didDoc.should.have.property("did");
 
                     done();
                 });
@@ -257,11 +258,12 @@ describe("DOC", function () {
 
                     res.body.should.have.property("didDoc");
                     res.body.didDoc.should.have.property("controller");
-                    res.body.didDoc.should.have.property("docController");
+                    res.body.didDoc.should.have.property("owner");
+                    res.body.didDoc.should.have.property("holder");
+                    res.body.didDoc.should.have.property("did");
                     res.body.didDoc.should.have
                         .property("url")
                         .eql(`${TEST_DATA.fileName}.document`);
-                    res.body.didDoc.should.have.property("did");
 
                     done();
                 });

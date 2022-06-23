@@ -120,7 +120,7 @@ export default {
             );
             const didDocsInfo = await Promise.all(getDidDocContentOperations);
             const ownerDocumentNames = didDocsInfo.filter(
-                (el) => el.content.docController === ownerPublicKey
+                (el) => el.content.owner === ownerPublicKey
             );
 
             if (ownerDocumentNames.length === 0)
@@ -167,9 +167,10 @@ export default {
             await GithubProxy.createNewFile(
                 `${fileName}.did`,
                 {
-                    controller: ownerPublicKey,
-                    did: `did:some_string:${companyName}:${ownerPublicKey}`,
-                    docController: ownerPublicKey,
+                    controller: [ownerPublicKey],
+                    did: `did::${companyName}:${ownerPublicKey}:${ownerPublicKey}`,
+                    owner: ownerPublicKey,
+                    holder: ownerPublicKey,
                     url: `${fileName}.document`,
                 },
                 branchName,
