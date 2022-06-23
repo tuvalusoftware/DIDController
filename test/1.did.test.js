@@ -79,10 +79,10 @@ describe("DID", function () {
                     res.body.should.be.a("object");
                     res.body.should.have
                         .property("errorCode")
-                        .eql(ERROR_CODES.FILE_NAME_EXISTED.errorCode);
+                        .eql(ERROR_CODES.FILE_EXISTED.errorCode);
                     res.body.should.have
                         .property("message")
-                        .eql(ERROR_CODES.FILE_NAME_EXISTED.message);
+                        .eql(ERROR_CODES.FILE_EXISTED.message);
 
                     done();
                 });

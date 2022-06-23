@@ -34,7 +34,7 @@ export default {
             );
         } catch (err) {
             if (err === ERROR_CODES.FOLDER_NOT_EXISTED) {
-                return next(ERROR_CODES.FILE_NOT_EXISTED);
+                return next(ERROR_CODES.BLOB_NOT_EXISTED);
             }
 
             next(err);
@@ -63,7 +63,7 @@ export default {
                 branch
             );
 
-            if (!isPublicKeyExist) return next(ERROR_CODES.FILE_NOT_EXISTED);
+            if (!isPublicKeyExist) return next(ERROR_CODES.BLOB_NOT_EXISTED);
 
             // Save new credential
             const now = Date.now();

@@ -398,7 +398,7 @@ export default {
                             : tryParse(data.text);
 
                         resolve(data);
-                    } else reject(ERROR_CODES.FILE_NOT_EXISTED);
+                    } else reject(ERROR_CODES.BLOB_NOT_EXISTED);
                 })
                 .catch((err) => {
                     const errInfo = Logger.handleGithubError(err);
@@ -575,7 +575,7 @@ export default {
                 .catch((err) => {
                     if (err.response) {
                         if (err.response.status === 422)
-                            return reject(ERROR_CODES.FILE_EXISTED);
+                            return reject(ERROR_CODES.BLOB_EXISTED);
                     }
 
                     const errInfo = Logger.handleGithubError(err);

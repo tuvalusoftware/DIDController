@@ -75,7 +75,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
                     COMMIT_MESSAGES[0]
                 );
             } catch (err) {
-                expect(err).equal(ERROR_CODES.FILE_EXISTED);
+                expect(err).equal(ERROR_CODES.BLOB_EXISTED);
             }
         });
 
@@ -163,7 +163,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
                     COMMIT_MESSAGES[1]
                 );
             } catch (err) {
-                expect(err).equal(ERROR_CODES.FILE_NOT_EXISTED);
+                expect(err).equal(ERROR_CODES.BLOB_NOT_EXISTED);
             }
         });
     });

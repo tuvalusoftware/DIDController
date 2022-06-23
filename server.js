@@ -25,7 +25,7 @@ app.use((err, req, res, _) => {
     let returnError;
     switch (err.errorCode) {
         case 1203:
-            returnError = ERROR_CODES.FILE_NAME_EXISTED;
+            returnError = ERROR_CODES.FILE_EXISTED;
             break;
         case 1204:
             returnError = ERROR_CODES.FILE_NOT_FOUND;

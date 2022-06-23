@@ -6,21 +6,21 @@ const ERROR_CODES = {
     },
     BAD_CREDENTIALS: {
         errorCode: 1201,
-        message: "Github token is not provided or invalid.",
+        message: "Github Access Token is not provided or invalid.",
     },
     CONFLICT_PUSH: {
         errorCode: 1202,
         message: "Asynchronous changes are pushed to the same branch.",
         cause: "Update/Create file",
     },
-    FILE_EXISTED: {
+    BLOB_EXISTED: {
         errorCode: 1203,
-        message: "File with the given name already exist.",
+        message: "Blob (file) with the given name already exist.",
         cause: "Create a file",
     },
-    FILE_NOT_EXISTED: {
+    BLOB_NOT_EXISTED: {
         errorCode: 1204,
-        message: "File with the given name cannot be found.",
+        message: "Blob (file) with the given name cannot be found.",
         cause: "Query a file",
     },
     FOLDER_NOT_EXISTED: {
@@ -91,7 +91,7 @@ const ERROR_CODES = {
         errorCode: 10004,
         message: "File/Public Key with the given value cannot be found.",
     },
-    FILE_NAME_EXISTED: {
+    FILE_EXISTED: {
         errorCode: 10005,
         message: "File or Public Key with the given value already exists.",
     },
