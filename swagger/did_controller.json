@@ -446,7 +446,7 @@
                                             "$ref": "#/components/schemas/WrappedDocument"
                                         },
                                         "didDoc": {
-                                            "$ref": "#/components/schemas/DID_Doc"
+                                            "$ref": "#/components/schemas/did_doc"
                                         }
                                     }
                                 }
@@ -508,7 +508,7 @@
                                 "type": "object",
                                 "properties": {
                                     "didDoc": {
-                                        "$ref": "#/components/schemas/DID_Doc"
+                                        "$ref": "#/components/schemas/did_doc"
                                     },
                                     "companyName": {
                                         "description": "Name of the company.",
@@ -722,7 +722,7 @@
                     "assetId": "d1082d0b547424c25487edc8f45d19041d1f64cba052b4f61ac6487c3964316238393761323763636139653733613333386630626135383231333139"
                 }
             },
-            "DID_Doc": {
+            "did_doc": {
                 "type": "object",
                 "properties": {
                     "controller": {
@@ -733,22 +733,22 @@
                     "did": {
                         "type": "string",
                         "description": "DID of the did doc",
-                        "example": "did:<company_name>:<owner_pk>:<holder_pk>"
+                        "example": "did:company_name:owner_pk:holder_pk"
                     },
                     "owner": {
                         "type": "string",
                         "description": "public key of the document owner",
-                        "example": "holder_public_key"
+                        "example": "owner_public_key"
                     },
                     "holder": {
                         "type": "string",
                         "description": "public key of the document holder",
-                        "example": "owner_public_key"
+                        "example": "holder_public_key"
                     },
                     "url": {
                         "type": "string",
                         "description": "URL to the document file",
-                        "example": "document_name.document"
+                        "example": "file_name.document"
                     }
                 }
             },
