@@ -3,7 +3,7 @@ import chaiHttp from "chai-http";
 
 import GithubProxy from "../db/github/index.js";
 import server from "../server.js";
-import { ERROR_CODES } from "../constants/index.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../constants/index.js";
 
 let should = chai.should();
 let expect = chai.expect;
@@ -56,8 +56,7 @@ describe("DID", function () {
     });
 
     describe("/POST create new DID", () => {
-        // Create new DID
-        it("it should return a success message", (done) => {
+        it("it should return a success message states that DID is saved successfully", (done) => {
             chai.request(server)
                 .post("/api/did")
                 .send(TEST_DATA)
@@ -65,11 +64,14 @@ describe("DID", function () {
                     res.should.have.status(201);
                     res.body.should.be.a("object");
 
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                    );
+
                     done();
                 });
         });
 
-        // Save DID with the same Public Key
         it("it should return an 'already exist' message", (done) => {
             chai.request(server)
                 .post("/api/did")
@@ -77,19 +79,16 @@ describe("DID", function () {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
-                    res.body.should.have
-                        .property("errorCode")
-                        .eql(ERROR_CODES.FILE_EXISTED.errorCode);
-                    res.body.should.have
-                        .property("message")
-                        .eql(ERROR_CODES.FILE_EXISTED.message);
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_EXISTED)
+                    );
 
                     done();
                 });
         });
 
-        // Create new DID
-        it("it should return a success message", (done) => {
+        it("it should return a success message states that DID is saved successfully", (done) => {
             chai.request(server)
                 .post("/api/did")
                 .send(TEST_DATA2)
@@ -97,12 +96,15 @@ describe("DID", function () {
                     res.should.have.status(201);
                     res.body.should.be.a("object");
 
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                    );
+
                     done();
                 });
         });
 
-        // Save DID with invalid content
-        it("it should return an 'invalid content' message", (done) => {
+        it("it should return an 'invalid content' message as the provided content is invalid", (done) => {
             chai.request(server)
                 .post("/api/did")
                 .send(INVALID_DATA)
@@ -119,7 +121,6 @@ describe("DID", function () {
     });
 
     describe("/GET get did", () => {
-        // Get a single DID
         it("it should GET a DID", (done) => {
             chai.request(server)
                 .get("/api/did")
@@ -136,7 +137,6 @@ describe("DID", function () {
                 });
         });
 
-        // Get all DID
         it("it should GET an array of DID from a company", (done) => {
             chai.request(server)
                 .get("/api/did/all")
@@ -159,7 +159,7 @@ describe("DID", function () {
     });
 
     describe("/PUT update data of a did", () => {
-        it("it should update the existed DID return a success message", (done) => {
+        it("it should return a success message a success message states that DID is updated successfully", (done) => {
             chai.request(server)
                 .put("/api/did")
                 .send(UPDATED_DATA)
@@ -167,11 +167,14 @@ describe("DID", function () {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
 
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.UPDATE_SUCCESS)
+                    );
+
                     done();
                 });
         });
 
-        // Get a single DID
         it("it should GET the updated DID", (done) => {
             chai.request(server)
                 .get("/api/did")
@@ -193,7 +196,7 @@ describe("DID", function () {
     });
 
     describe("/DELETE delete a DID", () => {
-        it("it should delete the existed DID return a success message", (done) => {
+        it("it should return a success message states that DID is deleted successfully", (done) => {
             chai.request(server)
                 .delete("/api/did")
                 .set("companyName", TEST_DATA.companyName)
@@ -202,11 +205,14 @@ describe("DID", function () {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
 
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.DELETE_SUCCESS)
+                    );
+
                     done();
                 });
         });
 
-        // Get a single DID that not exist
         it("it should return an error state that file not exists", (done) => {
             chai.request(server)
                 .get("/api/did")

@@ -1,120 +1,121 @@
 const ERROR_CODES = {
     // Github API Error
     GITHUB_API_ERROR: {
-        errorCode: 1200,
-        message: "Have-not-catch error given by github API.",
+        error_code: 1200,
+        error_message: "Have-not-catch error given by github API.",
     },
     BAD_CREDENTIALS: {
-        errorCode: 1201,
-        message: "Github Access Token is not provided or invalid.",
+        error_code: 1201,
+        error_message: "Github Access Token is not provided or invalid.",
     },
     CONFLICT_PUSH: {
-        errorCode: 1202,
-        message: "Asynchronous changes are pushed to the same branch.",
+        error_code: 1202,
+        error_message: "Asynchronous changes are pushed to the same branch.",
         cause: "Update/Create file",
     },
     BLOB_EXISTED: {
-        errorCode: 1203,
-        message: "Blob (file) with the given name already exist.",
+        error_code: 1203,
+        error_message: "Blob (file) with the given name already exist.",
         cause: "Create a file",
     },
     BLOB_NOT_EXISTED: {
-        errorCode: 1204,
-        message: "Blob (file) with the given name cannot be found.",
+        error_code: 1204,
+        error_message: "Blob (file) with the given name cannot be found.",
         cause: "Query a file",
     },
     FOLDER_NOT_EXISTED: {
-        errorCode: 1205,
-        message: "Folder with the given name cannot be found.",
+        error_code: 1205,
+        error_message: "Folder with the given name cannot be found.",
         cause: "Query a folder",
     },
     BRANCH_EXISTED: {
-        errorCode: 1206,
-        message: "Branch with the given name already exist.",
+        error_code: 1206,
+        error_message: "Branch with the given name already exist.",
         cause: "Create/Checkout new branch",
     },
     BRANCH_NOT_EXISTED: {
-        errorCode: 1207,
-        message: "Branch with the given name cannot be found.",
+        error_code: 1207,
+        error_message: "Branch with the given name cannot be found.",
         cause: "Query a branch",
     },
     REF_EXISTED: {
-        errorCode: 1208,
-        message: "Reference already exist.",
+        error_code: 1208,
+        error_message: "Reference already exist.",
         cause: "Create a tag/release. A tag with the same name already exist",
     },
     REF_NOT_EXISTED: {
-        errorCode: 1209,
-        message: "Reference cannot be found.",
+        error_code: 1209,
+        error_message: "Reference cannot be found.",
         cause: "Query/Delete a tag/release.",
     },
     DATA_NOT_CHANGE: {
-        errorCode: 1210,
-        message: "Content of file has not changed.",
+        error_code: 1210,
+        error_message: "Content of file has not changed.",
         cause: "Update a file",
     },
     DELETE_MAIN: {
-        errorCode: 1211,
-        message: "Branch 'main' cannot be deleted.",
+        error_code: 1211,
+        error_message: "Branch 'main' cannot be deleted.",
         cause: "Someone try to delete branch main",
     },
     INVALID_REF_NAME: {
-        errorCode: 1212,
-        message: "Name is invalid (should be like v0.0.1).",
+        error_code: 1212,
+        error_message: "Name is invalid (should be like v0.0.1).",
         cause: "Create a tag or a release",
     },
     INVALID_GIT_OBJECT_ID: {
-        errorCode: 1213,
-        message: "Git object ID provided is not valid.",
+        error_code: 1213,
+        error_message: "Git object ID provided is not valid.",
     },
     INVALID_WRAPPED_DOCUMENT: {
-        errorCode: 1214,
-        message:
+        error_code: 1214,
+        error_message:
             "Invalid wrapped document. Could not find the owner's address.",
     },
 
     // Server Error (Human readable error messages)
     UNKNOWN_ERROR: {
-        errorCode: 10001,
-        message: "Something went wrong!",
+        error_code: 10001,
+        error_message: "Something went wrong!",
     },
     MISSING_PARAMETERS: {
-        errorCode: 10002,
-        message:
+        error_code: 10002,
+        error_message:
             "Parameters in request body or header are missing. Please try again later.",
     },
     COMPANY_NOT_FOUND: {
-        errorCode: 10003,
-        message: "Company with the given name cannot be found.",
+        error_code: 10003,
+        error_message: "Company with the given name cannot be found.",
     },
     FILE_NOT_FOUND: {
-        errorCode: 10004,
-        message: "File/Public Key with the given value cannot be found.",
+        error_code: 10004,
+        error_message: "File/Public Key with the given value cannot be found.",
     },
     FILE_EXISTED: {
-        errorCode: 10005,
-        message: "File or Public Key with the given value already exists.",
+        error_code: 10005,
+        error_message:
+            "File or Public Key with the given value already exists.",
     },
     DID_CONTENT_INVALID: {
-        errorCode: 10006,
-        message:
+        error_code: 10006,
+        error_message:
             "Content of DID doc is invalid. Please make sure all required fields are provided with their valid value.",
     },
     CREDENTIAL_CONTENT_INVALID: {
-        errorCode: 10007,
-        message:
+        error_code: 10007,
+        error_message:
             "Content of credential is invalid. Please make sure all required fields are provided with their valid value.",
     },
     DID_DOC_CONTENT_INVALID: {
-        errorCode: 10007,
-        message:
+        error_code: 10007,
+        error_message:
             "Content of the did document is invalid. Please make sure all required fields are provided with their valid value.",
     },
 };
 
 const SUCCESS_CODES = {
-    SAVE_SUCCESS: "Successfully Saved",
-    UPDATE_SUCCESS: "Successfully Updated",
-    DELETE_SUCCESS: "Successfully Deleted",
+    SAVE_SUCCESS: { message: "Successfully Saved" },
+    UPDATE_SUCCESS: { message: "Successfully Updated" },
+    DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
 export { ERROR_CODES, SUCCESS_CODES };

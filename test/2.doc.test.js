@@ -124,13 +124,18 @@ describe("DOC", function () {
                 });
         });
 
-        it("it should return a success message", (done) => {
+        it("it should return a success message states that the wrapped document is saved successfully", (done) => {
             chai.request(server)
                 .post("/api/doc")
                 .send(TEST_DATA)
                 .end((err, res) => {
                     res.should.have.status(201);
                     res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                    );
+
                     done();
                 });
         });
@@ -345,7 +350,7 @@ describe("DOC", function () {
                 });
         });
 
-        it("it should return a 'success' message", (done) => {
+        it("it should return a success message states that the wrapped document is deleted successfully", (done) => {
             chai.request(server)
                 .delete("/api/doc")
                 .set("companyName", TEST_DATA.companyName)
@@ -353,9 +358,10 @@ describe("DOC", function () {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
-                    res.body.should.have
-                        .property("message")
-                        .eql(SUCCESS_CODES.DELETE_SUCCESS);
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.DELETE_SUCCESS)
+                    );
 
                     done();
                 });

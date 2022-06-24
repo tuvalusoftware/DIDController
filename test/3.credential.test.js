@@ -68,10 +68,13 @@ describe("CREDENTIAL", function () {
                 .post("/api/did")
                 .send(TEST_DATA)
                 .end((err, res) => {
-                    console.log(res.body);
                     res.should.have.status(201);
                     res.body.should.be.a("object");
-                    res.body.message.should.equal(SUCCESS_CODES.SAVE_SUCCESS);
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                    );
+
                     done();
                 });
         });
@@ -87,7 +90,11 @@ describe("CREDENTIAL", function () {
                 .end((err, res) => {
                     res.should.have.status(201);
                     res.body.should.be.a("object");
-                    res.body.message.should.equal(SUCCESS_CODES.SAVE_SUCCESS);
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                    );
+
                     done();
                 });
         });
@@ -103,7 +110,11 @@ describe("CREDENTIAL", function () {
                 .end((err, res) => {
                     res.should.have.status(201);
                     res.body.should.be.a("object");
-                    res.body.message.should.equal(SUCCESS_CODES.SAVE_SUCCESS);
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                    );
+
                     done();
                 });
         });

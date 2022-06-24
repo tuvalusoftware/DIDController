@@ -86,7 +86,7 @@ export default {
                 `NEW: '${fileName}' DID Doc of company "${companyName}"`
             );
 
-            res.status(201).json({ message: SUCCESS_CODES.SAVE_SUCCESS });
+            res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
             Logger.apiInfo(
                 req,
                 res,
@@ -104,6 +104,9 @@ export default {
         }
 
         try {
+            // Validate user's did document
+            SchemaValidator.validateDidDocOfUser(content);
+
             const branch = `DID_${companyName}`;
             await GithubProxy.getBranchInfo(branch);
 
@@ -114,7 +117,7 @@ export default {
                 `UPDATE: '${fileName}' DID of company ${companyName}`
             );
 
-            res.status(200).json({ message: SUCCESS_CODES.UPDATE_SUCCESS });
+            res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
             Logger.apiInfo(
                 req,
                 res,
@@ -140,7 +143,7 @@ export default {
                 `DELETE: '${fileName}' DID of company ${companyName}`
             );
 
-            res.status(200).json({ message: SUCCESS_CODES.DELETE_SUCCESS });
+            res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
             Logger.apiInfo(
                 req,
                 res,

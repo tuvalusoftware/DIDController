@@ -75,7 +75,7 @@ export default {
                 `NEW: '${fileName}' credential from '${publicKey}' of company "${companyName}"`
             );
 
-            res.status(201).json({ message: SUCCESS_CODES.SAVE_SUCCESS });
+            res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
             Logger.apiInfo(
                 req,
                 res,
