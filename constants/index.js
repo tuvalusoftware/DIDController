@@ -98,17 +98,17 @@ const ERROR_CODES = {
     DID_CONTENT_INVALID: {
         errorCode: 10006,
         message:
-            "Content of DID doc miss some important fields. Please try again.",
+            "Content of DID doc is invalid. Please make sure all required fields are provided with their valid value.",
     },
     CREDENTIAL_CONTENT_INVALID: {
         errorCode: 10007,
         message:
-            "Content of credential is missing important fields. Please try again",
+            "Content of credential is invalid. Please make sure all required fields are provided with their valid value.",
     },
     DID_DOC_CONTENT_INVALID: {
         errorCode: 10007,
         message:
-            "Content of the did document is missing important fields. Please try again",
+            "Content of the did document is invalid. Please make sure all required fields are provided with their valid value.",
     },
 };
 

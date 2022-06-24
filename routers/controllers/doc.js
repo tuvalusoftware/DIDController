@@ -1,6 +1,7 @@
 import GithubProxy from "../../db/github/index.js";
 import Logger from "../../logger.js";
-import { extractOwnerPKFromDID, validateObject } from "../../utils/index.js";
+import SchemaValidator from "../../schema/schemaValidator.js";
+import { extractOwnerPKFromDID } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 export default {
@@ -194,17 +195,16 @@ export default {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
 
-        if (
-            !validateObject(
-                ["controller", "did", "url", "owner", "holder"],
-                didDoc
-            )
-        )
-            return next(ERROR_CODES.DID_DOC_CONTENT_INVALID);
-
         try {
-            const branch = `DOC_${companyName}`;
+            // Validate fields of did doc content
+            SchemaValidator.validateDidDoc(didDoc);
 
+            // Check if did doc provides a valid wrapped document's url
+            if (didDoc.url !== `${fileName}.document`)
+                return next(ERROR_CODES.DID_DOC_CONTENT_INVALID);
+
+            // Update file
+            const branch = `DOC_${companyName}`;
             await GithubProxy.updateFile(
                 `${fileName}.did`,
                 didDoc,
