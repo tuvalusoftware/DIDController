@@ -60,8 +60,9 @@ const ERROR_CODES = {
     },
     INVALID_REF_NAME: {
         error_code: 1212,
-        error_message: "Name is invalid (should be like v0.0.1).",
-        cause: "Create a tag or a release",
+        error_message:
+            "Name is invalid (should be like v0.0.1 for tag/release and 'branch_name' for branch).",
+        cause: "Create a tag or a release or a branch",
     },
     INVALID_GIT_OBJECT_ID: {
         error_code: 1213,
@@ -110,6 +111,11 @@ const ERROR_CODES = {
         error_code: 10008,
         error_message:
             "Content of credential is invalid. Please make sure all required fields are provided with their valid value.",
+    },
+    COMPANY_NAME_INVALID: {
+        error_code: 10009,
+        error_message:
+            "Company name is invalid (Should not contain blank space).",
     },
 };
 

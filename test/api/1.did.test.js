@@ -15,6 +15,8 @@ const INVALID_DATA = {
     publicKey: "public_key_invalid",
     content: {},
 };
+const INVALID_COMPANY_NAME = "invalid___company___name";
+const INVALID_PUBLIC_KEY = "invalid___public___key";
 const TEST_DATA = {
     companyName: TEST_BRANCH,
     publicKey: "public_key",
@@ -56,6 +58,21 @@ describe("DID", function () {
     });
 
     describe("/POST create new DID", () => {
+        it("it should return a 'missing params' error as the required params are not provided", (done) => {
+            chai.request(server)
+                .post("/api/did")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.MISSING_PARAMETERS)
+                    );
+
+                    done();
+                });
+        });
+
         it("it should return a success message states that DID is saved successfully", (done) => {
             chai.request(server)
                 .post("/api/did")
@@ -120,7 +137,7 @@ describe("DID", function () {
         });
     });
 
-    describe("/GET get did", () => {
+    describe("/GET get single did", () => {
         it("it should GET a DID", (done) => {
             chai.request(server)
                 .get("/api/did")
@@ -137,6 +154,40 @@ describe("DID", function () {
                 });
         });
 
+        it("it should return a 'missing params' error as the required params are not provided", (done) => {
+            chai.request(server)
+                .get("/api/did")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.MISSING_PARAMETERS)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'company not found' error as the param 'companyName' cannot be found", (done) => {
+            chai.request(server)
+                .get("/api/did")
+                .set("companyName", INVALID_COMPANY_NAME)
+                .set("publicKey", TEST_DATA.publicKey)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+    });
+
+    describe("/GET get all dids of a company", () => {
         it("it should GET an array of DID from a company", (done) => {
             chai.request(server)
                 .get("/api/did/all")
@@ -156,10 +207,120 @@ describe("DID", function () {
                     done();
                 });
         });
+
+        it("it should return a 'missing params' error as the required params are not provided", (done) => {
+            chai.request(server)
+                .get("/api/did/all")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.MISSING_PARAMETERS)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'company not found' error as the param 'companyName' cannot be found", (done) => {
+            chai.request(server)
+                .get("/api/did/all")
+                .set("companyName", INVALID_COMPANY_NAME)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'public key not found' error as the param 'publicKey' is invalid", (done) => {
+            chai.request(server)
+                .get("/api/did")
+                .set("companyName", TEST_DATA.companyName)
+                .set("publicKey", INVALID_PUBLIC_KEY)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
     });
 
     describe("/PUT update data of a did", () => {
-        it("it should return a success message a success message states that DID is updated successfully", (done) => {
+        it("it should return a 'missing params' error as the required params are not provided", (done) => {
+            chai.request(server)
+                .put("/api/did")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.MISSING_PARAMETERS)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
+            chai.request(server)
+                .put("/api/did")
+                .send({ ...UPDATED_DATA, companyName: INVALID_COMPANY_NAME })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'public key not found' error as the param 'publicKey' is invalid", (done) => {
+            chai.request(server)
+                .put("/api/did")
+                .send({ ...UPDATED_DATA, publicKey: INVALID_PUBLIC_KEY })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return an 'invalid content' message as the provided content is invalid", (done) => {
+            chai.request(server)
+                .put("/api/did")
+                .send(INVALID_DATA)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.USER_DID_DOC_INVALID)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a success message states that DID is updated successfully", (done) => {
             chai.request(server)
                 .put("/api/did")
                 .send(UPDATED_DATA)
@@ -196,6 +357,55 @@ describe("DID", function () {
     });
 
     describe("/DELETE delete a DID", () => {
+        it("it should return a 'missing params' error as the required params are not provided", (done) => {
+            chai.request(server)
+                .delete("/api/did")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.MISSING_PARAMETERS)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'company not found' error as the param 'companyName' cannot be found", (done) => {
+            chai.request(server)
+                .delete("/api/did")
+                .set("companyName", INVALID_COMPANY_NAME)
+                .set("publicKey", TEST_DATA.publicKey)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'public key not found' error as the param 'publicKey' is invalid", (done) => {
+            chai.request(server)
+                .delete("/api/did")
+                .set("companyName", TEST_DATA.companyName)
+                .set("publicKey", INVALID_PUBLIC_KEY)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
         it("it should return a success message states that DID is deleted successfully", (done) => {
             chai.request(server)
                 .delete("/api/did")

@@ -64,9 +64,11 @@ export default {
         infoLogger.info(`[${req.method} - ${req.originalUrl}] ${message}`);
     },
     apiError(err, req, res) {
-        infoLogger.error(`[${req.method} - ${req.originalUrl}] ${err.message}`);
+        infoLogger.error(
+            `[${req.method} - ${req.originalUrl}] ${err.error_message}`
+        );
         debugLogger.error(
-            `[${req.method} - ${req.originalUrl}] ${err.message}`
+            `[${req.method} - ${req.originalUrl}] ${err.error_message}`
         );
     },
     handleGithubError(err) {

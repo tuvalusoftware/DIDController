@@ -169,7 +169,7 @@ export default {
                 `${fileName}.did`,
                 {
                     controller: [ownerPublicKey],
-                    did: `did::${companyName}:${ownerPublicKey}:${ownerPublicKey}`,
+                    did: `did:${companyName}:${ownerPublicKey}:${ownerPublicKey}`,
                     owner: ownerPublicKey,
                     holder: ownerPublicKey,
                     url: `${fileName}.document`,
@@ -185,7 +185,7 @@ export default {
                 `Create new document '${fileName}' from company ${companyName}`
             );
         } catch (err) {
-            return next(err);
+            next(err);
         }
     },
     updateDidDocController: async (req, res, next) => {
@@ -200,8 +200,8 @@ export default {
             SchemaValidator.validateDidDocOfWrapDoc(didDoc);
 
             // Check if did doc provides a valid wrapped document's url
-            if (didDoc.url !== `${fileName}.document`)
-                return next(ERROR_CODES.WRAP_DOC_DID_DOC_INVALID);
+            // if (didDoc.url !== `${fileName}.document`)
+            //     return next(ERROR_CODES.WRAP_DOC_DID_DOC_INVALID);
 
             // Update file
             const branch = `DOC_${companyName}`;

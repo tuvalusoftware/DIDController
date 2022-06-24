@@ -128,8 +128,7 @@ export default {
             this.checkoutNewBranch(branchName, "empty_branch")
                 .then((data) => resolve(data))
                 .catch((err) => {
-                    const errInfo = Logger.handleGithubError(err);
-                    reject(errInfo);
+                    reject(err);
                 });
         });
     },

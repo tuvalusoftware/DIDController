@@ -108,8 +108,6 @@ export default {
             SchemaValidator.validateDidDocOfUser(content);
 
             const branch = `DID_${companyName}`;
-            await GithubProxy.getBranchInfo(branch);
-
             await GithubProxy.updateFile(
                 `${fileName}.did`,
                 content,
