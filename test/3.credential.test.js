@@ -16,7 +16,7 @@ const TEST_DATA = {
     publicKey: TEST_PUBLICKEY,
     content: {
         controller: "123456adbcd",
-        id: "did:some_string:company:123456adbcd",
+        did: "did:company:123456adbcd",
     },
 };
 const CREDENTIAL_DATA = {
@@ -68,6 +68,7 @@ describe("CREDENTIAL", function () {
                 .post("/api/did")
                 .send(TEST_DATA)
                 .end((err, res) => {
+                    console.log(res.body);
                     res.should.have.status(201);
                     res.body.should.be.a("object");
                     res.body.message.should.equal(SUCCESS_CODES.SAVE_SUCCESS);

@@ -19,8 +19,8 @@ const TEST_DATA = {
     companyName: TEST_BRANCH,
     publicKey: "public_key",
     content: {
-        controller: "123abcd",
-        id: "did:some_string:company:publicKey",
+        controller: "public_key",
+        did: "did:some_string:company:public_key",
         date: "10-10-2000",
     },
 };
@@ -28,8 +28,8 @@ const TEST_DATA2 = {
     companyName: TEST_BRANCH,
     publicKey: "public_key_2",
     content: {
-        controller: "345abcd",
-        id: "did:some_string:company:publicKey",
+        controller: "public_key_2",
+        did: "did:some_string:company:public_key_2",
         date: "10-10-2022",
     },
 };
@@ -37,8 +37,8 @@ const UPDATED_DATA = {
     companyName: TEST_BRANCH,
     publicKey: "public_key_2",
     content: {
-        controller: "123abcd",
-        id: "did:some_string:company:publicKey",
+        controller: "public_key_2",
+        did: "did:some_string:company:public_key_2",
         date: "10-10-2000",
         updated: true,
     },
