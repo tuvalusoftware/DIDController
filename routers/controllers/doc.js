@@ -197,7 +197,7 @@ export default {
 
         try {
             // Validate fields of did doc content
-            SchemaValidator.validateDidDoc(didDoc);
+            SchemaValidator.validateDidDocOfWrapDoc(didDoc);
 
             // Check if did doc provides a valid wrapped document's url
             if (didDoc.url !== `${fileName}.document`)
