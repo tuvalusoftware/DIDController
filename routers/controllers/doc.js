@@ -201,7 +201,7 @@ export default {
 
             // Check if did doc provides a valid wrapped document's url
             if (didDoc.url !== `${fileName}.document`)
-                return next(ERROR_CODES.DID_DOC_CONTENT_INVALID);
+                return next(ERROR_CODES.WRAP_DOC_DID_DOC_INVALID);
 
             // Update file
             const branch = `DOC_${companyName}`;

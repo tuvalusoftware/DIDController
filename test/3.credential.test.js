@@ -151,7 +151,7 @@ describe("CREDENTIAL", function () {
                     res.body.should.be.a("object");
 
                     expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(ERROR_CODES.CREDENTIAL_CONTENT_INVALID)
+                        JSON.stringify(ERROR_CODES.CREDENTIAL_INVALID)
                     );
 
                     done();

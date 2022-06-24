@@ -96,20 +96,20 @@ const ERROR_CODES = {
         error_message:
             "File or Public Key with the given value already exists.",
     },
-    DID_CONTENT_INVALID: {
+    USER_DID_DOC_INVALID: {
         error_code: 10006,
         error_message:
-            "Content of DID doc is invalid. Please make sure all required fields are provided with their valid value.",
+            "Content of user's did doc is invalid. Please make sure all required fields are provided with their valid value.",
     },
-    CREDENTIAL_CONTENT_INVALID: {
+    WRAP_DOC_DID_DOC_INVALID: {
         error_code: 10007,
+        error_message:
+            "Content of wrapped document's did doc is invalid. Please make sure all required fields are provided with their valid value.",
+    },
+    CREDENTIAL_INVALID: {
+        error_code: 10008,
         error_message:
             "Content of credential is invalid. Please make sure all required fields are provided with their valid value.",
-    },
-    DID_DOC_CONTENT_INVALID: {
-        error_code: 10007,
-        error_message:
-            "Content of the did document is invalid. Please make sure all required fields are provided with their valid value.",
     },
 };
 
@@ -118,4 +118,5 @@ const SUCCESS_CODES = {
     UPDATE_SUCCESS: { message: "Successfully Updated" },
     DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
+
 export { ERROR_CODES, SUCCESS_CODES };

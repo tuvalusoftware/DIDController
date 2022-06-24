@@ -13,7 +13,7 @@ export default {
         const isValid = validate(obj);
 
         if (!isValid) {
-            throw ERROR_CODES.DID_CONTENT_INVALID;
+            throw ERROR_CODES.USER_DID_DOC_INVALID;
         }
 
         return isValid;
@@ -23,7 +23,7 @@ export default {
         const isValid = validate(obj);
 
         if (!isValid) {
-            throw ERROR_CODES.DID_DOC_CONTENT_INVALID;
+            throw ERROR_CODES.WRAP_DOC_DID_DOC_INVALID;
         }
 
         return isValid;

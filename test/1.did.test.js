@@ -112,7 +112,7 @@ describe("DID", function () {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
                     expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(ERROR_CODES.DID_CONTENT_INVALID)
+                        JSON.stringify(ERROR_CODES.USER_DID_DOC_INVALID)
                     );
 
                     done();

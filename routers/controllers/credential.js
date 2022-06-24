@@ -53,7 +53,7 @@ export default {
                 credential
             )
         )
-            return next(ERROR_CODES.CREDENTIAL_CONTENT_INVALID);
+            return next(ERROR_CODES.CREDENTIAL_INVALID);
 
         try {
             // Catch error if file does not exist
