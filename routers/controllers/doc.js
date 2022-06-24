@@ -177,9 +177,7 @@ export default {
                 `NEW: '${fileName}' DID for new document from company ${companyName}`
             );
 
-            res.status(201).json({
-                data: { message: SUCCESS_CODES.SAVE_SUCCESS },
-            });
+            res.status(201).json({ message: SUCCESS_CODES.SAVE_SUCCESS });
             Logger.apiInfo(
                 req,
                 res,
@@ -189,7 +187,7 @@ export default {
             return next(err);
         }
     },
-    changeDidDocController: async (req, res, next) => {
+    updateDidDocController: async (req, res, next) => {
         const { didDoc, fileName, companyName } = req.body;
 
         if (!companyName || !fileName || !didDoc) {
@@ -215,7 +213,7 @@ export default {
             );
 
             res.status(200).json({
-                data: { message: SUCCESS_CODES.UPDATE_SUCCESS },
+                message: SUCCESS_CODES.UPDATE_SUCCESS,
             });
             Logger.apiInfo(
                 req,
