@@ -1,9 +1,9 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 
-import GithubProxy from "../db/github/index.js";
-import server from "../server.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../constants/index.js";
+import GithubProxy from "../../db/github/index.js";
+import server from "../../server.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 let should = chai.should();
 let expect = chai.expect;
