@@ -14,6 +14,7 @@ export default {
         const defineSchema = {
             USER_DID_DOC: schema.did_doc_of_user,
             WRAP_DOC_DID_DOC: schema.did_doc_of_wrap_doc,
+            ERROR_OBJECT: schema.error_object,
         }[type];
 
         // Validate schema using AJV
@@ -22,7 +23,7 @@ export default {
 
         // Extra validation depends on the content
         let extraValidation = true;
-        if (type === "WRAP_DOC_DID_DOC")
+        if (type === "WRAP_DOC_DID_DOC" && payload)
             extraValidation = this._validateWrapDidDoc(obj, payload.fileName);
 
         return isValid && extraValidation;

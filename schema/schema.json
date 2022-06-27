@@ -42,5 +42,19 @@
             }
         },
         "additionalProperties": false
+    },
+    "error_object": {
+        "type": "object",
+        "required": ["error_code", "error_message"],
+        "properties": {
+            "error_code": {
+                "type": "string",
+                "minLength": 1
+            },
+            "error_message": {
+                "type": "string",
+                "minLength": 1
+            }
+        }
     }
 }
