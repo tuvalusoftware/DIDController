@@ -1,5 +1,6 @@
 import GithubProxy from "../../db/github/index.js";
 import Logger from "../../logger.js";
+import SchemaValidator from "../../schema/schemaValidator.js";
 import { validateObject } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
@@ -47,15 +48,11 @@ export default {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
 
-        if (
-            !validateObject(
-                ["issuer", "credentialSubject", "signature"],
-                credential
-            )
-        )
-            return next(ERROR_CODES.CREDENTIAL_INVALID);
-
         try {
+            // Validate the credential param
+            if (!SchemaValidator.validate(credential, "CREDENTIAL"))
+                return next(ERROR_CODES.CREDENTIAL_INVALID);
+
             // Catch error if file does not exist
             const branch = `DID_${companyName}`;
             const isPublicKeyExist = await GithubProxy.isExistedFile(

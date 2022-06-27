@@ -20,10 +20,10 @@ const TEST_DATA = {
     },
 };
 const CREDENTIAL_DATA = {
-    issuer: TEST_PUBLICKEY,
-    subject: "other_public_key",
+    issuer: `did:company:${TEST_PUBLICKEY}`,
+    subject: "did:company2:other_public_key",
     credentialSubject: {
-        object: "an_wrapped_doc_did",
+        object: "did:some_method:an_wrapped_doc_did",
         action: { code: 3000, value: "changeOwnerShip" },
     },
     signature: "12345678986543234567qwertytwq231234567876543sdfghgfds",
@@ -34,10 +34,10 @@ const CREDENTIAL_DATA = {
 };
 
 const CREDENTIAL_DATA2 = {
-    issuer: TEST_PUBLICKEY,
-    subject: "other_public_key2",
+    issuer: `did:company:${TEST_PUBLICKEY}`,
+    subject: "did:company:other_public_key2",
     credentialSubject: {
-        object: "an_wrapped_doc_did",
+        object: "did:some_method:an_wrapped_doc_did",
         action: { code: 3000, value: "changeHolderShip" },
     },
     signature: "12345678986543234567qwertytwq231234567876543sdfghgfds",

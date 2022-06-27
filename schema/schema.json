@@ -25,7 +25,6 @@
             },
             "did": {
                 "type": "string",
-                "minLength": 2,
                 "pattern": "^did:[a-z0-9_]+:[A-Za-z0-9.-:_]+$"
             },
             "owner": {
@@ -43,12 +42,53 @@
         },
         "additionalProperties": false
     },
+    "credential": {
+        "type": "object",
+        "required": ["issuer", "subject", "credentialSubject", "signature"],
+        "properties": {
+            "issuer": {
+                "type": "string",
+                "pattern": "^did:[a-z0-9_]+:[A-Za-z0-9.-:_]+$"
+            },
+            "subject": {
+                "type": "string",
+                "pattern": "^did:[a-z0-9_]+:[A-Za-z0-9.-:_]+$"
+            },
+            "credentialSubject": {
+                "type": "object",
+                "required": ["object", "action"],
+                "properties": {
+                    "object": {
+                        "type": "string",
+                        "pattern": "^did:[a-z0-9_]+:[A-Za-z0-9.-:_]+$"
+                    },
+                    "action": {
+                        "type": "object",
+                        "required": ["code", "value"],
+                        "properties": {
+                            "code": {
+                                "type": "number",
+                                "pattern": "^did:[a-z0-9_]+:[A-Za-z0-9.-:_]+$"
+                            },
+                            "value": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "signature": {
+                "type": "string",
+                "minLength": 5
+            }
+        }
+    },
     "error_object": {
         "type": "object",
         "required": ["error_code", "error_message"],
         "properties": {
             "error_code": {
-                "type": "string",
+                "type": "number",
                 "minLength": 1
             },
             "error_message": {

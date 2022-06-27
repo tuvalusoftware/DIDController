@@ -782,10 +782,10 @@
                     }
                 },
                 "example": {
-                    "issuer": "owner_public_key",
-                    "subject": "other_public_key",
+                    "issuer": "did:company:owner_public_key",
+                    "subject": "did:company2:other_public_key",
                     "credentialSubject": {
-                        "object": "an_wrapped_doc_did",
+                        "object": "did:some_method:an_wrapped_doc_did",
                         "action": { "code": 3000, "value": "changeHolderShip" }
                     },
                     "signature": "12345678986543234567qwertytwq231234567876543sdfghgfds",

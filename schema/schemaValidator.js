@@ -14,6 +14,7 @@ export default {
         const defineSchema = {
             USER_DID_DOC: schema.did_doc_of_user,
             WRAP_DOC_DID_DOC: schema.did_doc_of_wrap_doc,
+            CREDENTIAL: schema.credential,
             ERROR_OBJECT: schema.error_object,
         }[type];
 
