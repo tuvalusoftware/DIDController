@@ -1,3 +1,10 @@
+## Environment
+
+```
+Node version 17
+NPM version 8
+```
+
 ## Set up
 
 1. Install modules
@@ -17,13 +24,13 @@
 1. Run server (server will run on port 9000)
 
     ```
-    npm run server
+    npm start
     ```
 
 <br />
 
 ## All The API
 
-You can view all the API by visiting the swagger UI after start the server.
+You can view all the API by visiting the swagger UI [here](http://localhost:9000/api-docs/#/) after start the server.
 
 Here is the link to Github Proxy API [http://localhost:9000/api-docs/](http://localhost:9000/api-docs/#/)
