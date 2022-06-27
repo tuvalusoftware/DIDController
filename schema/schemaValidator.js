@@ -1,5 +1,4 @@
 import Ajv from "ajv";
-import { ERROR_CODES } from "../constants/index.js";
 
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
@@ -8,24 +7,24 @@ const ajv = new Ajv();
 const schema = require("./schema.json");
 
 export default {
-    validateDidDocOfUser(obj) {
-        const validate = ajv.compile(schema.did_doc_of_user);
-        const isValid = validate(obj);
-
-        if (!isValid) {
-            throw ERROR_CODES.USER_DID_DOC_INVALID;
-        }
-
-        return isValid;
+    _validateWrapDidDoc(didDoc, fileName) {
+        return didDoc.url === `${fileName}.document`;
     },
-    validateDidDocOfWrapDoc(obj) {
-        const validate = ajv.compile(schema.did_doc_of_wrap_doc);
+    validate(obj, type, payload = null) {
+        const defineSchema = {
+            USER_DID_DOC: schema.did_doc_of_user,
+            WRAP_DOC_DID_DOC: schema.did_doc_of_wrap_doc,
+        }[type];
+
+        // Validate schema using AJV
+        const validate = ajv.compile(defineSchema);
         const isValid = validate(obj);
 
-        if (!isValid) {
-            throw ERROR_CODES.WRAP_DOC_DID_DOC_INVALID;
-        }
+        // Extra validation depends on the content
+        let extraValidation = true;
+        if (type === "WRAP_DOC_DID_DOC")
+            extraValidation = this._validateWrapDidDoc(obj, payload.fileName);
 
-        return isValid;
+        return isValid && extraValidation;
     },
 };

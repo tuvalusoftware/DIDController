@@ -74,7 +74,8 @@ export default {
 
         try {
             // Validate user's did document
-            SchemaValidator.validateDidDocOfUser(content);
+            if (!SchemaValidator.validate(content, "USER_DID_DOC"))
+                return next(ERROR_CODES.USER_DID_DOC_INVALID);
 
             const newBranch = `DID_${companyName}`;
             await GithubProxy.createBranchIfNotExist(newBranch);
@@ -105,7 +106,8 @@ export default {
 
         try {
             // Validate user's did document
-            SchemaValidator.validateDidDocOfUser(content);
+            if (!SchemaValidator.validate(content, "USER_DID_DOC"))
+                return next(ERROR_CODES.USER_DID_DOC_INVALID);
 
             const branch = `DID_${companyName}`;
             await GithubProxy.updateFile(

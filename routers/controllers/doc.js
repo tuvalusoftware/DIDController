@@ -197,11 +197,12 @@ export default {
 
         try {
             // Validate fields of did doc content
-            SchemaValidator.validateDidDocOfWrapDoc(didDoc);
-
-            // Check if did doc provides a valid wrapped document's url
-            // if (didDoc.url !== `${fileName}.document`)
-            //     return next(ERROR_CODES.WRAP_DOC_DID_DOC_INVALID);
+            if (
+                !SchemaValidator.validate(didDoc, "WRAP_DOC_DID_DOC", {
+                    fileName,
+                })
+            )
+                return next(ERROR_CODES.WRAP_DOC_DID_DOC_INVALID);
 
             // Update file
             const branch = `DOC_${companyName}`;

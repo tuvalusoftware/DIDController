@@ -417,7 +417,7 @@ describe("DOC", function () {
                 });
         });
 
-        it("it should return a 'file not found' error as the param 'fileName' is invalid", (done) => {
+        it("it should return a 'invalid content' error as the param 'fileName' is invalid", (done) => {
             chai.request(server)
                 .put("/api/doc")
                 .send({ ...UPDATED_DID_DOC, fileName: INVALID_PUBLIC_KEY })
@@ -426,14 +426,14 @@ describe("DOC", function () {
                     res.body.should.be.a("object");
 
                     expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(ERROR_CODES.FILE_NOT_FOUND)
+                        JSON.stringify(ERROR_CODES.WRAP_DOC_DID_DOC_INVALID)
                     );
 
                     done();
                 });
         });
 
-        it("it should return an 'invalid content' message as the provided content is invalid", (done) => {
+        it("it should return an 'invalid content' message as the did doc content is invalid", (done) => {
             chai.request(server)
                 .put("/api/doc")
                 .send(INVALID_DID_DOC)
