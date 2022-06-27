@@ -32,5 +32,3 @@ NPM version 8
 ## All The API
 
 You can view all the API by visiting the swagger UI [here](http://localhost:9000/api-docs/#/) after start the server.
-
-Here is the link to Github Proxy API [http://localhost:9000/api-docs/](http://localhost:9000/api-docs/#/)
