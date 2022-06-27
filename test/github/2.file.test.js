@@ -246,19 +246,14 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
     describe("Check for commit history", () => {
         it("it should return the commit history of a branch in newest to oldest order", async () => {
             const data = await GithubProxy.getCommitHistory(
-                5,
+                10,
                 MAIN_TEST_BRANCH
             );
 
-            expect(data.length).equal(5);
+            expect(data.length).greaterThanOrEqual(5);
             const commitMessages = data.map((el) => el.message);
-            const inOrderCommitMsgs = JSON.parse(
-                JSON.stringify(COMMIT_MESSAGES)
-            ).reverse();
 
-            expect(JSON.stringify(commitMessages)).equal(
-                JSON.stringify(inOrderCommitMsgs)
-            );
+            expect(containAllElement(commitMessages, COMMIT_MESSAGES));
         });
 
         it("it should return the commit history of a file", async () => {

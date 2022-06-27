@@ -12,7 +12,8 @@ const TEST_BRANCHES = [
     "TEST_BRANCH__QUOCBAO2",
     "TEST_BRANCH__QUOCBAO3",
 ];
-const ALL_TEST_BRANCHES = [...TEST_BRANCHES, MAIN_TEST_BRANCH];
+const NEW_BRANCH = "Branch__For__Testing";
+const ALL_TEST_BRANCHES = [...TEST_BRANCHES, MAIN_TEST_BRANCH, NEW_BRANCH];
 const NOT_EXIST_BRANCH = "iiiiii_aaaaaa";
 
 const deleteAllTestBranches = async () => {
@@ -53,7 +54,7 @@ describe("GITHUB INTERACTION --- Branch", function () {
             expect(data).to.have.property("commit");
         });
 
-        it("it should return an 'not existed' error as the branch not exist", async () => {
+        it("it should return a 'not existed' error as the branch does not exist", async () => {
             try {
                 await GithubProxy.getBranchInfo(NOT_EXIST_BRANCH);
             } catch (err) {
@@ -87,10 +88,34 @@ describe("GITHUB INTERACTION --- Branch", function () {
         });
     });
 
+    describe("Create branch if not exist", () => {
+        it("it should create a new branch and return its info", async () => {
+            const data = await GithubProxy.createBranchIfNotExist(NEW_BRANCH);
+
+            expect(data).to.have.property("name").equal(NEW_BRANCH);
+            expect(data).to.have.property("commit");
+        });
+
+        it("it should return branch info because branch already exists", async () => {
+            const data = await GithubProxy.createBranchIfNotExist(NEW_BRANCH);
+
+            expect(data).to.have.property("name").equal(NEW_BRANCH);
+            expect(data).to.have.property("commit");
+        });
+    });
+
     describe("Delete branch", () => {
-        it("it should return 'true' as branch is successfully deleted", async () => {
+        it("it should return a success message as branch is successfully deleted", async () => {
             const response = await GithubProxy.deleteBranch(MAIN_TEST_BRANCH);
             expect(response).equal(SUCCESS_CODES.DELETE_SUCCESS);
+        });
+
+        it("it should return a 'not existed' error as the branch does not exist", async () => {
+            try {
+                await GithubProxy.deleteBranch(NOT_EXIST_BRANCH);
+            } catch (err) {
+                expect(err).equal(ERROR_CODES.BRANCH_NOT_EXISTED);
+            }
         });
 
         it("it should return an array with all branches without the deleted branch", async () => {
