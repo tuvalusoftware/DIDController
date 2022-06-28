@@ -13,5 +13,6 @@ router
     .delete(docController.deleteDoc);
 
 router.route("/user").get(docController.getDocsByUser);
+router.route("/did-doc-history").get(docController.getDidDocHistory);
 
 export default router;

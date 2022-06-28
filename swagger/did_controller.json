@@ -3,7 +3,7 @@
     "info": {
         "description": "DID Controller services. Interaction with Github.",
         "title": "DID Controller",
-        "version": ""
+        "version": "v1.0"
     },
     "servers": [
         {
@@ -294,10 +294,10 @@
                 }
             }
         },
-        "/doc/history": {
+        "/doc/did-doc-history": {
             "get": {
                 "tags": ["DOC"],
-                "summary": "Retrieve all history of a file.",
+                "summary": "Retrieve the edit history of wrapped document's did doc.",
                 "parameters": [
                     {
                         "name": "companyName",
@@ -337,7 +337,7 @@
                                             "history": {
                                                 "type": "array",
                                                 "items": {
-                                                    "$ref": "#/components/schemas/WrappedDocument"
+                                                    "$ref": "#/components/schemas/DidDocOfWrappedDoc"
                                                 }
                                             }
                                         }

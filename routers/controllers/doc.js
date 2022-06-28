@@ -188,6 +188,38 @@ export default {
             next(err);
         }
     },
+    deleteDoc: async (req, res, next) => {
+        const companyName = req.header("companyName");
+        const fileName = req.header("fileName");
+
+        if (!companyName || !fileName) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
+
+        try {
+            const branch = `DOC_${companyName}`;
+
+            await GithubProxy.deleteFile(
+                `${fileName}.document`,
+                branch,
+                `DELETE: '${fileName}' document of doc company ${companyName}`
+            );
+            await GithubProxy.deleteFile(
+                `${fileName}.did`,
+                branch,
+                `DELETE: '${fileName}' DID of doc company ${companyName}`
+            );
+
+            res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
+            Logger.apiInfo(
+                req,
+                res,
+                `Delete document '${fileName}' from company ${companyName}`
+            );
+        } catch (err) {
+            next(err);
+        }
+    },
     updateDidDocController: async (req, res, next) => {
         const { didDoc, fileName, companyName } = req.body;
 
@@ -223,7 +255,7 @@ export default {
             next(err);
         }
     },
-    deleteDoc: async (req, res, next) => {
+    getDidDocHistory: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
 
@@ -233,23 +265,14 @@ export default {
 
         try {
             const branch = `DOC_${companyName}`;
+            const didDocFile = `${fileName}.did`;
 
-            await GithubProxy.deleteFile(
-                `${fileName}.document`,
-                branch,
-                `DELETE: '${fileName}' document of doc company ${companyName}`
-            );
-            await GithubProxy.deleteFile(
-                `${fileName}.did`,
-                branch,
-                `DELETE: '${fileName}' DID of doc company ${companyName}`
-            );
-
-            res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
+            const data = await GithubProxy.getFileHistory(didDocFile, branch);
+            res.status(200).json(data);
             Logger.apiInfo(
                 req,
                 res,
-                `Delete document '${fileName}' from company ${companyName}`
+                `Get the history of did doc of '${fileName}' document from company ${companyName}`
             );
         } catch (err) {
             next(err);
