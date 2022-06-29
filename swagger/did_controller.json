@@ -247,151 +247,6 @@
                 }
             }
         },
-        "/doc/exists": {
-            "get": {
-                "tags": ["DOC"],
-                "summary": "Check if document with the given name already exists within the same company.",
-                "parameters": [
-                    {
-                        "name": "companyName",
-                        "in": "header",
-                        "description": "Name of a company",
-                        "required": true,
-                        "example": "Kukulu",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "fileName",
-                        "in": "header",
-                        "description": "Name of the document (not include the file extension).",
-                        "required": true,
-                        "example": "document_name",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Return true/false on whether a file is existed",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "isExisted": {
-                                            "description": "True if file is already existed, otherwise false.",
-                                            "type": "Boolean",
-                                            "example": false
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/doc/did-doc-history": {
-            "get": {
-                "tags": ["DOC"],
-                "summary": "Retrieve the edit history of wrapped document's did doc.",
-                "parameters": [
-                    {
-                        "name": "companyName",
-                        "in": "header",
-                        "description": "Name of a company",
-                        "required": true,
-                        "example": "Kukulu",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "fileName",
-                        "in": "header",
-                        "description": "Name of the document (not include the file extension).",
-                        "required": true,
-                        "example": "document_name",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Return an object contains total of file editions and file contents.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "total": {
-                                                "type": "Number",
-                                                "example": 4
-                                            },
-                                            "history": {
-                                                "type": "array",
-                                                "items": {
-                                                    "$ref": "#/components/schemas/DidDocOfWrappedDoc"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/doc/user": {
-            "get": {
-                "tags": ["DOC"],
-                "summary": "Retrieve a list of documents own by an user.",
-                "parameters": [
-                    {
-                        "name": "companyName",
-                        "in": "header",
-                        "description": "Name of a company",
-                        "required": true,
-                        "example": "Kukulu",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "publicKey",
-                        "in": "header",
-                        "description": "User's address (public key).",
-                        "required": true,
-                        "example": "addr_test1qq53em6pdpswwc7mmeq50848emp4u7gmhp2dft4ud0lhar54000k46cgk82rmlfjysyxyvh9qkj7vtuc69ulgdypcnssjk3hur",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Return a list of wrapped documents",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/WrappedDocument"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/doc": {
             "get": {
                 "tags": ["DOC"],
@@ -583,6 +438,193 @@
                     },
                     "404": {
                         "description": "Do not exist"
+                    }
+                }
+            }
+        },
+        "/doc/exists": {
+            "get": {
+                "tags": ["DOC"],
+                "summary": "Check if document with the given name already exists within the same company.",
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "example": "Kukulu",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fileName",
+                        "in": "header",
+                        "description": "Name of the document (not include the file extension).",
+                        "required": true,
+                        "example": "document_name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return true/false on whether a file is existed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "isExisted": {
+                                            "description": "True if file is already existed, otherwise false.",
+                                            "type": "Boolean",
+                                            "example": false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doc/did-doc-history": {
+            "get": {
+                "tags": ["DOC"],
+                "summary": "Retrieve the edit history of wrapped document's did doc.",
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "example": "Kukulu",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fileName",
+                        "in": "header",
+                        "description": "Name of the document (not include the file extension).",
+                        "required": true,
+                        "example": "document_name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return an object contains total of file editions and file contents.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "total": {
+                                                "type": "Number",
+                                                "example": 4
+                                            },
+                                            "history": {
+                                                "type": "array",
+                                                "items": {
+                                                    "$ref": "#/components/schemas/DidDocOfWrappedDoc"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doc/user": {
+            "get": {
+                "tags": ["DOC"],
+                "summary": "Retrieve a list of documents own by an user.",
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "header",
+                        "description": "Name of a company",
+                        "required": true,
+                        "example": "Kukulu",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "publicKey",
+                        "in": "header",
+                        "description": "User's address (public key).",
+                        "required": true,
+                        "example": "addr_test1qq53em6pdpswwc7mmeq50848emp4u7gmhp2dft4ud0lhar54000k46cgk82rmlfjysyxyvh9qkj7vtuc69ulgdypcnssjk3hur",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return a list of wrapped documents",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/WrappedDocument"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doc/clone": {
+            "post": {
+                "tags": ["DOC"],
+                "summary": "Clone a document to a new document. (Work exactly as create a new document)",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "wrappedDocument": {
+                                        "$ref": "#/components/schemas/WrappedDocument"
+                                    },
+                                    "companyName": {
+                                        "description": "Name of the company.",
+                                        "type": "string",
+                                        "example": "Kukulu"
+                                    },
+                                    "fileName": {
+                                        "description": "Name of the file.",
+                                        "type": "string",
+                                        "example": "file_name"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
                     }
                 }
             }

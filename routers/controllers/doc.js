@@ -156,12 +156,17 @@ export default {
 
             const ownerPublicKey = extractOwnerPKFromDID(ownerDID);
 
+            // Discriminate between create a new document and clone a document
+            const isCloned = req.route.path === "/clone";
+
             // Save wrapped document
             await GithubProxy.createNewFile(
                 `${fileName}.document`,
                 wrappedDocument,
                 branchName,
-                `NEW: '${fileName}' wrapped document from company ${companyName}`
+                !isCloned
+                    ? `NEW: '${fileName}' wrapped document from company ${companyName}`
+                    : `NEW: '${fileName}' (cloned) wrapped document from company ${companyName}`
             );
 
             // Save the did doc for the wrapped document
@@ -175,14 +180,22 @@ export default {
                     url: `${fileName}.document`,
                 },
                 branchName,
-                `NEW: '${fileName}' DID for new document from company ${companyName}`
+                !isCloned
+                    ? `NEW: '${fileName}' DID for new document from company ${companyName}`
+                    : `NEW: '${fileName}' DID (cloned) for new document from company ${companyName}`
             );
 
-            res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
+            res.status(201).json(
+                !isCloned
+                    ? SUCCESS_CODES.SAVE_SUCCESS
+                    : SUCCESS_CODES.CLONE_SUCCESS
+            );
             Logger.apiInfo(
                 req,
                 res,
-                `Create new document '${fileName}' from company ${companyName}`
+                !isCloned
+                    ? `Create a new document '${fileName}' from company ${companyName}`
+                    : `Clone a new document '${fileName}' from company ${companyName}`
             );
         } catch (err) {
             next(err);

@@ -121,6 +121,7 @@ const ERROR_CODES = {
 
 const SUCCESS_CODES = {
     SAVE_SUCCESS: { message: "Successfully Saved" },
+    CLONE_SUCCESS: { message: "Successfully Cloned" },
     UPDATE_SUCCESS: { message: "Successfully Updated" },
     DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
