@@ -1,6 +1,6 @@
 import GithubProxy from "../../db/github/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
-import { validateObject } from "../../utils/index.js";
+import SchemaValidator from "../../schema/schemaValidator.js";
 import Logger from "../../logger.js";
 
 export default {
@@ -73,11 +73,12 @@ export default {
         }
 
         try {
+            // Validate user's did document
+            if (!SchemaValidator.validate(content, "USER_DID_DOC"))
+                return next(ERROR_CODES.USER_DID_DOC_INVALID);
+
             const newBranch = `DID_${companyName}`;
             await GithubProxy.createBranchIfNotExist(newBranch);
-
-            if (!validateObject(["controller", "id"], content))
-                return next(ERROR_CODES.DID_CONTENT_INVALID);
 
             await GithubProxy.createNewFile(
                 `${fileName}.did`,
@@ -86,7 +87,7 @@ export default {
                 `NEW: '${fileName}' DID Doc of company "${companyName}"`
             );
 
-            res.status(201).json({ message: SUCCESS_CODES.SAVE_SUCCESS });
+            res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
             Logger.apiInfo(
                 req,
                 res,
@@ -104,9 +105,11 @@ export default {
         }
 
         try {
-            const branch = `DID_${companyName}`;
-            await GithubProxy.getBranchInfo(branch);
+            // Validate user's did document
+            if (!SchemaValidator.validate(content, "USER_DID_DOC"))
+                return next(ERROR_CODES.USER_DID_DOC_INVALID);
 
+            const branch = `DID_${companyName}`;
             await GithubProxy.updateFile(
                 `${fileName}.did`,
                 content,
@@ -114,7 +117,7 @@ export default {
                 `UPDATE: '${fileName}' DID of company ${companyName}`
             );
 
-            res.status(200).json({ message: SUCCESS_CODES.UPDATE_SUCCESS });
+            res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
             Logger.apiInfo(
                 req,
                 res,
@@ -140,7 +143,7 @@ export default {
                 `DELETE: '${fileName}' DID of company ${companyName}`
             );
 
-            res.status(200).json({ message: SUCCESS_CODES.DELETE_SUCCESS });
+            res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
             Logger.apiInfo(
                 req,
                 res,

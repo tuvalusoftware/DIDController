@@ -1,9 +1,9 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 
-import GithubProxy from "../db/github/index.js";
-import server from "../server.js";
-import { SUCCESS_CODES, ERROR_CODES } from "../constants/index.js";
+import GithubProxy from "../../db/github/index.js";
+import server from "../../server.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 let should = chai.should();
 let expect = chai.expect;
@@ -16,14 +16,14 @@ const TEST_DATA = {
     publicKey: TEST_PUBLICKEY,
     content: {
         controller: "123456adbcd",
-        id: "did:some_string:company:123456adbcd",
+        did: "did:company:123456adbcd",
     },
 };
 const CREDENTIAL_DATA = {
-    issuer: TEST_PUBLICKEY,
-    subject: "other_public_key",
+    issuer: `did:company:${TEST_PUBLICKEY}`,
+    subject: "did:company2:other_public_key",
     credentialSubject: {
-        object: "an_wrapped_doc_did",
+        object: "did:some_method:an_wrapped_doc_did",
         action: { code: 3000, value: "changeOwnerShip" },
     },
     signature: "12345678986543234567qwertytwq231234567876543sdfghgfds",
@@ -34,10 +34,10 @@ const CREDENTIAL_DATA = {
 };
 
 const CREDENTIAL_DATA2 = {
-    issuer: TEST_PUBLICKEY,
-    subject: "other_public_key2",
+    issuer: `did:company:${TEST_PUBLICKEY}`,
+    subject: "did:company:other_public_key2",
     credentialSubject: {
-        object: "an_wrapped_doc_did",
+        object: "did:some_method:an_wrapped_doc_did",
         action: { code: 3000, value: "changeHolderShip" },
     },
     signature: "12345678986543234567qwertytwq231234567876543sdfghgfds",
@@ -70,7 +70,11 @@ describe("CREDENTIAL", function () {
                 .end((err, res) => {
                     res.should.have.status(201);
                     res.body.should.be.a("object");
-                    res.body.message.should.equal(SUCCESS_CODES.SAVE_SUCCESS);
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                    );
+
                     done();
                 });
         });
@@ -86,7 +90,11 @@ describe("CREDENTIAL", function () {
                 .end((err, res) => {
                     res.should.have.status(201);
                     res.body.should.be.a("object");
-                    res.body.message.should.equal(SUCCESS_CODES.SAVE_SUCCESS);
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                    );
+
                     done();
                 });
         });
@@ -102,7 +110,11 @@ describe("CREDENTIAL", function () {
                 .end((err, res) => {
                     res.should.have.status(201);
                     res.body.should.be.a("object");
-                    res.body.message.should.equal(SUCCESS_CODES.SAVE_SUCCESS);
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                    );
+
                     done();
                 });
         });
@@ -139,7 +151,7 @@ describe("CREDENTIAL", function () {
                     res.body.should.be.a("object");
 
                     expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(ERROR_CODES.CREDENTIAL_CONTENT_INVALID)
+                        JSON.stringify(ERROR_CODES.CREDENTIAL_INVALID)
                     );
 
                     done();

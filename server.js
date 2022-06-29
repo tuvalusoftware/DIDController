@@ -34,6 +34,9 @@ app.use((err, req, res, _) => {
         case ERROR_CODES.BRANCH_NOT_EXISTED:
             returnError = ERROR_CODES.COMPANY_NOT_FOUND;
             break;
+        case ERROR_CODES.INVALID_REF_NAME:
+            returnError = ERROR_CODES.COMPANY_NAME_INVALID;
+            break;
         default:
             returnError = err;
     }

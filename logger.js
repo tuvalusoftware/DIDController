@@ -1,6 +1,7 @@
 /* c8 ignore start */
 import { createLogger, format, transports } from "winston";
 import { detectGithubError } from "./db/github/helpers.js";
+import SchemaValidator from "./schema/schemaValidator.js";
 import { ERROR_CODES } from "./constants/index.js";
 
 const customLogLevel = (logLevel) => {
@@ -64,12 +65,19 @@ export default {
         infoLogger.info(`[${req.method} - ${req.originalUrl}] ${message}`);
     },
     apiError(err, req, res) {
-        infoLogger.error(`[${req.method} - ${req.originalUrl}] ${err.message}`);
+        infoLogger.error(
+            `[${req.method} - ${req.originalUrl}] ${err.error_message}`
+        );
         debugLogger.error(
-            `[${req.method} - ${req.originalUrl}] ${err.message}`
+            `[${req.method} - ${req.originalUrl}] ${err.error_message}`
         );
     },
     handleGithubError(err) {
+        // If error is already identified as the custom error, return it.
+        if (SchemaValidator.validate(err, "ERROR_OBJECT")) {
+            return err;
+        }
+
         if (err.response) {
             const detectedErr = detectGithubError(err);
 

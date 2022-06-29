@@ -1,7 +1,7 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "description": "DID Controller service",
+        "description": "DID Controller services. Interaction with Github.",
         "title": "DID Controller",
         "version": ""
     },
@@ -53,7 +53,10 @@
                             "application/json": {
                                 "schema": {
                                     "type": "array",
-                                    "example": ["example1.did", "example2.did"],
+                                    "example": [
+                                        "public_key1.did",
+                                        "public_key2.did"
+                                    ],
                                     "items": {}
                                 }
                             }
@@ -97,7 +100,17 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/DID_Object"
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "Name of the DID",
+                                            "example": "public_key"
+                                        },
+                                        "didDoc": {
+                                            "$ref": "#/components/schemas/DidDocOfUser"
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -127,13 +140,7 @@
                                         "example": "public_key"
                                     },
                                     "content": {
-                                        "description": "Content of the DID doc.",
-                                        "type": "object",
-                                        "example": {
-                                            "controller": "123abcd",
-                                            "id": "did:some_string:company:publicKey",
-                                            "date": "10-10-2000"
-                                        }
+                                        "$ref": "#/components/schemas/DidDocOfUser"
                                     }
                                 }
                             }
@@ -446,7 +453,7 @@
                                             "$ref": "#/components/schemas/WrappedDocument"
                                         },
                                         "didDoc": {
-                                            "$ref": "#/components/schemas/DID_Doc"
+                                            "$ref": "#/components/schemas/DidDocOfWrappedDoc"
                                         }
                                     }
                                 }
@@ -508,7 +515,7 @@
                                 "type": "object",
                                 "properties": {
                                     "didDoc": {
-                                        "$ref": "#/components/schemas/DID_Doc"
+                                        "$ref": "#/components/schemas/DidDocOfWrappedDoc"
                                     },
                                     "companyName": {
                                         "description": "Name of the company.",
@@ -670,21 +677,13 @@
     },
     "components": {
         "schemas": {
-            "DID_Object": {
+            "DidDocOfUser": {
                 "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "Name of the DID",
-                        "example": "public_key"
-                    },
-                    "content": {
-                        "type": "object",
-                        "description": "DID document in JSON format.",
-                        "example": {
-                            "date": "10-10-2000"
-                        }
-                    }
+                "description": "DID document in JSON format.",
+                "example": {
+                    "controller": "publicKey",
+                    "did": "did:company:publicKey",
+                    "date": "10-10-2000"
                 }
             },
             "WrappedDocument": {
@@ -722,7 +721,7 @@
                     "assetId": "d1082d0b547424c25487edc8f45d19041d1f64cba052b4f61ac6487c3964316238393761323763636139653733613333386630626135383231333139"
                 }
             },
-            "DID_Doc": {
+            "DidDocOfWrappedDoc": {
                 "type": "object",
                 "properties": {
                     "controller": {
@@ -733,22 +732,22 @@
                     "did": {
                         "type": "string",
                         "description": "DID of the did doc",
-                        "example": "did:<company_name>:<owner_pk>:<holder_pk>"
+                        "example": "did:company_name:owner_pk:holder_pk"
                     },
                     "owner": {
                         "type": "string",
                         "description": "public key of the document owner",
-                        "example": "holder_public_key"
+                        "example": "owner_public_key"
                     },
                     "holder": {
                         "type": "string",
                         "description": "public key of the document holder",
-                        "example": "owner_public_key"
+                        "example": "holder_public_key"
                     },
                     "url": {
                         "type": "string",
                         "description": "URL to the document file",
-                        "example": "document_name.document"
+                        "example": "file_name.document"
                     }
                 }
             },
@@ -783,10 +782,10 @@
                     }
                 },
                 "example": {
-                    "issuer": "owner_public_key",
-                    "subject": "other_public_key",
+                    "issuer": "did:company:owner_public_key",
+                    "subject": "did:company2:other_public_key",
                     "credentialSubject": {
-                        "object": "an_wrapped_doc_did",
+                        "object": "did:some_method:an_wrapped_doc_did",
                         "action": { "code": 3000, "value": "changeHolderShip" }
                     },
                     "signature": "12345678986543234567qwertytwq231234567876543sdfghgfds",

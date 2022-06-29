@@ -1,6 +1,7 @@
 import GithubProxy from "../../db/github/index.js";
 import Logger from "../../logger.js";
-import { extractOwnerPKFromDID, validateObject } from "../../utils/index.js";
+import SchemaValidator from "../../schema/schemaValidator.js";
+import { extractOwnerPKFromDID } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 export default {
@@ -168,7 +169,7 @@ export default {
                 `${fileName}.did`,
                 {
                     controller: [ownerPublicKey],
-                    did: `did::${companyName}:${ownerPublicKey}:${ownerPublicKey}`,
+                    did: `did:${companyName}:${ownerPublicKey}:${ownerPublicKey}`,
                     owner: ownerPublicKey,
                     holder: ownerPublicKey,
                     url: `${fileName}.document`,
@@ -177,14 +178,14 @@ export default {
                 `NEW: '${fileName}' DID for new document from company ${companyName}`
             );
 
-            res.status(201).json({ message: SUCCESS_CODES.SAVE_SUCCESS });
+            res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
             Logger.apiInfo(
                 req,
                 res,
                 `Create new document '${fileName}' from company ${companyName}`
             );
         } catch (err) {
-            return next(err);
+            next(err);
         }
     },
     updateDidDocController: async (req, res, next) => {
@@ -194,17 +195,17 @@ export default {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
 
-        if (
-            !validateObject(
-                ["controller", "did", "url", "owner", "holder"],
-                didDoc
-            )
-        )
-            return next(ERROR_CODES.DID_DOC_CONTENT_INVALID);
-
         try {
-            const branch = `DOC_${companyName}`;
+            // Validate fields of did doc content
+            if (
+                !SchemaValidator.validate(didDoc, "WRAP_DOC_DID_DOC", {
+                    fileName,
+                })
+            )
+                return next(ERROR_CODES.WRAP_DOC_DID_DOC_INVALID);
 
+            // Update file
+            const branch = `DOC_${companyName}`;
             await GithubProxy.updateFile(
                 `${fileName}.did`,
                 didDoc,
@@ -212,9 +213,7 @@ export default {
                 `UPDATE: '${fileName}' did document of company ${companyName}`
             );
 
-            res.status(200).json({
-                message: SUCCESS_CODES.UPDATE_SUCCESS,
-            });
+            res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
             Logger.apiInfo(
                 req,
                 res,
@@ -246,7 +245,7 @@ export default {
                 `DELETE: '${fileName}' DID of doc company ${companyName}`
             );
 
-            res.status(200).json({ message: SUCCESS_CODES.DELETE_SUCCESS });
+            res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
             Logger.apiInfo(
                 req,
                 res,

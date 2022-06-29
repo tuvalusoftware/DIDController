@@ -1,9 +1,9 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 
-import GithubProxy from "../db/github/index.js";
-import server from "../server.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../constants/index.js";
+import GithubProxy from "../../db/github/index.js";
+import server from "../../server.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 let should = chai.should();
 let expect = chai.expect;
@@ -57,10 +57,11 @@ const TEST_DATA = {
             "d1082d0b547424c25487edc8f45d19041d1f64cba052b4f61ac6487c3964316238393761323763636139653733613333386630626135383231333139",
     },
     companyName: TEST_BRANCH,
-    fileName: "file_name",
+    fileName: "test_file_name_10",
 };
 
 const INVALID_PUBLIC_KEY = "this is an ivalid public key";
+const INVALID_COMPANY_NAME = "this is an ivalid company name";
 const TEST_PUBLIC_KEY = "abcdxyz12345";
 const TEST_WRAPPED_DOCS = [
     {
@@ -95,6 +96,28 @@ const TEST_WRAPPED_DOCS = [
     },
 ];
 
+const UPDATED_DID_DOC = {
+    didDoc: {
+        controller: ["owner_public_key", "holder_public_key"],
+        did: "did:company_name:owner_pk:holder_pk",
+        owner: "owner_public_key",
+        holder: "holder_public_key",
+        url: "test_file_name_10.document",
+    },
+    companyName: TEST_BRANCH,
+    fileName: "test_file_name_10",
+};
+
+const INVALID_DID_DOC = {
+    didDoc: {
+        controller: ["owner_public_key", "holder_public_key"],
+        did: "did:company_name:owner_pk:holder_pk",
+        owner: "owner_public_key",
+    },
+    companyName: TEST_BRANCH,
+    fileName: "test_file_name",
+};
+
 const EMPTY_DATA = {};
 
 describe("DOC", function () {
@@ -109,7 +132,7 @@ describe("DOC", function () {
     });
 
     describe("/POST create new document", () => {
-        it("it should return a error message as the post data is invalid", (done) => {
+        it("it should return a 'missing params' error as the required params are not provided", (done) => {
             chai.request(server)
                 .post("/api/doc")
                 .send(EMPTY_DATA)
@@ -124,13 +147,34 @@ describe("DOC", function () {
                 });
         });
 
-        it("it should return a success message", (done) => {
+        it("it should return a 'company name invalid' error as the param 'companyName' is invalid", (done) => {
+            chai.request(server)
+                .post("/api/doc")
+                .send({ ...TEST_DATA, companyName: INVALID_COMPANY_NAME })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NAME_INVALID)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a success message states that the wrapped document is saved successfully", (done) => {
             chai.request(server)
                 .post("/api/doc")
                 .send(TEST_DATA)
                 .end((err, res) => {
                     res.should.have.status(201);
                     res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                    );
+
                     done();
                 });
         });
@@ -233,12 +277,15 @@ describe("DOC", function () {
 
         it("it should GET only the wrapped document as the flag indicates to exclude the did doc", (done) => {
             chai.request(server)
-                .get("/api/doc?exclude=did")
+                .get("/api/doc?only=doc")
                 .set("companyName", TEST_DATA.companyName)
                 .set("fileName", TEST_DATA.fileName)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
+
+                    expect(Object.keys(res.body).length).equal(1);
+
                     res.body.should.have
                         .property("wrappedDoc")
                         .eql(TEST_DATA.wrappedDocument);
@@ -249,12 +296,14 @@ describe("DOC", function () {
 
         it("it should GET only the did document of the wrapped document as the flag indicates to exclude the wrapped document", (done) => {
             chai.request(server)
-                .get("/api/doc?exclude=doc")
+                .get("/api/doc?only=did")
                 .set("companyName", TEST_DATA.companyName)
                 .set("fileName", TEST_DATA.fileName)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
+
+                    expect(Object.keys(res.body).length).equal(1);
 
                     res.body.should.have.property("didDoc");
                     res.body.didDoc.should.have.property("controller");
@@ -335,6 +384,108 @@ describe("DOC", function () {
         });
     });
 
+    describe("/PUT update did doc of the wrapped document", () => {
+        it("it should return a 'missing params' error as the required params are not provided", (done) => {
+            chai.request(server)
+                .put("/api/doc")
+                .send(EMPTY_DATA)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.MISSING_PARAMETERS)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
+            chai.request(server)
+                .put("/api/doc")
+                .send({ ...UPDATED_DID_DOC, companyName: INVALID_COMPANY_NAME })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'invalid content' error as the param 'fileName' is invalid", (done) => {
+            chai.request(server)
+                .put("/api/doc")
+                .send({ ...UPDATED_DID_DOC, fileName: INVALID_PUBLIC_KEY })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.WRAP_DOC_DID_DOC_INVALID)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return an 'invalid content' message as the did doc content is invalid", (done) => {
+            chai.request(server)
+                .put("/api/doc")
+                .send(INVALID_DID_DOC)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.WRAP_DOC_DID_DOC_INVALID)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a success message states that did document is updated successfully", (done) => {
+            chai.request(server)
+                .put("/api/doc")
+                .send(UPDATED_DID_DOC)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.UPDATE_SUCCESS)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should successfully GET the updated did document ", (done) => {
+            chai.request(server)
+                .get("/api/doc?only=did")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", TEST_DATA.fileName)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(Object.keys(res.body).length).equal(1);
+
+                    res.body.should.have.property("didDoc");
+                    expect(JSON.stringify(res.body.didDoc)).equal(
+                        JSON.stringify(UPDATED_DID_DOC.didDoc)
+                    );
+
+                    done();
+                });
+        });
+    });
+
     describe("/DELETE delete document from a branch", () => {
         it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
             chai.request(server)
@@ -345,7 +496,7 @@ describe("DOC", function () {
                 });
         });
 
-        it("it should return a 'success' message", (done) => {
+        it("it should return a success message states that the wrapped document is deleted successfully", (done) => {
             chai.request(server)
                 .delete("/api/doc")
                 .set("companyName", TEST_DATA.companyName)
@@ -353,9 +504,10 @@ describe("DOC", function () {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
-                    res.body.should.have
-                        .property("message")
-                        .eql(SUCCESS_CODES.DELETE_SUCCESS);
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.DELETE_SUCCESS)
+                    );
 
                     done();
                 });

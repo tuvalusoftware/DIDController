@@ -7,9 +7,10 @@
     "scripts": {
         "main": "npx nodemon main.js",
         "start": "npx nodemon server.js",
-        "test-did": "export NODE_ENV=test && mocha ./test/1.did.test.js --exit",
-        "test-doc": "export NODE_ENV=test && mocha ./test/2.doc.test.js --exit",
-        "test-cre": "export NODE_ENV=test && mocha ./test/3.credential.test.js --exit",
+        "test-did": "export NODE_ENV=test && mocha ./test/api/1.did.test.js --exit",
+        "test-doc": "export NODE_ENV=test && mocha ./test/api/2.doc.test.js --exit",
+        "test-cre": "export NODE_ENV=test && mocha ./test/api/3.credential.test.js --exit",
+        "test-api": "export NODE_ENV=test && mocha ./test/api/**.test.js --exit",
         "test-github": "export NODE_ENV=test && mocha ./test/github/**.test.js --exit",
         "test": "export NODE_ENV=test && mocha --recursive --exit",
         "coverage": "c8 --check-coverage --lines 85 npm test"
@@ -26,6 +27,7 @@
     },
     "homepage": "https://github.com/NgoQuocBao1010/My-JS-Utils#readme",
     "dependencies": {
+        "ajv": "^8.11.0",
         "axios": "^0.27.2",
         "body-parser": "^1.20.0",
         "cors": "^2.8.5",

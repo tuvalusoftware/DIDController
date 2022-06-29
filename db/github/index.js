@@ -12,7 +12,7 @@ const repo = process.env.REPO_NAME;
 
 export default {
     /**
-     *
+     * @description Get any object (blob, tree, commit) info from github using its SHA (Github ID)
      * @param {String} sha Git Object Id (could be blob, tree, commit)
      * @param {String} type Type of git object (default to 'blob')
      * @returns {Object} Information of a git object
@@ -119,19 +119,20 @@ export default {
      * @returns {Promise} branch object { ref, object { sha } }
      */
     createBranchIfNotExist: async function (branchName) {
-        const branches = await this.getAllBranches();
-        const branch = branches.find((el) => el.name === branchName);
+        try {
+            const branch = await this.getBranchInfo(branchName);
+            return branch;
+        } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED) {
+                const branch = await this.checkoutNewBranch(
+                    branchName,
+                    "empty_branch"
+                );
+                return branch;
+            }
 
-        if (branch) return branch;
-
-        return new Promise((resolve, reject) => {
-            this.checkoutNewBranch(branchName, "empty_branch")
-                .then((data) => resolve(data))
-                .catch((err) => {
-                    const errInfo = Logger.handleGithubError(err);
-                    reject(errInfo);
-                });
-        });
+            throw err;
+        }
     },
     /**
      * @description Delete a branch, for security reason, branch "main" cannot be deleted
@@ -147,6 +148,14 @@ export default {
                     resolve(SUCCESS_CODES.DELETE_SUCCESS);
                 })
                 .catch((err) => {
+                    if (
+                        err.response.data.message ===
+                            "Reference does not exist" &&
+                        err.response.status === 422
+                    ) {
+                        return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
+                    }
+
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);
                 });
@@ -157,11 +166,11 @@ export default {
      * @param {String} branchName new branch's name
      */
     deleteBranchIfExist: async function (branchName) {
-        const branches = await this.getAllBranches();
-        const branch = branches.find((el) => el.name === branchName);
-
-        if (!branch) return;
-        await this.deleteBranch(branchName);
+        try {
+            await this.deleteBranch(branchName);
+        } catch (err) {
+            if (err !== ERROR_CODES.BRANCH_NOT_EXISTED) throw err;
+        }
     },
     /**
      * @description Return the last commit SHA (id) of a branch
