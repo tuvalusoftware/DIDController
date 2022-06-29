@@ -945,25 +945,26 @@ export default {
      * @returns {Promise} 'Delete success'
      */
     deleteRelease: async function (tagName) {
-        const { id: tagId } = await this.getARelease(tagName);
+        try {
+            const { id: tagId } = await this.getARelease(tagName);
 
-        return new Promise((resolve, reject) => {
-            GithubREST.delete(`releases/${tagId}`)
-                .then((_) => {
-                    resolve(SUCCESS_CODES.DELETE_SUCCESS);
-                })
-                .catch((err) => {
-                    if (
-                        err.response.data.message ===
-                            "Reference does not exist" &&
-                        err.response.status === 422
-                    ) {
-                        return reject(ERROR_CODES.REF_NOT_EXISTED);
-                    }
+            // Delete both the release and its tag
+            await Promise.all([
+                GithubREST.delete(`releases/${tagId}`),
+                this.deleteATag(tagName),
+            ]);
 
-                    const errInfo = Logger.handleGithubError(err);
-                    reject(errInfo);
-                });
-        });
+            return SUCCESS_CODES.DELETE_SUCCESS;
+        } catch (err) {
+            if (
+                err.response?.data.message === "Reference does not exist" &&
+                err.response?.status === 422
+            ) {
+                throw ERROR_CODES.REF_NOT_EXISTED;
+            }
+
+            const errInfo = Logger.handleGithubError(err);
+            throw errInfo;
+        }
     },
 };
