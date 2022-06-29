@@ -8,13 +8,13 @@ import { ERROR_CODES } from "../../constants/index.js";
 let expect = chai.expect;
 
 const RELEASE1 = {
-    name: "v0.0.test.1",
+    name: `v0.0.test.${Date.now()}`,
     message: "Release test 1",
     commit: "Save a file",
 };
 
 const RELEASE2 = {
-    name: "v0.0.test.2",
+    name: `v0.0.test.${Date.now()}.2`,
     message: "Release test 2",
     commit: "Update a file",
 };
@@ -48,6 +48,11 @@ describe("GITHUB INTERACTION --- Release", function () {
 
     after(async () => {
         await GithubProxy.deleteBranchIfExist(MAIN_TEST_BRANCH);
+
+        try {
+            await GithubProxy.deleteRelease(RELEASE1.name);
+            await GithubProxy.deleteRelease(RELEASE2.name);
+        } catch (err) {}
     });
 
     describe("Tag a commit as release", () => {
@@ -133,7 +138,13 @@ describe("GITHUB INTERACTION --- Release", function () {
         });
     });
 
-    describe("Get releases and their targets", () => {
+    describe("Get releases and their targets", function () {
+        before(function (done) {
+            setTimeout(function () {
+                done();
+            }, 2000);
+        });
+
         it("Get all tags should include the new tags", async () => {
             const releases = await GithubProxy.getAllReleases();
             const releaseNames = releases.map((el) => el.tag_name);
