@@ -21,6 +21,8 @@ NPM version 8
     AUTH_TOKEN=<Github access token>
     ```
 
+1. In the repository, it should have the "main" branch and create another branch named "empty_branch" which should not have any file under that branch.
+
 1. Run server (server will run on port 9000)
 
     ```
