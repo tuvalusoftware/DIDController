@@ -88,8 +88,7 @@
         "required": ["error_code", "error_message"],
         "properties": {
             "error_code": {
-                "type": "number",
-                "minLength": 1
+                "type": "number"
             },
             "error_message": {
                 "type": "string",
