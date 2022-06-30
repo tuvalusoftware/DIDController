@@ -145,13 +145,23 @@ describe("GITHUB INTERACTION --- Release", function () {
             }, 2000);
         });
 
-        it("Get all tags should include the new tags", async () => {
+        it("Get all releases should include the new ones", async () => {
             const releases = await GithubProxy.getAllReleases();
             const releaseNames = releases.map((el) => el.tag_name);
 
             expect(
                 containAllElement(releaseNames, [RELEASE1.name, RELEASE2.name])
             ).equal(true);
+        });
+
+        it("it should return an 'not found' error as the release with the given name does not exist", async () => {
+            const NONE_EXIST_RL_NAME = `NOT__EXIST__RL`;
+
+            try {
+                await GithubProxy.getARelease(NONE_EXIST_RL_NAME);
+            } catch (err) {
+                console.log(err);
+            }
         });
 
         it("it should get each release along with its commit info successfully ", async () => {

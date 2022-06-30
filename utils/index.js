@@ -7,7 +7,7 @@ dayjs.extend(customParseFormat);
  * @param {String} dataString
  * @returns {String}
  */
-const tryParse = (dataString) => {
+const tryParseStringToObj = (dataString) => {
     try {
         return JSON.parse(dataString);
     } catch (e) {
@@ -90,7 +90,7 @@ const extractOwnerPKFromDID = (didString) => {
 export {
     containAllElement,
     haveCommonElement,
-    tryParse,
+    tryParseStringToObj,
     getFileExtension,
     stringToDate,
     isExistsKey,

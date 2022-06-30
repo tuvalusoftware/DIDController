@@ -4,7 +4,7 @@ dotenv.config();
 import GithubREST from "./rest.js";
 import GithubGraphQL from "./graphql.js";
 import Logger from "../../logger.js";
-import { tryParse, getFileExtension } from "../../utils/index.js";
+import { tryParseStringToObj, getFileExtension } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 const owner = process.env.REPO_OWNER;
@@ -58,13 +58,11 @@ export default {
                     resolve({ name, commit });
                 })
                 .catch((err) => {
-                    if (err.response) {
-                        if (
-                            err.response.status === 404 &&
-                            err.response.data.message === "Branch not found"
-                        ) {
-                            return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
-                        }
+                    if (
+                        err.response?.status === 404 &&
+                        err.response?.data.message === "Branch not found"
+                    ) {
+                        return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
                     }
 
                     const errInfo = Logger.handleGithubError(err);
@@ -98,14 +96,12 @@ export default {
                     throw ERROR_CODES.GITHUB_API_ERROR;
                 })
                 .catch((err) => {
-                    if (err.response) {
-                        if (
-                            err.response.status === 422 &&
-                            err.response.data.message ===
-                                "Reference already exists"
-                        ) {
-                            return reject(ERROR_CODES.BRANCH_EXISTED);
-                        }
+                    if (
+                        err.response?.status === 422 &&
+                        err.response?.data.message ===
+                            "Reference already exists"
+                    ) {
+                        return reject(ERROR_CODES.BRANCH_EXISTED);
                     }
 
                     const errInfo = Logger.handleGithubError(err);
@@ -141,7 +137,8 @@ export default {
      */
     deleteBranch: function (branch) {
         return new Promise((resolve, reject) => {
-            if (branch === "main") return reject(ERROR_CODES.DELETE_MAIN);
+            if (branch === "main")
+                return reject(ERROR_CODES.DELETE_MAIN_BRANCH);
 
             GithubREST.delete(`git/refs/heads/${branch}`)
                 .then((_) => {
@@ -149,9 +146,9 @@ export default {
                 })
                 .catch((err) => {
                     if (
-                        err.response.data.message ===
+                        err.response?.data.message ===
                             "Reference does not exist" &&
-                        err.response.status === 422
+                        err.response?.status === 422
                     ) {
                         return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
                     }
@@ -182,7 +179,10 @@ export default {
             GithubREST.get(`git/ref/heads/${branch}`)
                 .then((response) => resolve(response.data.object.sha))
                 .catch((err) => {
-                    if (err.response?.status === 404) {
+                    if (
+                        err.response?.status === 404 &&
+                        err.response?.data.message === "Not Found"
+                    ) {
                         return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
                     }
 
@@ -247,12 +247,15 @@ export default {
                         return reject(errInfo);
                     }
 
-                    if (!res.data.data.repository.branch) {
+                    if (!res.data.data?.repository?.branch)
                         return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
-                    }
 
                     const { totalCount, pageInfo } =
                         res.data.data.repository.branch.target.history;
+
+                    // If there is no commits, file is not exists
+                    if (totalCount === 0)
+                        return reject(ERROR_CODES.BLOB_NOT_EXISTED);
 
                     const history =
                         res.data.data.repository.branch.target.history.edges.map(
@@ -335,8 +338,8 @@ export default {
                 )
                 .catch((err) => {
                     if (
-                        err.response.status === 404 &&
-                        err.response.data.message === "Not Found"
+                        err.response?.status === 404 &&
+                        err.response?.data.message === "Not Found"
                     )
                         return resolve(false);
 
@@ -346,11 +349,11 @@ export default {
         });
     },
     /**
-     * @description Return the content as a string (mostly base64 encoded) of file from repository
+     * @description Return the content as a string (mostly base64 encoded e.g image, pdf, ...) of file from repository
      * @param {String} fileSHA SHA (id) string of a file
      * @returns {String}
      */
-    getBinaryFile: function (fileSHA) {
+    getFileAsBinary: function (fileSHA) {
         return new Promise((resolve, reject) => {
             GithubREST.get(`git/blobs/${fileSHA}`)
                 .then((response) => resolve(response.data.content))
@@ -401,10 +404,10 @@ export default {
                         )
                             data.isBinary = true;
 
-                        // Parse content to JS object if data is json
+                        // Parse content to JS object if data is a text file (e.g: json)
                         data.content = data.isBinary
-                            ? await this.getBinaryFile(data.oid)
-                            : tryParse(data.text);
+                            ? await this.getFileAsBinary(data.oid)
+                            : tryParseStringToObj(data.text);
 
                         resolve(data);
                     } else reject(ERROR_CODES.BLOB_NOT_EXISTED);
@@ -443,6 +446,7 @@ export default {
             cursor = pageInfo.endCursor;
         }
 
+        // Loop through all the commits to get file content
         const getFileOperations = commits.map((el) =>
             this.getFile(filePath, el.oid)
         );
@@ -466,14 +470,14 @@ export default {
         includeContent = false
     ) {
         const includeContentQuery = includeContent
-            ? `object {
-            ... on Blob {
-                byteSize
-                text
-                isBinary
-                oid
-            }
-        }`
+            ? ` object {
+                    ... on Blob {
+                        byteSize
+                        text
+                        isBinary
+                        oid
+                    }
+                }`
             : "";
 
         const queryString = `
@@ -504,7 +508,7 @@ export default {
                         return reject(errInfo);
                     }
 
-                    const responseData = response.data.data.repository.object;
+                    const responseData = response.data.data?.repository?.object;
                     if (
                         (responseData &&
                             Object.keys(responseData).length === 0 &&
@@ -573,7 +577,7 @@ export default {
         path,
         content,
         branch = "main",
-        commitMessage = "New Commit"
+        commitMessage = "CREATE a file"
     ) {
         return new Promise((resolve, reject) => {
             this._updateContent(path, content, branch, commitMessage)
@@ -582,9 +586,12 @@ export default {
                     return resolve({ path, sha, size });
                 })
                 .catch((err) => {
-                    if (err.response) {
-                        if (err.response.status === 422)
-                            return reject(ERROR_CODES.BLOB_EXISTED);
+                    if (
+                        err.response?.status === 422 &&
+                        err.response?.data.message ===
+                            `Invalid request.\n\n"sha" wasn't supplied.`
+                    ) {
+                        return reject(ERROR_CODES.BLOB_EXISTED);
                     }
 
                     const errInfo = Logger.handleGithubError(err);
@@ -604,7 +611,7 @@ export default {
         path,
         content,
         branch = "main",
-        commitMessage = "New Update Commit"
+        commitMessage = "UPDATE a file"
     ) {
         const lastCommitOfBranch = await this.getBranchLastCommitSHA(branch);
         const { oid: fileSHA, content: oldContent } = await this.getFile(
@@ -643,12 +650,12 @@ export default {
                 branch,
                 message: commitMessage
                     ? commitMessage
-                    : `Delete a file with path: "${path}"`,
+                    : `DELETE a file with path: "${path}"`,
                 sha: fileSHA,
             };
 
             GithubREST.delete(`contents/${path}`, data)
-                .then((response) => resolve(SUCCESS_CODES.DELETE_SUCCESS))
+                .then((_) => resolve(SUCCESS_CODES.DELETE_SUCCESS))
                 .catch((err) => {
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);
@@ -794,9 +801,9 @@ export default {
                 })
                 .catch((err) => {
                     if (
-                        err.response.data.message ===
+                        err.response?.data.message ===
                             "Reference does not exist" &&
-                        err.response.status === 422
+                        err.response?.status === 422
                     ) {
                         return reject(ERROR_CODES.REF_NOT_EXISTED);
                     }
@@ -808,6 +815,7 @@ export default {
     },
     /**
      * Create a release by pointing to a commit
+     * Releases are GitHub's way of packaging and providing software to your users. You can think of it as a replacement to using downloads to provide software.
      * @param {String} tagName name of the tag
      * @param {String} message message for the release
      * @param {String} commitSHA commit ID
@@ -881,13 +889,9 @@ export default {
                 })
                 .catch((err) => {
                     if (
-                        err.response?.status === 422 &&
-                        err.response?.data.message
+                        err.response?.status === 404 &&
+                        err.response?.data.message === "Not Found"
                     ) {
-                        return reject(ERROR_CODES.REF_EXISTED);
-                    }
-
-                    if (err.response.status === 404) {
                         return reject(ERROR_CODES.REF_NOT_EXISTED);
                     }
 
@@ -927,13 +931,6 @@ export default {
                     resolve(results);
                 })
                 .catch((err) => {
-                    if (
-                        err.response?.status === 422 &&
-                        err.response?.data.message
-                    ) {
-                        return reject(ERROR_CODES.REF_EXISTED);
-                    }
-
                     const errInfo = Logger.handleGithubError(err);
                     reject(errInfo);
                 });
