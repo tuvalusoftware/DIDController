@@ -38,6 +38,9 @@
             "url": {
                 "type": "string",
                 "minLength": 2
+            },
+            "meta_data": {
+                "type": "object"
             }
         },
         "additionalProperties": false
