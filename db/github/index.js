@@ -426,21 +426,18 @@ export default {
      */
     getFileHistory: async function (filePath, branchName = "main") {
         let commits = [];
-        let total = 0;
         let cursor = null;
         const commitsPerQuery = 100;
 
         while (true) {
-            const { history, totalCount, pageInfo } =
-                await this._getCommitHistory(
-                    commitsPerQuery,
-                    branchName,
-                    filePath,
-                    cursor
-                );
+            const { history, pageInfo } = await this._getCommitHistory(
+                commitsPerQuery,
+                branchName,
+                filePath,
+                cursor
+            );
 
             commits = [...commits, ...history];
-            total = totalCount;
             if (!pageInfo.hasNextPage) break;
 
             cursor = pageInfo.endCursor;
@@ -453,7 +450,7 @@ export default {
 
         const data = await Promise.all(getFileOperations);
         const fileHistory = data.map((el) => el.content);
-        return { total, history: fileHistory };
+        return fileHistory;
     },
     /**
      * @description Return all files from a folder of a repo
