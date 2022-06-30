@@ -160,7 +160,7 @@ describe("GITHUB INTERACTION --- Release", function () {
             try {
                 await GithubProxy.getARelease(NONE_EXIST_RL_NAME);
             } catch (err) {
-                console.log(err);
+                expect(err).equal(ERROR_CODES.REF_NOT_EXISTED);
             }
         });
 
