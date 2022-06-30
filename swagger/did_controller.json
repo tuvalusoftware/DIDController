@@ -26,7 +26,7 @@
         },
         {
             "name": "CREDENTIAL",
-            "description": "CRUD for credential"
+            "description": "CRUD for credential <b>(deprecated)</b>"
         }
     ],
     "paths": {
