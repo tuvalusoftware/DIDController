@@ -6,7 +6,8 @@
     "main": "index.js",
     "scripts": {
         "main": "npx nodemon main.js",
-        "start": "npx nodemon server.js",
+        "start": "node server.js",
+        "start:dev": "npx nodemon server.js",
         "test-did": "export NODE_ENV=test && mocha ./test/api/1.did.test.js --exit",
         "test-doc": "export NODE_ENV=test && mocha ./test/api/2.doc.test.js --exit",
         "test-cre": "export NODE_ENV=test && mocha ./test/api/3.credential.test.js --exit",
