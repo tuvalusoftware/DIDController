@@ -9,7 +9,7 @@ let should = chai.should();
 let expect = chai.expect;
 chai.use(chaiHttp);
 
-const TEST_BRANCH = "MOCHA_TESTING";
+const TEST_BRANCH = "MOCHA___TESTING";
 
 const NOT_EXIST_BRANCH = "BRANCH___INVALID";
 const NOT_EXIST_FILE = "FILE__NOT__EXIST";
@@ -60,6 +60,7 @@ const TEST_DATA = {
     fileName: "test_file_name_10",
 };
 
+const INVALID_FILE_NAME = "this is an ivalid file name";
 const INVALID_PUBLIC_KEY = "this is an ivalid public key";
 const INVALID_COMPANY_NAME = "this is an ivalid company name";
 const TEST_PUBLIC_KEY = "abcdxyz12345";
@@ -96,6 +97,8 @@ const TEST_WRAPPED_DOCS = [
     },
 ];
 
+let ORIGINAL_DID_DOC = null;
+
 const UPDATED_DID_DOC = {
     didDoc: {
         controller: ["owner_public_key", "holder_public_key"],
@@ -103,6 +106,9 @@ const UPDATED_DID_DOC = {
         owner: "owner_public_key",
         holder: "holder_public_key",
         url: "test_file_name_10.document",
+        meta_data: {
+            timestamp: Date.now(),
+        },
     },
     companyName: TEST_BRANCH,
     fileName: "test_file_name_10",
@@ -181,6 +187,15 @@ describe("DOC", function () {
     });
 
     describe("/GET check if document exists", () => {
+        it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
+            chai.request(server)
+                .get("/api/doc/exists")
+                .end((err, res) => {
+                    res.body.should.eql(ERROR_CODES.MISSING_PARAMETERS);
+                    done();
+                });
+        });
+
         it("it should return a 'not found' error as the company name is invalid", (done) => {
             chai.request(server)
                 .get("/api/doc/exists")
@@ -232,6 +247,40 @@ describe("DOC", function () {
                 .get("/api/doc/")
                 .end((err, res) => {
                     res.body.should.eql(ERROR_CODES.MISSING_PARAMETERS);
+                    done();
+                });
+        });
+
+        it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
+            chai.request(server)
+                .get("/api/doc")
+                .set("companyName", INVALID_COMPANY_NAME)
+                .set("fileName", TEST_DATA.fileName)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return an 'file not found' error as the provided file name cannot be found", (done) => {
+            chai.request(server)
+                .get("/api/doc")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", INVALID_FILE_NAME)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_NOT_FOUND)
+                    );
+
                     done();
                 });
         });
@@ -314,12 +363,89 @@ describe("DOC", function () {
                         .property("url")
                         .eql(`${TEST_DATA.fileName}.document`);
 
+                    ORIGINAL_DID_DOC = res.body.didDoc;
+
+                    done();
+                });
+        });
+    });
+
+    describe("/POST clone a document", () => {
+        it("it should return a 'missing params' error as the required params are not provided", (done) => {
+            chai.request(server)
+                .post("/api/doc/clone")
+                .send(EMPTY_DATA)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.MISSING_PARAMETERS)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'company name invalid' error as the param 'companyName' is invalid", (done) => {
+            chai.request(server)
+                .post("/api/doc/clone")
+                .send({ ...TEST_DATA, companyName: INVALID_COMPANY_NAME })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NAME_INVALID)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a success message states that the wrapped document is saved successfully", (done) => {
+            chai.request(server)
+                .post("/api/doc/clone")
+                .send({ ...TEST_DATA, fileName: "clone_document" })
+                .end((err, res) => {
+                    res.should.have.status(201);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.CLONE_SUCCESS)
+                    );
+
                     done();
                 });
         });
     });
 
     describe("/GET fetch list of documents own by an user", () => {
+        it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
+            chai.request(server)
+                .get("/api/doc/user")
+                .end((err, res) => {
+                    res.body.should.eql(ERROR_CODES.MISSING_PARAMETERS);
+                    done();
+                });
+        });
+
+        it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
+            chai.request(server)
+                .get("/api/doc/user")
+                .set("companyName", INVALID_COMPANY_NAME)
+                .set("publicKey", TEST_PUBLIC_KEY)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
         it("it should return an empty list as the provided public key is invalid or unknown", (done) => {
             chai.request(server)
                 .get("/api/doc/user")
@@ -417,7 +543,7 @@ describe("DOC", function () {
                 });
         });
 
-        it("it should return a 'invalid content' error as the param 'fileName' is invalid", (done) => {
+        it("it should return an 'invalid content' error as the param 'fileName' is invalid", (done) => {
             chai.request(server)
                 .put("/api/doc")
                 .send({ ...UPDATED_DID_DOC, fileName: INVALID_PUBLIC_KEY })
@@ -486,12 +612,108 @@ describe("DOC", function () {
         });
     });
 
+    describe("/GET get history of did doc of wrapped document", () => {
+        it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
+            chai.request(server)
+                .get("/api/doc/did-doc-history")
+                .end((err, res) => {
+                    res.body.should.eql(ERROR_CODES.MISSING_PARAMETERS);
+                    done();
+                });
+        });
+
+        it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
+            chai.request(server)
+                .get("/api/doc/did-doc-history")
+                .set("companyName", INVALID_COMPANY_NAME)
+                .set("fileName", TEST_DATA.fileName)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return an 'file name not found' error as the provided file name cannot be found", (done) => {
+            chai.request(server)
+                .get("/api/doc/did-doc-history")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", INVALID_FILE_NAME)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should get all the previous history of the did doc", (done) => {
+            chai.request(server)
+                .get("/api/doc/did-doc-history")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", TEST_DATA.fileName)
+                .end((err, res) => {
+                    expect(res.body.length).equal(2);
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify([
+                            UPDATED_DID_DOC.didDoc,
+                            ORIGINAL_DID_DOC,
+                        ])
+                    );
+                    done();
+                });
+        });
+    });
+
     describe("/DELETE delete document from a branch", () => {
         it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
             chai.request(server)
                 .delete("/api/doc/")
                 .end((err, res) => {
                     res.body.should.eql(ERROR_CODES.MISSING_PARAMETERS);
+                    done();
+                });
+        });
+
+        it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
+            chai.request(server)
+                .delete("/api/doc/")
+                .set("companyName", INVALID_COMPANY_NAME)
+                .set("fileName", TEST_DATA.fileName)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return an 'file name not found' error as the provided file name cannot be found", (done) => {
+            chai.request(server)
+                .delete("/api/doc/")
+                .set("companyName", TEST_DATA.companyName)
+                .set("fileName", INVALID_FILE_NAME)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_NOT_FOUND)
+                    );
+
                     done();
                 });
         });

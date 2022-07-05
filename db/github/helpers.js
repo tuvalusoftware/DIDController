@@ -2,12 +2,12 @@
 import { ERROR_CODES } from "../../constants/index.js";
 
 /**
- * @description Resolve the error from Github API to a simplified, easy to understand version
+ * @description Resolve the error returned by Github API to a simplified, easy to understand version
  * @param {Object} err an object error
  * @returns {Object} custom error object or null if there is no document on the error
  */
 const detectGithubError = (err) => {
-    // ** Errors return from the Github GraphQL API are formatted as an array
+    // ** Errors returned by the Github GraphQL API are formatted as an array
     if (Array.isArray(err)) {
         const errors = err;
         errors.forEach((error) => {

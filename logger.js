@@ -78,6 +78,7 @@ export default {
             return err;
         }
 
+        // Handle error returned by Github
         if (err.response) {
             const detectedErr = detectGithubError(err);
 

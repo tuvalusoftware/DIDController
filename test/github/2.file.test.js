@@ -29,7 +29,7 @@ const UPDATE_EXAMPLE_DATA = {
 let fileCommits = [];
 
 describe("GITHUB INTERACTION --- File && Commits", function () {
-    this.timeout(10000);
+    this.timeout(0);
 
     before(async () => {
         await GithubProxy.deleteBranchIfExist(MAIN_TEST_BRANCH);
@@ -361,12 +361,12 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
         });
 
         it("it should get the all the version of a file", async () => {
-            const { total, history } = await GithubProxy.getFileHistory(
+            const history = await GithubProxy.getFileHistory(
                 TEST_FILE_NAME3,
                 MAIN_TEST_BRANCH
             );
 
-            expect(total).equal(VERSIONS.length + 1);
+            expect(history.length).equal(VERSIONS.length + 1);
             expect(JSON.stringify(history)).equal(
                 JSON.stringify([...VERSIONS.reverse(), EXAMPLE_DATA])
             );

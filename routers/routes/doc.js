@@ -12,6 +12,8 @@ router
     .put(docController.updateDidDocController)
     .delete(docController.deleteDoc);
 
+router.route("/clone").post(docController.createNewDoc);
 router.route("/user").get(docController.getDocsByUser);
+router.route("/did-doc-history").get(docController.getDidDocHistory);
 
 export default router;

@@ -11,22 +11,19 @@ const ERROR_CODES = {
     CONFLICT_PUSH: {
         error_code: 1202,
         error_message: "Asynchronous changes are pushed to the same branch.",
-        cause: "Update/Create file",
+        cause: "Update/Create/Delete file or any modification regard to commits on a same branch at the same time.",
     },
     BLOB_EXISTED: {
         error_code: 1203,
         error_message: "Blob (file) with the given name already exist.",
-        cause: "Create a file",
     },
     BLOB_NOT_EXISTED: {
         error_code: 1204,
         error_message: "Blob (file) with the given name cannot be found.",
-        cause: "Query a file",
     },
     FOLDER_NOT_EXISTED: {
         error_code: 1205,
         error_message: "Folder with the given name cannot be found.",
-        cause: "Query a folder",
     },
     BRANCH_EXISTED: {
         error_code: 1206,
@@ -36,7 +33,6 @@ const ERROR_CODES = {
     BRANCH_NOT_EXISTED: {
         error_code: 1207,
         error_message: "Branch with the given name cannot be found.",
-        cause: "Query a branch",
     },
     REF_EXISTED: {
         error_code: 1208,
@@ -53,7 +49,7 @@ const ERROR_CODES = {
         error_message: "Content of file has not changed.",
         cause: "Update a file",
     },
-    DELETE_MAIN: {
+    DELETE_MAIN_BRANCH: {
         error_code: 1211,
         error_message: "Branch 'main' cannot be deleted.",
         cause: "Someone try to delete branch main",
@@ -121,6 +117,7 @@ const ERROR_CODES = {
 
 const SUCCESS_CODES = {
     SAVE_SUCCESS: { message: "Successfully Saved" },
+    CLONE_SUCCESS: { message: "Successfully Cloned" },
     UPDATE_SUCCESS: { message: "Successfully Updated" },
     DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
