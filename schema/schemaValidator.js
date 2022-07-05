@@ -4,22 +4,17 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
 const ajv = new Ajv();
-const schema = require("./schema.json");
+const DEFINE_SCHEMAS = require("./schema.json");
 
 export default {
     _validateWrapDidDoc(didDoc, fileName) {
         return didDoc.url === `${fileName}.document`;
     },
     validate(obj, type, payload = null) {
-        const defineSchema = {
-            USER_DID_DOC: schema.did_doc_of_user,
-            WRAP_DOC_DID_DOC: schema.did_doc_of_wrap_doc,
-            CREDENTIAL: schema.credential,
-            ERROR_OBJECT: schema.error_object,
-        }[type];
+        const schema = DEFINE_SCHEMAS[type];
 
         // Validate schema using AJV
-        const validate = ajv.compile(defineSchema);
+        const validate = ajv.compile(schema);
         const isValid = validate(obj);
 
         // Extra validation depends on the content

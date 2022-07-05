@@ -29,7 +29,7 @@ const UPDATE_EXAMPLE_DATA = {
 let fileCommits = [];
 
 describe("GITHUB INTERACTION --- File && Commits", function () {
-    this.timeout(10000);
+    this.timeout(0);
 
     before(async () => {
         await GithubProxy.deleteBranchIfExist(MAIN_TEST_BRANCH);

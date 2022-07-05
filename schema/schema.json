@@ -1,5 +1,5 @@
 {
-    "did_doc_of_user": {
+    "USER_DID_DOC": {
         "type": "object",
         "required": ["controller", "did"],
         "properties": {
@@ -14,7 +14,7 @@
             }
         }
     },
-    "did_doc_of_wrap_doc": {
+    "WRAP_DOC_DID_DOC": {
         "type": "object",
         "required": ["controller", "did", "owner", "holder", "url"],
         "properties": {
@@ -45,7 +45,7 @@
         },
         "additionalProperties": false
     },
-    "credential": {
+    "CREDENTIAL": {
         "type": "object",
         "required": ["issuer", "subject", "credentialSubject", "signature"],
         "properties": {
@@ -86,7 +86,7 @@
             }
         }
     },
-    "error_object": {
+    "ERROR_OBJECT": {
         "type": "object",
         "required": ["error_code", "error_message"],
         "properties": {
