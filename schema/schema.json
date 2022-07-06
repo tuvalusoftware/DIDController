@@ -25,7 +25,7 @@
             },
             "did": {
                 "type": "string",
-                "pattern": "^did:[a-z0-9_]+:[A-Za-z0-9.-:_]+$"
+                "pattern": "^did:[A-Za-z0-9_]+:[A-Za-z0-9.-:_]+$"
             },
             "owner": {
                 "type": "string",
