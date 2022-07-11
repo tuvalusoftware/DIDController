@@ -63,11 +63,6 @@ export default {
             const data = { name: fileName, content: JSON.parse(fileData.text) };
 
             res.status(200).json(data);
-            Logger.apiInfo(
-                req,
-                res,
-                `Retrieve DID '${fileName}' from company ${companyName}`
-            );
         } catch (err) {
             next(err);
         }

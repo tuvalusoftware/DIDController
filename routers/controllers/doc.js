@@ -1,7 +1,7 @@
 import GithubProxy from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import SchemaValidator from "../../schema/schemaValidator.js";
-import { extractOwnerPKFromDID } from "../../utils/index.js";
+import { extractOwnerPKFromAddress } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 export default {
@@ -163,7 +163,7 @@ export default {
             const ownerDID = wrappedDocument.data.issuers[0].address;
             if (!ownerDID) throw ERROR_CODES.INVALID_WRAPPED_DOCUMENT;
 
-            const ownerPublicKey = extractOwnerPKFromDID(ownerDID);
+            const ownerPublicKey = extractOwnerPKFromAddress(ownerDID);
 
             // Save wrapped document
             await GithubProxy.createNewFile(

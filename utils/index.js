@@ -82,7 +82,7 @@ const validateObject = (keys, obj) => {
  * @param {String} didString DID of the owner
  * @returns {String} owner public key
  */
-const extractOwnerPKFromDID = (didString) => {
+const extractOwnerPKFromAddress = (didString) => {
     const fields = didString.split(":");
     return fields[fields.length - 1];
 };
@@ -95,5 +95,5 @@ export {
     stringToDate,
     isExistsKey,
     validateObject,
-    extractOwnerPKFromDID,
+    extractOwnerPKFromAddress,
 };
