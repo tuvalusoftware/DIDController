@@ -72,13 +72,17 @@ const ERROR_CODES = {
 
     // Server Error (Human readable error messages)
     UNKNOWN_ERROR: {
-        error_code: 10001,
+        error_code: 10000,
         error_message: "Something went wrong!",
     },
     MISSING_PARAMETERS: {
-        error_code: 10002,
+        error_code: 10001,
         error_message:
             "Parameters in request body or header are missing. Please try again later.",
+    },
+    INVALID_QUERY_PARAMS: {
+        error_code: 10002,
+        error_message: "Query params provided are invalid.",
     },
     COMPANY_NOT_FOUND: {
         error_code: 10003,
@@ -103,13 +107,17 @@ const ERROR_CODES = {
         error_message:
             "Content of wrapped document's did doc is invalid. Please make sure all required fields are provided with their valid value.",
     },
-    CREDENTIAL_INVALID: {
+    WRAP_DOC_DID_DOC_INVALID_MODIFIED: {
         error_code: 10008,
+        error_message: "DID of the did document should not be modified.",
+    },
+    CREDENTIAL_INVALID: {
+        error_code: 10009,
         error_message:
             "Content of credential is invalid. Please make sure all required fields are provided with their valid value.",
     },
     COMPANY_NAME_INVALID: {
-        error_code: 10009,
+        error_code: 10010,
         error_message:
             "Company name is invalid (Should not contain blank space).",
     },
