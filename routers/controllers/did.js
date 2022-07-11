@@ -1,7 +1,7 @@
 import GithubProxy from "../../db/github/index.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
-import SchemaValidator from "../../schema/schemaValidator.js";
 import Logger from "../../logger.js";
+import SchemaValidator from "../../schema/schemaValidator.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 export default {
     getAllDIDs: async (req, res, next) => {

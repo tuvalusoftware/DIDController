@@ -1,7 +1,6 @@
 import GithubProxy from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import SchemaValidator from "../../schema/schemaValidator.js";
-import { validateObject } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 export default {
