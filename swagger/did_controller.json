@@ -7,22 +7,26 @@
     },
     "servers": [
         {
-            "url": "http://18.139.84.180:9000/api/",
-            "description": "Anh Tam's remote host"
-        },
-        {
             "url": "/api",
             "description": "Localhost with port 9000"
+        },
+        {
+            "url": "http://18.139.84.180:9000/api/",
+            "description": "Anh Tam's remote host"
         }
     ],
     "tags": [
         {
             "name": "DID",
-            "description": "CRUD for DID"
+            "description": "CRUD for DID (Public Key of users)"
         },
         {
             "name": "DOC",
             "description": "CRUD for document"
+        },
+        {
+            "name": "MSG",
+            "description": "CRUD for message (notification)"
         },
         {
             "name": "CREDENTIAL",
@@ -629,6 +633,69 @@
                 }
             }
         },
+        "/message": {
+            "get": {
+                "tags": ["MSG"],
+                "summary": "Retrieve all messages belong to a receiver.",
+                "parameters": [
+                    {
+                        "name": "publicKey",
+                        "in": "header",
+                        "description": "Receiver's Public Key",
+                        "required": true,
+                        "example": "receiver_public_key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return a list of messages.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Message"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["MSG"],
+                "summary": "Save a new message (notification)",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "$ref": "#/components/schemas/Message"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/credential": {
             "get": {
                 "tags": ["CREDENTIAL"],
@@ -793,6 +860,53 @@
                     }
                 }
             },
+            "Message": {
+                "type": "object",
+                "properties": {
+                    "receiver": {
+                        "type": "string",
+                        "description": "Receiver DID"
+                    },
+                    "sender": {
+                        "type": "string",
+                        "description": "Sender DID"
+                    },
+                    "content": {
+                        "type": "object",
+                        "description": "Description of the message.",
+                        "properties": {
+                            "code": {
+                                "type": "number",
+                                "description": "Message code"
+                            },
+                            "value": {
+                                "type": "object",
+                                "description": "Message description"
+                            }
+                        }
+                    },
+                    "status": {
+                        "type": "object",
+                        "description": "Status of message.",
+                        "properties": {
+                            "code": {
+                                "type": "number",
+                                "description": "Status code"
+                            },
+                            "value": {
+                                "type": "object",
+                                "description": "Status description"
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "receiver": "did:method:company:receiver_public_key",
+                    "sender": "did:method:company2:sender_public_key",
+                    "content": { "code": 3000, "value": "changeHolderShip" },
+                    "status": { "code": 0, "value": "unread" }
+                }
+            },
             "Credential": {
                 "type": "object",
                 "properties": {
@@ -843,7 +957,7 @@
                 "properties": {
                     "message": {
                         "type": "string",
-                        "example": "Success"
+                        "example": "Successfully Saved/Updated/Deleted/Cloned"
                     }
                 }
             }
