@@ -2,13 +2,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import GithubREST from "./rest.js";
-import GithubGraphQL from "./graphql.js";
 import Logger from "../../logger.js";
+import { executeGraphQL } from "./helpers.js";
 import { tryParseStringToObj, getFileExtension } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
 const owner = process.env.REPO_OWNER;
-const repo = process.env.REPO_NAME;
+const repo = process.env.DOCUMENT_REPO;
 
 export default {
     /**
@@ -238,7 +238,7 @@ export default {
             }
             `;
 
-            GithubGraphQL.execute(queryString)
+            executeGraphQL(queryString)
                 .then((res) => {
                     if (res.data.errors) {
                         const errInfo = Logger.handleGithubError(
@@ -386,7 +386,7 @@ export default {
         `;
 
         return new Promise((resolve, reject) => {
-            GithubGraphQL.execute(queryString)
+            executeGraphQL(queryString)
                 .then(async (response) => {
                     if (response.status !== 200 || !response.data.data) {
                         const errInfo = Logger.handleGithubError(err);
@@ -496,7 +496,7 @@ export default {
         `;
 
         return new Promise((resolve, reject) => {
-            GithubGraphQL.execute(queryString)
+            executeGraphQL(queryString)
                 .then((response) => {
                     if (response.data.errors) {
                         const errInfo = Logger.handleGithubError(
@@ -691,7 +691,7 @@ export default {
         `;
 
         return new Promise((resolve, reject) => {
-            GithubGraphQL.execute(queryString)
+            executeGraphQL(queryString)
                 .then((response) => {
                     if (response.data.errors) {
                         const errInfo = Logger.handleGithubError(

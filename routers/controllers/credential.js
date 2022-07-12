@@ -1,3 +1,4 @@
+// ! Deprecated
 import GithubProxy from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import SchemaValidator from "../../schema/schemaValidator.js";

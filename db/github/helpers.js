@@ -1,6 +1,22 @@
-/* c8 ignore start */
+import axios from "axios";
+
+import { gitGraphQLUrl, axiosHeaderConfig } from "./constants.js";
 import { ERROR_CODES } from "../../constants/index.js";
 
+/**
+ * @description Make API call to the GraphQL Github API to execute a GraphQL command
+ * @param {String} queryString A GraphQL query string
+ * @returns {Promise} an Axios promise
+ */
+const executeGraphQL = (queryString) => {
+    return axios.post(
+        gitGraphQLUrl,
+        JSON.stringify({ query: queryString }),
+        axiosHeaderConfig
+    );
+};
+
+/* c8 ignore start */
 /**
  * @description Resolve the error returned by Github API to a simplified, easy to understand version
  * @param {Object} err an object error
@@ -109,6 +125,6 @@ const detectGithubError = (err) => {
 
     return ERROR_CODES.GITHUB_API_ERROR;
 };
-
-export { detectGithubError };
 /* c8 ignore stop */
+
+export { detectGithubError, executeGraphQL };

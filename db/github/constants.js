@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const owner = process.env.REPO_OWNER;
-const repo = process.env.REPO_NAME;
+const repo = process.env.DOCUMENT_REPO;
 const token = process.env.AUTH_TOKEN;
 
 const gitRESTUrl = `https://api.github.com/repos/${owner}/${repo}/`;
