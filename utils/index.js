@@ -72,19 +72,43 @@ const isExistsKey = (key, obj) => {
  * @param {Object} obj
  * @returns {Boolean}
  */
-const validateObject = (keys, obj) => {
+const validateObjectKeys = (keys, obj) => {
     const isValid = keys.every((el) => isExistsKey(el, obj));
     return isValid;
 };
 
 /**
- * @description Extract the owner public key from an user's did
+ * @description Extract the owner public key from an user's DID
  * @param {String} didString DID of the owner
  * @returns {String} owner public key
  */
 const extractOwnerPKFromAddress = (didString) => {
     const fields = didString.split(":");
     return fields[fields.length - 1];
+};
+
+/**
+ * @description Validate and extract the public key or filename from a DID
+ * @param {String} did DID
+ * @param {Boolean} isSalted Flag indicates if the DID is salted
+ * @returns {{ valid: Boolean, companyName: String, fileNameOrPublicKey: String }} Object holds validation info, company name and file name/pk
+ */
+const validateDIDSyntax = (did, isSalted = false) => {
+    const maxLength = isSalted ? 6 : 4,
+        didPosition = isSalted ? 2 : 0,
+        didComponents = did.split(":");
+
+    if (
+        didComponents.length < maxLength ||
+        didComponents[didPosition] !== "did"
+    )
+        return { valid: false };
+
+    return {
+        valid: true,
+        companyName: didComponents[didPosition + 2],
+        fileNameOrPublicKey: didComponents[didPosition + 3],
+    };
 };
 
 export {
@@ -94,6 +118,7 @@ export {
     getFileExtension,
     stringToDate,
     isExistsKey,
-    validateObject,
+    validateObjectKeys,
     extractOwnerPKFromAddress,
+    validateDIDSyntax,
 };
