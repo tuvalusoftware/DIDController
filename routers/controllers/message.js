@@ -8,6 +8,44 @@ import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 const FIRST_N_LETTERS = 5;
 
 export default {
+    getMessageByID: async (req, res, next) => {
+        const receiverPK = req.header("publicKey");
+        const msgID = req.header("msgID");
+
+        Logger.apiInfo(
+            req,
+            res,
+            `Retrieve a message with ID: ${msgID} of receiver ${receiverPK}`
+        );
+
+        if (!msgID) return next(ERROR_CODES.MISSING_PARAMETERS);
+
+        try {
+            // Determine branch name
+            const branchName = `MSG_${receiverPK.substring(
+                0,
+                FIRST_N_LETTERS
+            )}`;
+
+            // Get branch and file
+            const branchLatestSHA = await GithubProxy.getBranchLastCommitSHA(
+                branchName
+            );
+            const fileData = await GithubProxy.getFile(
+                `${receiverPK}/${msgID}.msg`,
+                branchLatestSHA
+            );
+
+            res.status(200).json(JSON.parse(fileData.text));
+        } catch (err) {
+            // Convert to human-readable message
+            if (err === ERROR_CODES.BLOB_NOT_EXISTED) {
+                return next(ERROR_CODES.MESSAGE_NOT_FOUND);
+            }
+
+            next(err);
+        }
+    },
     getMessagesByReceiver: async (req, res, next) => {
         const receiverPK = req.header("publicKey");
 
@@ -41,6 +79,7 @@ export default {
             const files = filesInfo.map((el) => JSON.parse(el.object.text));
             res.status(200).json(files);
         } catch (err) {
+            // Convert to human-readable message
             if (err === ERROR_CODES.FOLDER_NOT_EXISTED) {
                 return next(ERROR_CODES.FILE_NOT_FOUND);
             }
@@ -72,10 +111,12 @@ export default {
             await GithubProxy.createBranchIfNotExist(branchName);
 
             // Save to a file
-            const fileName = `${receiverPK}/${Date.now()}_${senderPK}.msg`;
+            const msgId = `${Date.now()}_${senderPK}`,
+                fileName = `${receiverPK}/${msgId}.msg`;
+
             await GithubProxy.createNewFile(
                 fileName,
-                message,
+                { id: msgId, ...message },
                 branchName,
                 `NEW: '${fileName}' message from '${receiverPK}'`
             );

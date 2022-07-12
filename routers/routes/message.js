@@ -5,7 +5,8 @@ const router = express.Router();
 
 router
     .route("/")
-    .get(messageController.getMessagesByReceiver)
+    .get(messageController.getMessageByID)
     .post(messageController.saveMessage);
+router.route("/receiver").get(messageController.getMessagesByReceiver);
 
 export default router;

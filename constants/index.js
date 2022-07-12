@@ -113,6 +113,10 @@ const ERROR_CODES = {
         error_message:
             "File or Public Key with the given value already exists.",
     },
+    MESSAGE_NOT_FOUND: {
+        error_code: 20004,
+        error_message: "Message with the given ID or receiver cannot be found.",
+    },
 
     // Content Errors
     USER_DID_DOC_INVALID: {

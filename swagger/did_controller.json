@@ -633,7 +633,7 @@
                 }
             }
         },
-        "/message": {
+        "/message/receiver": {
             "get": {
                 "tags": ["MSG"],
                 "summary": "Retrieve all messages belong to a receiver.",
@@ -657,8 +657,48 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/Message"
+                                        "$ref": "#/components/schemas/MessageWithID"
                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/message": {
+            "get": {
+                "tags": ["MSG"],
+                "summary": "Retrieve one single message by its id.",
+                "parameters": [
+                    {
+                        "name": "publicKey",
+                        "in": "header",
+                        "description": "Receiver's Public Key",
+                        "required": true,
+                        "example": "receiver_public_key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "msgID",
+                        "in": "header",
+                        "description": "Message's ID",
+                        "required": true,
+                        "example": "123456789_sender_pk",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return a messages.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MessageWithID"
                                 }
                             }
                         }
@@ -884,27 +924,49 @@
                                 "description": "Message description"
                             }
                         }
-                    },
-                    "status": {
-                        "type": "object",
-                        "description": "Status of message.",
-                        "properties": {
-                            "code": {
-                                "type": "number",
-                                "description": "Status code"
-                            },
-                            "value": {
-                                "type": "object",
-                                "description": "Status description"
-                            }
-                        }
                     }
                 },
                 "example": {
                     "receiver": "did:method:company:receiver_public_key",
                     "sender": "did:method:company2:sender_public_key",
-                    "content": { "code": 3000, "value": "changeHolderShip" },
-                    "status": { "code": 0, "value": "unread" }
+                    "content": { "code": 3000, "value": "changeHolderShip" }
+                }
+            },
+            "MessageWithID": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Message's ID"
+                    },
+                    "receiver": {
+                        "type": "string",
+                        "description": "Receiver DID"
+                    },
+                    "sender": {
+                        "type": "string",
+                        "description": "Sender DID"
+                    },
+                    "content": {
+                        "type": "object",
+                        "description": "Description of the message.",
+                        "properties": {
+                            "code": {
+                                "type": "number",
+                                "description": "Message code"
+                            },
+                            "value": {
+                                "type": "object",
+                                "description": "Message description"
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "id": "123456789_sender_pk",
+                    "receiver": "did:method:company:receiver_public_key",
+                    "sender": "did:method:company2:sender_public_key",
+                    "content": { "code": 3000, "value": "changeHolderShip" }
                 }
             },
             "Credential": {
