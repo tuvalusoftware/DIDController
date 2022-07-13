@@ -1,15 +1,18 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 
-import GithubProxy from "../../db/github/index.js";
+import GithubProxyConfig from "../../db/github/index.js";
 import server from "../../server.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+
+const REPOSITORY = process.env.DOCUMENT_REPO;
+const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 let should = chai.should();
 let expect = chai.expect;
 chai.use(chaiHttp);
 
-const TEST_BRANCH = "MOCHA_TESTING";
+const TEST_BRANCH = "MOCHA____TESTING";
 const INVALID_DATA = {
     companyName: TEST_BRANCH,
     publicKey: "public_key_invalid",

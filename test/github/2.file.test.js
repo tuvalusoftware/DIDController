@@ -1,9 +1,12 @@
 import chai from "chai";
 
-import GithubProxy from "../../db/github/index.js";
+import GithubProxyConfig from "../../db/github/index.js";
 import { haveCommonElement, containAllElement } from "../../utils/index.js";
 import { MAIN_TEST_BRANCH, COMMIT_MESSAGES } from "./constant.js";
 import { ERROR_CODES } from "../../constants/index.js";
+
+const REPOSITORY = process.env.DOCUMENT_REPO;
+const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 let expect = chai.expect;
 
