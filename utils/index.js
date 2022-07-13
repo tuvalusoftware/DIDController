@@ -48,36 +48,6 @@ const containAllElement = (bigArr, smallArr) => {
 };
 
 /**
- * @description Convert a 'DD/MM/YYYY' string to a datetime object (the time will be at 0:00 AM)
- * @param {String} dateStr string with format "DD/MM/YYYY"
- * @returns {Date}
- */
-const stringToDate = (dateStr) => {
-    return dayjs(dateStr, "DD/MM/YYYY", true).toDate();
-};
-
-/**
- * @description Check if key exists in object
- * @param {String} key value of a key
- * @param {Object} obj An object
- * @returns {Boolean} True if exists
- */
-const isExistsKey = (key, obj) => {
-    return obj[key] !== undefined;
-};
-
-/**
- * @description Validate if a set of keys exist in an object
- * @param {Array} keys array of keys
- * @param {Object} obj
- * @returns {Boolean}
- */
-const validateObjectKeys = (keys, obj) => {
-    const isValid = keys.every((el) => isExistsKey(el, obj));
-    return isValid;
-};
-
-/**
  * @description Extract the owner public key from an user's DID
  * @param {String} didString DID of the owner
  * @returns {String} owner public key
@@ -116,9 +86,6 @@ export {
     haveCommonElement,
     tryParseStringToObj,
     getFileExtension,
-    stringToDate,
-    isExistsKey,
-    validateObjectKeys,
     extractOwnerPKFromAddress,
     validateDIDSyntax,
 };

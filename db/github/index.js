@@ -55,7 +55,7 @@ export default function (REPOSITORY) {
          * @async
          * @description Get info of a branch
          * @param {String} branchName
-         * @returns {Object} check if branch is exist and return the branch object
+         * @returns {{ name: String, commit: Object }} check if branch is exist and return the branch object
          */
         getBranchInfo: function (branchName = "main") {
             return new Promise((resolve, reject) => {

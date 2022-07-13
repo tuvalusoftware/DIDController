@@ -115,7 +115,11 @@ const ERROR_CODES = {
     },
     MESSAGE_NOT_FOUND: {
         error_code: 20004,
-        error_message: "Message with the given ID or receiver cannot be found.",
+        error_message: "ID/Receiver of message cannot be found.",
+    },
+    MESSAGE_CONTENT_INVALID: {
+        error_code: 20005,
+        error_message: "Sender Public Key or Receiver Public Key is invalid.",
     },
 
     // Content Errors

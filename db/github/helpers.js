@@ -20,7 +20,7 @@ const executeGraphQL = (queryString) => {
 /**
  * @description Resolve the error returned by Github API to a simplified, easy to understand version
  * @param {Object} err an object error
- * @returns {Object} custom error object or null if there is no document on the error
+ * @returns {{ error_code: Number, error_message: String }} custom error object or null if there is no document on the error
  */
 const detectGithubError = (err) => {
     // ** Errors returned by the Github GraphQL API are formatted as an array
