@@ -74,7 +74,6 @@ const ERROR_CODES = {
             "Invalid wrapped document. Could not find the owner's address.",
     },
 
-    // Human readable error messages
     // Common Errors
     UNKNOWN_ERROR: {
         error_code: 10000,
@@ -82,7 +81,7 @@ const ERROR_CODES = {
     },
     AUTHENTICATION: {
         error_code: 10001,
-        error_message: "Access Token is invalid or not provided.",
+        error_message: "Unauthorized.",
     },
     MISSING_PARAMETERS: {
         error_code: 10002,

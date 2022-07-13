@@ -17,6 +17,10 @@
     ],
     "tags": [
         {
+            "name": "AUTH",
+            "description": "Helper Endpoints for Authentication <b>(Please run this endpoint before test any other endpoint)</b>"
+        },
+        {
             "name": "DID",
             "description": "CRUD for DID (Public Key of users)"
         },
@@ -34,6 +38,57 @@
         }
     ],
     "paths": {
+        "/auth": {
+            "post": {
+                "tags": ["AUTH"],
+                "summary": "Set cookie for your requests.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "accessToken": {
+                                        "description": "Access Token for Security service",
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": ["AUTH"],
+                "summary": "Clear Cookie.",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/did/all": {
             "get": {
                 "tags": ["DID"],
@@ -118,9 +173,6 @@
                                 }
                             }
                         }
-                    },
-                    "404": {
-                        "description": "Do not exist"
                     }
                 }
             },
@@ -1019,7 +1071,7 @@
                 "properties": {
                     "message": {
                         "type": "string",
-                        "example": "Successfully Saved/Updated/Deleted/Cloned"
+                        "example": "Successfully Saved/Updated/Deleted/Cloned/Set Cookie"
                     }
                 }
             }
