@@ -41,7 +41,12 @@ export default {
             res.status(200).json(JSON.parse(fileData.text));
         } catch (err) {
             // Convert to human-readable message
-            if (err === ERROR_CODES.BLOB_NOT_EXISTED) {
+            if (
+                [
+                    ERROR_CODES.BLOB_NOT_EXISTED,
+                    ERROR_CODES.BRANCH_NOT_EXISTED,
+                ].includes(err)
+            ) {
                 return next(ERROR_CODES.MESSAGE_NOT_FOUND);
             }
 
@@ -82,8 +87,13 @@ export default {
             res.status(200).json(files);
         } catch (err) {
             // Convert to human-readable message
-            if (err === ERROR_CODES.FOLDER_NOT_EXISTED) {
-                return next(ERROR_CODES.FILE_NOT_FOUND);
+            if (
+                [
+                    ERROR_CODES.FOLDER_NOT_EXISTED,
+                    ERROR_CODES.BRANCH_NOT_EXISTED,
+                ].includes(err)
+            ) {
+                return next(ERROR_CODES.MESSAGE_NOT_FOUND);
             }
 
             next(err);
@@ -100,10 +110,14 @@ export default {
             const { receiver: receiverDID, sender: senderDID } = message;
 
             // Extract Receiver and Sender Public Key
-            const { fileNameOrPublicKey: receiverPK } =
+            const { valid: receiverPkValid, fileNameOrPublicKey: receiverPK } =
                 validateDIDSyntax(receiverDID);
-            const { fileNameOrPublicKey: senderPK } =
+            const { valid: senderPkValid, fileNameOrPublicKey: senderPK } =
                 validateDIDSyntax(senderDID);
+
+            if (!receiverPkValid || !senderPkValid) {
+                return next(ERROR_CODES.MESSAGE_CONTENT_INVALID);
+            }
 
             // Determine branch name
             const branchName = `MSG_${receiverPK.substring(
