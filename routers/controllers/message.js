@@ -1,8 +1,10 @@
-import GithubProxy from "../../db/github/index.js";
+import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import { validateDIDSyntax } from "../../utils/index.js";
-import SchemaValidator from "../../schema/schemaValidator.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+
+const REPOSITORY = process.env.MESSAGE_REPO;
+const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 // The number of first letter of a receiver PK to determine its branch
 const FIRST_N_LETTERS = 5;
@@ -18,7 +20,7 @@ export default {
             `Retrieve a message with ID: ${msgID} of receiver ${receiverPK}`
         );
 
-        if (!msgID) return next(ERROR_CODES.MISSING_PARAMETERS);
+        if (!msgID || !receiverPK) return next(ERROR_CODES.MISSING_PARAMETERS);
 
         try {
             // Determine branch name

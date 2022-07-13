@@ -1,4 +1,5 @@
 // ! Deprecated
+/* c8 ignore start */
 import GithubProxy from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import SchemaValidator from "../../schema/schemaValidator.js";
@@ -83,3 +84,4 @@ export default {
         }
     },
 };
+/* c8 ignore stop */

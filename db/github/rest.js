@@ -2,22 +2,40 @@ import axios from "axios";
 
 import { axiosHeaderConfig, gitRESTUrl } from "./constants.js";
 
-const GithubREST = {
-    get(url) {
-        return axios.get(gitRESTUrl + url, axiosHeaderConfig);
+const GithubREST = (REPOSITORY) => ({
+    get(path) {
+        return axios.get(
+            `${gitRESTUrl}/${REPOSITORY}/${path}`,
+            axiosHeaderConfig
+        );
     },
-    post(url, data) {
-        return axios.post(gitRESTUrl + url, data, axiosHeaderConfig);
+    post(path, data) {
+        return axios.post(
+            `${gitRESTUrl}/${REPOSITORY}/${path}`,
+            data,
+            axiosHeaderConfig
+        );
     },
-    put(url, data) {
-        return axios.put(gitRESTUrl + url, data, axiosHeaderConfig);
+    put(path, data) {
+        return axios.put(
+            `${gitRESTUrl}/${REPOSITORY}/${path}`,
+            data,
+            axiosHeaderConfig
+        );
     },
-    patch(url, data) {
-        return axios.patch(gitRESTUrl + url, data, axiosHeaderConfig);
+    patch(path, data) {
+        return axios.patch(
+            `${gitRESTUrl}/${REPOSITORY}/${path}`,
+            data,
+            axiosHeaderConfig
+        );
     },
-    delete(url, data = {}) {
-        return axios.delete(gitRESTUrl + url, { data, ...axiosHeaderConfig });
+    delete(path, data = {}) {
+        return axios.delete(`${gitRESTUrl}/${REPOSITORY}/${path}`, {
+            data,
+            ...axiosHeaderConfig,
+        });
     },
-};
+});
 
 export default GithubREST;
