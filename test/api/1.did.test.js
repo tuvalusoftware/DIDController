@@ -35,7 +35,16 @@ const TEST_DATA2 = {
     content: {
         controller: "public_key_2",
         did: "did:some_string:company:public_key_2",
-        date: "10-10-2022",
+        data: {
+            name: "Jane Doe",
+            gender: "female",
+            dayOfBirth: "12/05/1970",
+            address: "27, Avenue X, Birmingham city",
+            country: "UK",
+            identityNumber: "87654567876",
+            identityDocumentType: "123213456",
+            phone: "097657890",
+        },
     },
 };
 const UPDATED_DATA = {
@@ -44,7 +53,16 @@ const UPDATED_DATA = {
     content: {
         controller: "public_key_2",
         did: "did:some_string:company:public_key_2",
-        date: "10-10-2000",
+        data: {
+            name: "Mary Doe",
+            gender: "female",
+            dayOfBirth: "12/08/1970",
+            address: "10, Avenue ZHY, Venice city",
+            country: "Italy",
+            identityNumber: "0987654",
+            identityDocumentType: "123987634567",
+            phone: "0912376544",
+        },
         updated: true,
     },
 };
