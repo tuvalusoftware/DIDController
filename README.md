@@ -30,7 +30,7 @@ NPM version 8
     ```
     npm start
 
-    <!-- Run with Nodemon -->
+    # Run with Nodemon
     npm run start:dev
     ```
 
