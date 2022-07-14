@@ -1,3 +1,4 @@
+/* c8 ignore start */
 import express from "express";
 import authController from "../controllers/auth.js";
 
@@ -9,3 +10,4 @@ router
     .get(authController.clearCookie);
 
 export default router;
+/* c8 ignore stop */

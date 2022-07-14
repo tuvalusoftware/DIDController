@@ -1,10 +1,14 @@
 import axios from "axios";
+import Logger from "../../logger.js";
 import { ERROR_CODES, SERVICES } from "../../constants/index.js";
 
 export default {
+    /* c8 ignore start */
     ensureSecurityServiceAuthentication: async (req, res, next) => {
         // Ignore Security Service If In Test Environment
         if (process.env.NODE_ENV === "test") return next();
+
+        Logger.apiInfo(req, res, "Ensure Authentication from Security Service");
 
         const token = req.cookies["access_token"];
         if (!token) {
@@ -49,4 +53,5 @@ export default {
         res.clearCookie("access_token");
         res.json({ message: "Clear Cookie Successfully" });
     },
+    /* c8 ignore stop */
 };
