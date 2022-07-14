@@ -881,10 +881,30 @@
             "DidDocOfUser": {
                 "type": "object",
                 "description": "DID document in JSON format.",
-                "example": {
-                    "controller": "publicKey",
-                    "did": "did:company:publicKey",
-                    "date": "10-10-2000"
+                "properties": {
+                    "controller": {
+                        "type": "string",
+                        "description": "Public Key of the controller for this DID doc.",
+                        "example": "iuytre_12345676543"
+                    },
+                    "did": {
+                        "type": "string",
+                        "description": "DID of the DID doc",
+                        "example": "did:method:company_name:iuytre_12345676543"
+                    },
+                    "data": {
+                        "type": "object",
+                        "example": {
+                            "name": "John Doe",
+                            "gender": "male",
+                            "dayOfBirth": "10-10-1995",
+                            "address": "27, Avenue X, New York city",
+                            "country": "USA",
+                            "identityNumber": "76543234567",
+                            "identityDocumentType": "987654567",
+                            "phone": "098765543"
+                        }
+                    }
                 }
             },
             "WrappedDocument": {
