@@ -120,6 +120,10 @@ const ERROR_CODES = {
         error_code: 20005,
         error_message: "Sender Public Key or Receiver Public Key is invalid.",
     },
+    CREDENTIAL_NOT_FOUND: {
+        error_code: 20005,
+        error_message: "Hash of credential cannot be found.",
+    },
 
     // Content Errors
     USER_DID_DOC_INVALID: {

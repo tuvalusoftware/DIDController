@@ -29,12 +29,12 @@
             "description": "CRUD for document"
         },
         {
-            "name": "MSG",
-            "description": "CRUD for message (notification)"
+            "name": "CREDENTIAL",
+            "description": "CRUD for credential "
         },
         {
-            "name": "CREDENTIAL",
-            "description": "CRUD for credential <b>(deprecated)</b>"
+            "name": "MSG",
+            "description": "CRUD for message (notification) <b>(deprecated)</b>"
         }
     ],
     "paths": {
@@ -718,6 +718,72 @@
                 }
             }
         },
+        "/credential": {
+            "get": {
+                "tags": ["CREDENTIAL"],
+                "summary": "Retrieve a credential by its hash.",
+                "parameters": [
+                    {
+                        "name": "hash",
+                        "in": "header",
+                        "description": "Hash of the credential",
+                        "required": true,
+                        "example": "ghjk_rtyuiocvbnm456dfghj",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return a credential",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Credential"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["CREDENTIAL"],
+                "summary": "Save a credential.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "hash": {
+                                        "description": "Target hash of the credential.",
+                                        "type": "string",
+                                        "example": "ghjk_rtyuiocvbnm456dfghj"
+                                    },
+                                    "content": {
+                                        "$ref": "#/components/schemas/Credential"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/message": {
             "get": {
                 "tags": ["MSG"],
@@ -777,93 +843,6 @@
                 },
                 "responses": {
                     "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SuccessResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/credential": {
-            "get": {
-                "tags": ["CREDENTIAL"],
-                "summary": "Retrieve a list of credentials issuer from an user.",
-                "parameters": [
-                    {
-                        "name": "companyName",
-                        "in": "header",
-                        "description": "Name of a company",
-                        "required": true,
-                        "example": "Kukulu",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "publicKey",
-                        "in": "header",
-                        "description": "Public key of an user.",
-                        "required": true,
-                        "example": "public_key",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Return a list of credential",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Credential"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Do not exist"
-                    }
-                }
-            },
-            "post": {
-                "tags": ["CREDENTIAL"],
-                "summary": "Save a credential.",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "companyName": {
-                                        "description": "Name of the company.",
-                                        "type": "string",
-                                        "example": "Kukulu"
-                                    },
-                                    "publicKey": {
-                                        "description": "Public key of the issuer.",
-                                        "type": "string",
-                                        "example": "owner_public_key"
-                                    },
-                                    "credential": {
-                                        "$ref": "#/components/schemas/Credential"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
