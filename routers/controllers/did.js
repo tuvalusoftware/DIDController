@@ -1,11 +1,20 @@
-import GithubProxy from "../../db/github/index.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
-import SchemaValidator from "../../schema/schemaValidator.js";
+import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
+import SchemaValidator from "../../schema/schemaValidator.js";
+import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+
+const REPOSITORY = process.env.DOCUMENT_REPO;
+const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 export default {
     getAllDIDs: async (req, res, next) => {
         const companyName = req.header("companyName");
+
+        Logger.apiInfo(
+            req,
+            res,
+            `Retrieve all DIDs from company ${companyName}`
+        );
 
         if (!companyName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -25,11 +34,6 @@ export default {
             const result = DID_strings.map((did) => did.name);
 
             res.status(200).json(result);
-            Logger.apiInfo(
-                req,
-                res,
-                `Retrieve all DIDs from company ${companyName}`
-            );
         } catch (err) {
             next(err);
         }
@@ -37,6 +41,12 @@ export default {
     getSingleDID: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("publicKey");
+
+        Logger.apiInfo(
+            req,
+            res,
+            `Retrieve DID '${fileName}' from company ${companyName}`
+        );
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -56,17 +66,18 @@ export default {
             const data = { name: fileName, content: JSON.parse(fileData.text) };
 
             res.status(200).json(data);
-            Logger.apiInfo(
-                req,
-                res,
-                `Retrieve DID '${fileName}' from company ${companyName}`
-            );
         } catch (err) {
             next(err);
         }
     },
     createNewDID: async (req, res, next) => {
         const { companyName, publicKey: fileName, content } = req.body;
+
+        Logger.apiInfo(
+            req,
+            res,
+            `Create new DID with '${fileName}' from company ${companyName}`
+        );
 
         if (!companyName || !fileName || !content) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -88,17 +99,18 @@ export default {
             );
 
             res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
-            Logger.apiInfo(
-                req,
-                res,
-                `Create new DID with '${fileName}' from company ${companyName}`
-            );
         } catch (err) {
             next(err);
         }
     },
     updateDID: async (req, res, next) => {
         const { companyName, publicKey: fileName, content } = req.body;
+
+        Logger.apiInfo(
+            req,
+            res,
+            `Update DID '${fileName}' from company ${companyName}`
+        );
 
         if (!companyName || !fileName || !content) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -118,11 +130,6 @@ export default {
             );
 
             res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
-            Logger.apiInfo(
-                req,
-                res,
-                `Update DID '${fileName}' from company ${companyName}`
-            );
         } catch (err) {
             next(err);
         }
@@ -130,6 +137,12 @@ export default {
     deleteDID: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("publicKey");
+
+        Logger.apiInfo(
+            req,
+            res,
+            `Delete DID '${fileName}' from company ${companyName}`
+        );
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -144,11 +157,6 @@ export default {
             );
 
             res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
-            Logger.apiInfo(
-                req,
-                res,
-                `Delete DID '${fileName}' from company ${companyName}`
-            );
         } catch (err) {
             next(err);
         }

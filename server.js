@@ -7,7 +7,6 @@ import cors from "cors";
 import router from "./routers/index.js";
 import Logger from "./logger.js";
 import { ERROR_CODES } from "./constants/index.js";
-import logger from "./logger.js";
 
 const require = createRequire(import.meta.url);
 const services = require("./swagger/did_controller.json");
@@ -41,7 +40,7 @@ app.use((err, req, res, _) => {
             returnError = err;
     }
 
-    logger.apiError(err, req, res);
+    Logger.apiError(err, req, res);
     res.status(200).json(returnError);
 });
 

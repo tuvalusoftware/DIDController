@@ -1,3 +1,7 @@
+const SERVICES = {
+    AUTH: `http://18.139.84.180:12000`,
+};
+
 const ERROR_CODES = {
     // Github API Error
     GITHUB_API_ERROR: {
@@ -70,48 +74,73 @@ const ERROR_CODES = {
             "Invalid wrapped document. Could not find the owner's address.",
     },
 
-    // Server Error (Human readable error messages)
+    // Human readable error messages
+    // Common Errors
     UNKNOWN_ERROR: {
-        error_code: 10001,
+        error_code: 10000,
         error_message: "Something went wrong!",
+    },
+    AUTHENTICATION: {
+        error_code: 10001,
+        error_message: "Access Token is invalid or not provided.",
     },
     MISSING_PARAMETERS: {
         error_code: 10002,
         error_message:
             "Parameters in request body or header are missing. Please try again later.",
     },
-    COMPANY_NOT_FOUND: {
+    INVALID_QUERY_PARAMS: {
         error_code: 10003,
+        error_message: "Query params provided are invalid.",
+    },
+
+    // Invalid Param Error
+    COMPANY_NOT_FOUND: {
+        error_code: 20000,
         error_message: "Company with the given name cannot be found.",
     },
+    COMPANY_NAME_INVALID: {
+        error_code: 20001,
+        error_message:
+            "Company name is invalid (Should not contain blank space).",
+    },
     FILE_NOT_FOUND: {
-        error_code: 10004,
+        error_code: 20002,
         error_message: "File/Public Key with the given value cannot be found.",
     },
     FILE_EXISTED: {
-        error_code: 10005,
+        error_code: 20003,
         error_message:
             "File or Public Key with the given value already exists.",
     },
+    MESSAGE_NOT_FOUND: {
+        error_code: 20004,
+        error_message: "ID/Receiver of message cannot be found.",
+    },
+    MESSAGE_CONTENT_INVALID: {
+        error_code: 20005,
+        error_message: "Sender Public Key or Receiver Public Key is invalid.",
+    },
+
+    // Content Errors
     USER_DID_DOC_INVALID: {
-        error_code: 10006,
+        error_code: 30000,
         error_message:
             "Content of user's did doc is invalid. Please make sure all required fields are provided with their valid value.",
     },
     WRAP_DOC_DID_DOC_INVALID: {
-        error_code: 10007,
+        error_code: 30001,
         error_message:
             "Content of wrapped document's did doc is invalid. Please make sure all required fields are provided with their valid value.",
     },
+    WRAP_DOC_DID_DOC_INVALID_MODIFIED: {
+        error_code: 30002,
+        error_message: "DID of the did document should not be modified.",
+    },
     CREDENTIAL_INVALID: {
-        error_code: 10008,
+        error_code: 30003,
         error_message:
             "Content of credential is invalid. Please make sure all required fields are provided with their valid value.",
-    },
-    COMPANY_NAME_INVALID: {
-        error_code: 10009,
-        error_message:
-            "Company name is invalid (Should not contain blank space).",
     },
 };
 
@@ -122,4 +151,4 @@ const SUCCESS_CODES = {
     DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
 
-export { ERROR_CODES, SUCCESS_CODES };
+export { SERVICES, ERROR_CODES, SUCCESS_CODES };

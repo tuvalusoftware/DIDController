@@ -82,12 +82,13 @@ export default {
         if (err.response) {
             const detectedErr = detectGithubError(err);
 
+            // Handle unexpected Github errors
             if (detectedErr === ERROR_CODES.GITHUB_API_ERROR) {
                 infoLogger.error(
-                    `Uncaught when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
+                    `Unexpected error when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
                 );
                 debugLogger.error(
-                    `Uncaught when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
+                    `Unexpected error when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
                 );
             }
 
@@ -99,8 +100,8 @@ export default {
         }
         // Other unexpected errors
         else {
-            infoLogger.error(`Uncaught error: ${JSON.stringify(err)}`);
-            debugLogger.error(`Uncaught error: ${JSON.stringify(err)}`);
+            infoLogger.error(`Unexpected error: ${JSON.stringify(err)}`);
+            debugLogger.error(`Unexpected error: ${JSON.stringify(err)}`);
             return ERROR_CODES.UNKNOWN_ERROR;
         }
     },

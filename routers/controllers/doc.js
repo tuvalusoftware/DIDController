@@ -1,13 +1,21 @@
-import GithubProxy from "../../db/github/index.js";
+import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import SchemaValidator from "../../schema/schemaValidator.js";
-import { extractOwnerPKFromDID } from "../../utils/index.js";
+import { extractOwnerPKFromAddress } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+
+const REPOSITORY = process.env.DOCUMENT_REPO;
+const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 export default {
     isExist: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
+        Logger.apiInfo(
+            req,
+            res,
+            `Check the existence of '${fileName}' document from company ${companyName}`
+        );
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -21,11 +29,6 @@ export default {
             );
 
             res.status(200).json({ isExisted });
-            Logger.apiInfo(
-                req,
-                res,
-                `Check the existence of '${fileName}' document from company ${companyName}`
-            );
         } catch (err) {
             return next(err);
         }
@@ -33,12 +36,20 @@ export default {
     getDoc: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
+        const only = req.query.only;
+        Logger.apiInfo(
+            req,
+            res,
+            `Get wrapped document/did document '${fileName}' from company ${companyName} with param query: only = "${only}"`
+        );
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
 
-        const only = req.query.only;
+        if (only && !["did", "doc"].includes(only)) {
+            return next(ERROR_CODES.INVALID_QUERY_PARAMS);
+        }
 
         try {
             const branch = `DOC_${companyName}`;
@@ -51,11 +62,6 @@ export default {
                     `${fileName}.did`,
                     branchLastCommitSHA
                 );
-                Logger.apiInfo(
-                    req,
-                    res,
-                    `Get only did document '${fileName}' from company ${companyName}`
-                );
                 return res.status(200).json({ didDoc: didDoc.content });
             }
             // Get document only
@@ -63,11 +69,6 @@ export default {
                 const wrappedDoc = await GithubProxy.getFile(
                     `${fileName}.document`,
                     branchLastCommitSHA
-                );
-                Logger.apiInfo(
-                    req,
-                    res,
-                    `Get only wrapped document '${fileName}' from company ${companyName}`
                 );
                 return res.status(200).json({ wrappedDoc: wrappedDoc.content });
             }
@@ -80,11 +81,6 @@ export default {
                     ),
                     GithubProxy.getFile(`${fileName}.did`, branchLastCommitSHA),
                 ]);
-                Logger.apiInfo(
-                    req,
-                    res,
-                    `Get both document '${fileName}' from company ${companyName}`
-                );
                 return res.status(200).json({
                     wrappedDoc: wrappedDoc.content,
                     didDoc: didDoc.content,
@@ -97,6 +93,12 @@ export default {
     getDocsByUser: async (req, res, next) => {
         const companyName = req.header("companyName");
         const ownerPublicKey = req.header("publicKey");
+
+        Logger.apiInfo(
+            req,
+            res,
+            `Retrieve all documents issuer by '${ownerPublicKey}' document from company ${companyName}`
+        );
 
         if (!companyName || !ownerPublicKey) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -142,6 +144,16 @@ export default {
     createNewDoc: async (req, res, next) => {
         const { wrappedDocument, fileName, companyName } = req.body;
 
+        // Discriminate between create a new document and clone a document
+        const isCloned = req.route.path === "/clone";
+        Logger.apiInfo(
+            req,
+            res,
+            !isCloned
+                ? `Create a new document '${fileName}' from company ${companyName}`
+                : `Clone a new document '${fileName}' from company ${companyName}`
+        );
+
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -154,10 +166,7 @@ export default {
             const ownerDID = wrappedDocument.data.issuers[0].address;
             if (!ownerDID) throw ERROR_CODES.INVALID_WRAPPED_DOCUMENT;
 
-            const ownerPublicKey = extractOwnerPKFromDID(ownerDID);
-
-            // Discriminate between create a new document and clone a document
-            const isCloned = req.route.path === "/clone";
+            const ownerPublicKey = extractOwnerPKFromAddress(ownerDID);
 
             // Save wrapped document
             await GithubProxy.createNewFile(
@@ -190,13 +199,6 @@ export default {
                     ? SUCCESS_CODES.SAVE_SUCCESS
                     : SUCCESS_CODES.CLONE_SUCCESS
             );
-            Logger.apiInfo(
-                req,
-                res,
-                !isCloned
-                    ? `Create a new document '${fileName}' from company ${companyName}`
-                    : `Clone a new document '${fileName}' from company ${companyName}`
-            );
         } catch (err) {
             next(err);
         }
@@ -204,6 +206,12 @@ export default {
     deleteDoc: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
+
+        Logger.apiInfo(
+            req,
+            res,
+            `Delete document '${fileName}' from company ${companyName}`
+        );
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -224,17 +232,18 @@ export default {
             );
 
             res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
-            Logger.apiInfo(
-                req,
-                res,
-                `Delete document '${fileName}' from company ${companyName}`
-            );
         } catch (err) {
             next(err);
         }
     },
     updateDidDocController: async (req, res, next) => {
         const { didDoc, fileName, companyName } = req.body;
+
+        Logger.apiInfo(
+            req,
+            res,
+            `Update the did doc of '${fileName}' document from company ${companyName}`
+        );
 
         if (!companyName || !fileName || !didDoc) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -259,11 +268,6 @@ export default {
             );
 
             res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
-            Logger.apiInfo(
-                req,
-                res,
-                `Update the did doc of '${fileName}' document from company ${companyName}`
-            );
         } catch (err) {
             next(err);
         }
@@ -271,6 +275,12 @@ export default {
     getDidDocHistory: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
+
+        Logger.apiInfo(
+            req,
+            res,
+            `Get the history of did doc of '${fileName}' document from company ${companyName}`
+        );
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -282,11 +292,6 @@ export default {
 
             const data = await GithubProxy.getFileHistory(didDocFile, branch);
             res.status(200).json(data);
-            Logger.apiInfo(
-                req,
-                res,
-                `Get the history of did doc of '${fileName}' document from company ${companyName}`
-            );
         } catch (err) {
             next(err);
         }
