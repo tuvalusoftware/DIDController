@@ -11,11 +11,7 @@ export default {
     isExist: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
-        Logger.apiInfo(
-            req,
-            res,
-            `Check the existence of '${fileName}' document from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `CHECK FILE EXISTENCE`);
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -37,11 +33,7 @@ export default {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
         const only = req.query.only;
-        Logger.apiInfo(
-            req,
-            res,
-            `Get wrapped document/did document '${fileName}' from company ${companyName} with param query: only = "${only}"`
-        );
+        Logger.apiInfo(req, res, `GET WRAPPED DOCUMENT/DID DOCUMENT`);
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -72,20 +64,19 @@ export default {
                 );
                 return res.status(200).json({ wrappedDoc: wrappedDoc.content });
             }
+
             // Get both
-            else {
-                const [wrappedDoc, didDoc] = await Promise.all([
-                    GithubProxy.getFile(
-                        `${fileName}.document`,
-                        branchLastCommitSHA
-                    ),
-                    GithubProxy.getFile(`${fileName}.did`, branchLastCommitSHA),
-                ]);
-                return res.status(200).json({
-                    wrappedDoc: wrappedDoc.content,
-                    didDoc: didDoc.content,
-                });
-            }
+            const [wrappedDoc, didDoc] = await Promise.all([
+                GithubProxy.getFile(
+                    `${fileName}.document`,
+                    branchLastCommitSHA
+                ),
+                GithubProxy.getFile(`${fileName}.did`, branchLastCommitSHA),
+            ]);
+            return res.status(200).json({
+                wrappedDoc: wrappedDoc.content,
+                didDoc: didDoc.content,
+            });
         } catch (err) {
             next(err);
         }
@@ -94,11 +85,7 @@ export default {
         const companyName = req.header("companyName");
         const ownerPublicKey = req.header("publicKey");
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Retrieve all documents issuer by '${ownerPublicKey}' document from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `RETRIEVE ALL DOCS BY ISSUER'S PUBLIC KEY`);
 
         if (!companyName || !ownerPublicKey) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -149,9 +136,7 @@ export default {
         Logger.apiInfo(
             req,
             res,
-            !isCloned
-                ? `Create a new document '${fileName}' from company ${companyName}`
-                : `Clone a new document '${fileName}' from company ${companyName}`
+            !isCloned ? `CREATE A NEW DOCUMENT` : `CLONE A NEW DOCUMENT`
         );
 
         if (!companyName || !fileName) {
@@ -207,11 +192,7 @@ export default {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Delete document '${fileName}' from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `DELETE DOCUMENT`);
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -239,11 +220,7 @@ export default {
     updateDidDocController: async (req, res, next) => {
         const { didDoc, fileName, companyName } = req.body;
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Update the did doc of '${fileName}' document from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `UPDATE DID DOCUMENT OF WRAPPED DOCUMENT`);
 
         if (!companyName || !fileName || !didDoc) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -276,11 +253,7 @@ export default {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Get the history of did doc of '${fileName}' document from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `GET HISTORY OF DID DOCUMENT`);
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);

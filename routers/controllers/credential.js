@@ -6,13 +6,13 @@ const REPOSITORY = process.env.MESSAGE_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 // The number of first letter of a receiver PK to determine its branch
-const FIRST_N_LETTERS = 5;
+const FIRST_N_LETTERS = 3;
 
 export default {
     getCredentialByHash: async (req, res, next) => {
         const hash = req.header("hash");
 
-        Logger.apiInfo(req, res, `Retrieve new credential`);
+        Logger.apiInfo(req, res, `RETRIEVE CREDENTIAL BY HASH`);
 
         if (!hash) return next(ERROR_CODES.MISSING_PARAMETERS);
 
@@ -45,7 +45,7 @@ export default {
     saveCredential: async (req, res, next) => {
         const { hash, content } = req.body;
 
-        Logger.apiInfo(req, res, `Save new credential`);
+        Logger.apiInfo(req, res, `SAVE NEW CREDENTIAL`);
 
         if (!hash || !content) return next(ERROR_CODES.MISSING_PARAMETERS);
 

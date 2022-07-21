@@ -10,11 +10,7 @@ export default {
     getAllDIDs: async (req, res, next) => {
         const companyName = req.header("companyName");
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Retrieve all DIDs from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `RETRIEVE ALL DIDs BY COMPANY NAME`);
 
         if (!companyName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -42,11 +38,7 @@ export default {
         const companyName = req.header("companyName");
         const fileName = req.header("publicKey");
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Retrieve DID '${fileName}' from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `RETRIEVE DID BY ITS NAME`);
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -73,11 +65,7 @@ export default {
     createNewDID: async (req, res, next) => {
         const { companyName, publicKey: fileName, content } = req.body;
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Create new DID with '${fileName}' from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `CREATE A DID`);
 
         if (!companyName || !fileName || !content) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -106,11 +94,7 @@ export default {
     updateDID: async (req, res, next) => {
         const { companyName, publicKey: fileName, content } = req.body;
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Update DID '${fileName}' from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `UPDATE DID DOCUMENT OF A DID`);
 
         if (!companyName || !fileName || !content) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -138,11 +122,7 @@ export default {
         const companyName = req.header("companyName");
         const fileName = req.header("publicKey");
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Delete DID '${fileName}' from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `DELETE A DID`);
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);

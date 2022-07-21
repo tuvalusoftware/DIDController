@@ -8,7 +8,7 @@ export default {
         // Ignore Security Service If In Test Environment
         if (process.env.NODE_ENV === "test") return next();
 
-        Logger.apiInfo(req, res, "Ensure Authentication from Security Service");
+        Logger.apiInfo(req, res, "ENSURE AUTHENTICATION FROM SECURITY SERVICE");
 
         const token = req.cookies["access_token"];
         if (!token) {

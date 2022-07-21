@@ -6,9 +6,9 @@ import { ERROR_CODES } from "./constants/index.js";
 
 const customLogLevel = (logLevel) => {
     return {
-        error: "⛔️ ERROR",
-        warn: "⚠️ WARN",
-        info: "🆕 INFO",
+        error: "ERROR",
+        warn: "WARN",
+        info: "INFO",
     }[logLevel];
 };
 
@@ -20,9 +20,9 @@ const formatConfig = format.combine(
     format.align(),
     format.printf(
         (info) =>
-            `[${customLogLevel(info.level)}]: [${[info.timestamp]}]: ${
+            `[${customLogLevel(info.level)}] - [${[info.timestamp]}]: ${
                 info.message
-            }\n`
+            }`
     )
 );
 
@@ -60,6 +60,9 @@ const debugLogger = createLogger(debugLogConfigs);
 export default {
     info(message) {
         infoLogger.info(message);
+    },
+    functionInfo(fileInfo, functionInfo) {
+        infoLogger.info(`[${fileInfo}] ${functionInfo}`);
     },
     apiInfo(req, res, message) {
         infoLogger.info(`[${req.method} - ${req.originalUrl}] ${message}`);
