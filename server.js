@@ -27,27 +27,25 @@ router(app);
 
 // Handle global err
 app.use((err, req, res, _) => {
+    Logger.apiError(err, req, res);
+
     // Convert github errors to human readable errors
-    let returnError;
     switch (err) {
         case ERROR_CODES.BLOB_EXISTED:
-            returnError = ERROR_CODES.FILE_EXISTED;
-            break;
+            return res.status(200).json(ERROR_CODES.FILE_EXISTED);
         case ERROR_CODES.BLOB_NOT_EXISTED:
-            returnError = ERROR_CODES.FILE_NOT_FOUND;
-            break;
+            return res.status(200).json(ERROR_CODES.FILE_NOT_FOUND);
         case ERROR_CODES.BRANCH_NOT_EXISTED:
-            returnError = ERROR_CODES.COMPANY_NOT_FOUND;
-            break;
+            return res.status(200).json(ERROR_CODES.COMPANY_NOT_FOUND);
         case ERROR_CODES.INVALID_REF_NAME:
-            returnError = ERROR_CODES.COMPANY_NAME_INVALID;
-            break;
-        default:
-            returnError = err;
+            return res.status(200).json(ERROR_CODES.COMPANY_NAME_INVALID);
     }
 
-    Logger.apiError(err, req, res);
-    res.status(200).json(returnError);
+    // Catching common errors
+    if (err instanceof Error)
+        return res.status(200).json(ERROR_CODES.UNKNOWN_ERROR);
+
+    return res.status(200).json(err);
 });
 
 /* c8 ignore start */

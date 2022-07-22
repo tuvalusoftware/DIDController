@@ -77,7 +77,7 @@ const ERROR_CODES = {
     // Common Errors
     UNKNOWN_ERROR: {
         error_code: 10000,
-        error_message: "Something went wrong!",
+        error_message: "Something went wrong with the server!",
     },
     AUTHENTICATION: {
         error_code: 10001,

@@ -68,12 +68,13 @@ export default {
         infoLogger.info(`[${req.method} - ${req.originalUrl}] ${message}`);
     },
     apiError(err, req, res) {
-        infoLogger.error(
-            `[${req.method} - ${req.originalUrl}] ${err.error_message}`
-        );
-        debugLogger.error(
-            `[${req.method} - ${req.originalUrl}] ${err.error_message}`
-        );
+        const errorMsg =
+            err instanceof Error
+                ? `${err.message} - ${err.stack}`
+                : err.error_message;
+
+        infoLogger.error(`[${req.method} - ${req.originalUrl}] ${errorMsg}`);
+        debugLogger.error(`[${req.method} - ${req.originalUrl}] ${errorMsg}`);
     },
     handleGithubError(err) {
         // If error is already identified as the custom error, return it.
