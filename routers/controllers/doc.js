@@ -128,6 +128,42 @@ export default {
             next(err);
         }
     },
+    searchContent: async (req, res, next) => {
+        const { companyName, searchString } = req.query;
+        Logger.apiInfo(req, res, `SEARCH A STRING IN DOCUMENT`);
+
+        if (!companyName || !searchString) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
+
+        try {
+            const branch = `DOC_${companyName}`;
+            const branchLastCommitSHA =
+                await GithubProxy.getBranchLastCommitSHA(branch);
+
+            // Get all files in a branch
+            const files = await GithubProxy.getFilesOfTree(
+                "",
+                false,
+                branchLastCommitSHA,
+                true
+            );
+
+            // Find documents that contains the search string
+            let results = files.filter(
+                (file) =>
+                    file.name.includes(".document") &&
+                    file.object.text.includes(searchString)
+            );
+
+            // Parse content to JS object
+            results = results.map((file) => JSON.parse(file.object.text));
+
+            res.status(200).json(results);
+        } catch (err) {
+            next(err);
+        }
+    },
     createNewDoc: async (req, res, next) => {
         const { wrappedDocument, fileName, companyName } = req.body;
 

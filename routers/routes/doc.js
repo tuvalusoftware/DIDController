@@ -7,6 +7,7 @@ const router = express.Router();
 // router.use(authController.ensureSecurityServiceAuthentication);
 
 router.route("/exists").get(docController.isExist);
+router.route("/search-content").get(docController.searchContent);
 router
     .route("/")
     .get(docController.getDoc)

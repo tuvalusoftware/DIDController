@@ -545,6 +545,43 @@
                 }
             }
         },
+        "/doc/search-content": {
+            "get": {
+                "tags": ["DOC"],
+                "summary": "Search for any document that contain a certain string within the same company.",
+                "parameters": [
+                    {
+                        "name": "companyName",
+                        "in": "query",
+                        "description": "Name of a company",
+                        "required": true,
+                        "example": "Kukulu"
+                    },
+                    {
+                        "name": "searchString",
+                        "in": "query",
+                        "description": "String value that need to be found",
+                        "required": true,
+                        "example": "Search this string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return a list of wrapped document if the string is found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/WrappedDocument"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/doc/did-doc-history": {
             "get": {
                 "tags": ["DOC"],
