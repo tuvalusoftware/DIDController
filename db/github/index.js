@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import GithubRESTConfig from "./rest.js";
 import Logger from "../../logger.js";
 import { executeGraphQL } from "./helpers.js";

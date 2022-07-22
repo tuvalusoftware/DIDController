@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import methodOverride from "method-override";
 import swaggerUiExpress from "swagger-ui-express";
+import dotenv from "dotenv";
+dotenv.config();
 
 import router from "./routers/index.js";
 import Logger from "./logger.js";
