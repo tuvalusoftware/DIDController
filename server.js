@@ -13,7 +13,7 @@ import Logger from "./logger.js";
 import { ERROR_CODES } from "./constants/index.js";
 
 const require = createRequire(import.meta.url);
-const services = require("./swagger/did_controller.json");
+const services = require("./docs/swagger.json");
 
 const app = express();
 app.use(cors());
