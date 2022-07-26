@@ -177,6 +177,9 @@ export default {
 
             res.status(200).json(results);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
             next(err);
         }
     },

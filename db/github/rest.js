@@ -42,6 +42,7 @@ const GithubREST = (REPOSITORY) => ({
             ...axiosHeaderConfig,
         });
     },
+    /* c8 ignore start */
     search(queryString) {
         return axios.get(`https://api.github.com/search/code?${queryString}`, {
             headers: {
@@ -50,6 +51,7 @@ const GithubREST = (REPOSITORY) => ({
             },
         });
     },
+    /* c8 ignore stop */
 });
 
 export default GithubREST;

@@ -10,6 +10,7 @@ dotenv.config();
 
 import router from "./routers/index.js";
 import Logger from "./logger.js";
+import SchemaValidator from "./schema/schemaValidator.js";
 import { ERROR_CODES } from "./constants/index.js";
 
 const require = createRequire(import.meta.url);
@@ -29,23 +30,11 @@ router(app);
 app.use((err, req, res, _) => {
     Logger.apiError(err, req, res);
 
-    // Convert github errors to human readable errors
-    // switch (err) {
-    //     case ERROR_CODES.BLOB_EXISTED:
-    //         return res.status(200).json(ERROR_CODES.FILE_EXISTED);
-    //     case ERROR_CODES.BLOB_NOT_EXISTED:
-    //         return res.status(200).json(ERROR_CODES.FILE_NOT_FOUND);
-    //     case ERROR_CODES.BRANCH_NOT_EXISTED:
-    //         return res.status(200).json(ERROR_CODES.COMPANY_NOT_FOUND);
-    //     case ERROR_CODES.INVALID_REF_NAME:
-    //         return res.status(200).json(ERROR_CODES.COMPANY_NAME_INVALID);
-    // }
+    if (SchemaValidator.validate(err, "ERROR_OBJECT")) {
+        return res.status(200).json(err);
+    }
 
-    // Catching common errors
-    if (err instanceof Error)
-        return res.status(200).json(ERROR_CODES.UNKNOWN_ERROR);
-
-    return res.status(200).json(err);
+    return res.status(200).json(ERROR_CODES.UNKNOWN_ERROR);
 });
 
 /* c8 ignore start */
