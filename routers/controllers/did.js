@@ -31,6 +31,9 @@ export default {
 
             res.status(200).json(result);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
             next(err);
         }
     },
@@ -59,6 +62,12 @@ export default {
 
             res.status(200).json(data);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
+            if (err === ERROR_CODES.BLOB_NOT_EXISTED)
+                return next(ERROR_CODES.FILE_NOT_FOUND);
+
             next(err);
         }
     },
@@ -88,6 +97,10 @@ export default {
 
             res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
         } catch (err) {
+            if (err === ERROR_CODES.BLOB_EXISTED) {
+                return next(ERROR_CODES.FILE_EXISTED);
+            }
+
             next(err);
         }
     },
@@ -115,6 +128,12 @@ export default {
 
             res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
+            if (err === ERROR_CODES.BLOB_NOT_EXISTED)
+                return next(ERROR_CODES.FILE_NOT_FOUND);
+
             next(err);
         }
     },
@@ -138,6 +157,12 @@ export default {
 
             res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
+            if (err === ERROR_CODES.BLOB_NOT_EXISTED)
+                return next(ERROR_CODES.FILE_NOT_FOUND);
+
             next(err);
         }
     },

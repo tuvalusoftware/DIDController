@@ -30,16 +30,16 @@ app.use((err, req, res, _) => {
     Logger.apiError(err, req, res);
 
     // Convert github errors to human readable errors
-    switch (err) {
-        case ERROR_CODES.BLOB_EXISTED:
-            return res.status(200).json(ERROR_CODES.FILE_EXISTED);
-        case ERROR_CODES.BLOB_NOT_EXISTED:
-            return res.status(200).json(ERROR_CODES.FILE_NOT_FOUND);
-        case ERROR_CODES.BRANCH_NOT_EXISTED:
-            return res.status(200).json(ERROR_CODES.COMPANY_NOT_FOUND);
-        case ERROR_CODES.INVALID_REF_NAME:
-            return res.status(200).json(ERROR_CODES.COMPANY_NAME_INVALID);
-    }
+    // switch (err) {
+    //     case ERROR_CODES.BLOB_EXISTED:
+    //         return res.status(200).json(ERROR_CODES.FILE_EXISTED);
+    //     case ERROR_CODES.BLOB_NOT_EXISTED:
+    //         return res.status(200).json(ERROR_CODES.FILE_NOT_FOUND);
+    //     case ERROR_CODES.BRANCH_NOT_EXISTED:
+    //         return res.status(200).json(ERROR_CODES.COMPANY_NOT_FOUND);
+    //     case ERROR_CODES.INVALID_REF_NAME:
+    //         return res.status(200).json(ERROR_CODES.COMPANY_NAME_INVALID);
+    // }
 
     // Catching common errors
     if (err instanceof Error)

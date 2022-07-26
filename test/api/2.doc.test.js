@@ -187,6 +187,22 @@ describe("DOC", function () {
                     done();
                 });
         });
+
+        it("it should return a 'file already existed' error", (done) => {
+            chai.request(server)
+                .post("/api/doc")
+                .send(TEST_DATA)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_EXISTED)
+                    );
+
+                    done();
+                });
+        });
     });
 
     describe("/GET check if document exists", () => {
@@ -422,7 +438,7 @@ describe("DOC", function () {
         });
     });
 
-    describe("/GET fetch list of documents own by an user", () => {
+    describe("/GET fetch list of documents which user is their owner/holder", () => {
         it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
             chai.request(server)
                 .get("/api/doc/user")

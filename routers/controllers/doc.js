@@ -26,6 +26,9 @@ export default {
 
             res.status(200).json({ isExisted });
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
             return next(err);
         }
     },
@@ -78,6 +81,12 @@ export default {
                 didDoc: didDoc.content,
             });
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
+            if (err === ERROR_CODES.BLOB_NOT_EXISTED)
+                return next(ERROR_CODES.FILE_NOT_FOUND);
+
             next(err);
         }
     },
@@ -129,6 +138,9 @@ export default {
 
             return res.status(200).json(documents);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
             next(err);
         }
     },
@@ -225,6 +237,13 @@ export default {
                     : SUCCESS_CODES.CLONE_SUCCESS
             );
         } catch (err) {
+            if (err === ERROR_CODES.INVALID_REF_NAME)
+                return next(ERROR_CODES.COMPANY_NAME_INVALID);
+
+            if (err === ERROR_CODES.BLOB_EXISTED) {
+                return next(ERROR_CODES.FILE_EXISTED);
+            }
+
             next(err);
         }
     },
@@ -254,6 +273,12 @@ export default {
 
             res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
+            if (err === ERROR_CODES.BLOB_NOT_EXISTED)
+                return next(ERROR_CODES.FILE_NOT_FOUND);
+
             next(err);
         }
     },
@@ -286,6 +311,9 @@ export default {
 
             res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
             next(err);
         }
     },
@@ -306,6 +334,12 @@ export default {
             const data = await GithubProxy.getFileHistory(didDocFile, branch);
             res.status(200).json(data);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
+            if (err === ERROR_CODES.BLOB_NOT_EXISTED)
+                return next(ERROR_CODES.FILE_NOT_FOUND);
+
             next(err);
         }
     },
