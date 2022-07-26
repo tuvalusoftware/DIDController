@@ -96,34 +96,38 @@ export default {
             const branchLastCommitSHA =
                 await GithubProxy.getBranchLastCommitSHA(branch);
 
-            // Get all files from the given company
-            const files = await GithubProxy.getFilesOfTree(
+            // Get all files in a company branch
+            const allFiles = await GithubProxy.getFilesOfTree(
                 "",
                 false,
-                branchLastCommitSHA
+                branchLastCommitSHA,
+                true
             );
 
-            // Check the did doc for the document with the owner public key as the controller
-            const didDocs = files.filter((el) => el.name.includes(".did"));
-            const getDidDocContentOperations = didDocs.map((el) =>
-                GithubProxy.getFile(el.name, branchLastCommitSHA)
-            );
-            const didDocsInfo = await Promise.all(getDidDocContentOperations);
-            const ownerDocumentNames = didDocsInfo.filter(
-                (el) => el.content.owner === ownerPublicKey
+            // Filter and Parse DID File contents
+            const didFiles = allFiles
+                .filter((file) => file.name.includes(".did"))
+                .map((file) => ({
+                    name: file.name,
+                    content: JSON.parse(file.object.text),
+                }));
+
+            // Filter through the DID document to find documents that belong to the owner or holder
+            const filesBelongToOwner = didFiles.filter(
+                (file) =>
+                    file.content.owner === ownerPublicKey ||
+                    file.content.holder === ownerPublicKey
             );
 
-            if (ownerDocumentNames.length === 0)
-                return res.status(200).json([]);
+            const documents = filesBelongToOwner.map((file) => {
+                const fileContent = allFiles.find(
+                    (f) => f.name === file.content.url
+                );
 
-            // Get all owner documents
-            const getWrappedDocOperations = ownerDocumentNames.map((el) =>
-                GithubProxy.getFile(el.content.url, branchLastCommitSHA)
-            );
-            const documents = await Promise.all(getWrappedDocOperations);
-            const results = documents.map((el) => el.content);
+                return JSON.parse(fileContent.object.text);
+            });
 
-            return res.status(200).json(results);
+            return res.status(200).json(documents);
         } catch (err) {
             next(err);
         }
