@@ -33,6 +33,25 @@ export default function (REPOSITORY) {
 
         /**
          * @async
+         * @description Return repository's info
+         * @returns {{ id: Number, name: String, full_name: String, private: Boolean, owner: { login: String, id: Number }, description: String|null, created_at: String, updated_at: String, size: Number, default_branch: String }} Repository Info
+         */
+        getRepoInfo: function () {
+            Logger.functionInfo("db/github/index.js", "getRepoInfo");
+            return new Promise((resolve, reject) => {
+                GithubREST.get(``)
+                    .then((response) => {
+                        resolve(response.data);
+                    })
+                    .catch((err) => {
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
+                    });
+            });
+        },
+
+        /**
+         * @async
          * @description Get the info of all branches from a repo
          * @returns {{ name: String, commit: { sha: String, url: String }, protected: Boolean }[]} An array of branch objects
          */
@@ -77,6 +96,62 @@ export default function (REPOSITORY) {
                     });
             });
         },
+
+        /**
+         * @async
+         * @description Set default branch for the repo
+         * @param {String} branchName Default to main
+         * @returns {{ id: Number, name: String, full_name: String, private: Boolean, owner: { login: String, id: Number }, description: String|null, created_at: String, updated_at: String, size: Number, default_branch: String }} Repository Info
+         */
+        setDefaultBranch: function (branchName = "main") {
+            Logger.functionInfo("db/github/index.js", "setDefaultBranch");
+            return new Promise((resolve, reject) => {
+                GithubREST.patch(``, {
+                    default_branch: branchName,
+                })
+                    .then((response) => {
+                        resolve(response.data);
+                    })
+                    .catch((err) => {
+                        if (
+                            err.response?.status === 422 &&
+                            err.response?.data.message === "Validation Failed"
+                        ) {
+                            return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
+                        }
+
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
+                    });
+            });
+        },
+
+        /* c8 ignore start */
+        /**
+         * @async
+         * @description Perform Github Search API on a specific branch
+         * @warning Only works perfectly on default branch, otherwise there is a significant delay because the Search API cannot detect the change on default branch
+         * @reference https://docs.github.com/en/rest/search, https://docs.github.com/en/search-github/searching-on-github/searching-code, https://docs.github.com/en/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax
+         * @param {String} queryString Query String for Github Search API (For example: 'Hello in:file repo:kazCTU1077/Fuixlabs_Document')
+         * @returns {{ total_count: Number, incomplete_results: Boolean, items: { name: String, path: String, sha: String, text_matches: { fragment: String, matches: { text: String, indices: Number[] }[] }[] }[] }}
+         */
+        searchOnBranch: async function (queryString, branch = null) {
+            Logger.functionInfo("db/github/index.js", "search");
+
+            try {
+                // Set default branch
+                if (branch) {
+                    await this.setDefaultBranch(branch);
+                }
+
+                const { data } = await GithubREST.search(queryString);
+                return data;
+            } catch (err) {
+                const errInfo = Logger.handleGithubError(err);
+                reject(errInfo);
+            }
+        },
+        /* c8 ignore stop */
 
         /**
          * @async

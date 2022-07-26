@@ -89,10 +89,18 @@ export default {
             // Handle unexpected Github errors
             if (detectedErr === ERROR_CODES.GITHUB_API_ERROR) {
                 infoLogger.error(
-                    `Unexpected error when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
+                    `Unexpected error when call Github API error: Status: ${
+                        err.response.status
+                    }, Error message: ${
+                        err.response.data.message
+                    }, Errors: ${JSON.stringify(err.response.data.errors)}`
                 );
                 debugLogger.error(
-                    `Unexpected error when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
+                    `Unexpected error when call Github API error: Status: ${
+                        err.response.status
+                    }, Error message: ${
+                        err.response.data.message
+                    }, Errors: ${JSON.stringify(err.response.data.errors)}`
                 );
             }
 
