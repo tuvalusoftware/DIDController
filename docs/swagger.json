@@ -819,6 +819,42 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "tags": ["CREDENTIAL"],
+                "summary": "Update a credential.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "hash": {
+                                        "description": "Target hash of the credential.",
+                                        "type": "string",
+                                        "example": "ghjk_rtyuiocvbnm456dfghj"
+                                    },
+                                    "content": {
+                                        "$ref": "#/components/schemas/Credential"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/message": {

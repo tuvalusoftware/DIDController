@@ -9,6 +9,7 @@ const router = express.Router();
 router
     .route("/")
     .get(credentialController.getCredentialByHash)
-    .post(credentialController.saveCredential);
+    .post(credentialController.saveCredential)
+    .put(credentialController.updateCredential);
 
 export default router;

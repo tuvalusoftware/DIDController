@@ -34,11 +34,11 @@ export default {
             if (
                 [
                     ERROR_CODES.BRANCH_NOT_EXISTED,
-                    ERROR_CODES.FOLDER_NOT_EXISTED,
+                    ERROR_CODES.BLOB_NOT_EXISTED,
                 ].includes(err)
-            ) {
+            )
                 return next(ERROR_CODES.CREDENTIAL_NOT_FOUND);
-            }
+
             next(err);
         }
     },
@@ -64,6 +64,38 @@ export default {
 
             res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
         } catch (err) {
+            next(err);
+        }
+    },
+    updateCredential: async (req, res, next) => {
+        const { hash, content: updatedContent } = req.body;
+
+        Logger.apiInfo(req, res, `UPDATE CREDENTIAL`);
+
+        if (!hash || !updatedContent)
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+
+        try {
+            // Determine branch name
+            const branchName = `CRE_${hash.substring(0, FIRST_N_LETTERS)}`;
+
+            await GithubProxy.updateFile(
+                `${hash}.cre`,
+                updatedContent,
+                branchName,
+                `UPDATE: '${hash}' credential`
+            );
+
+            res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
+        } catch (err) {
+            if (
+                [
+                    ERROR_CODES.BRANCH_NOT_EXISTED,
+                    ERROR_CODES.BLOB_NOT_EXISTED,
+                ].includes(err)
+            )
+                return next(ERROR_CODES.CREDENTIAL_NOT_FOUND);
+
             next(err);
         }
     },
