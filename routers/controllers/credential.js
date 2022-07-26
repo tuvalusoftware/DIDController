@@ -29,7 +29,7 @@ export default {
                 branchLatestSHA
             );
 
-            res.status(201).json(fileData.content);
+            res.status(200).json(fileData.content);
         } catch (err) {
             if (
                 [
