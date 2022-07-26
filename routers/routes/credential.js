@@ -4,7 +4,7 @@ import authController from "../controllers/auth.js";
 
 const router = express.Router();
 
-// router.use(authController.ensureSecurityServiceAuthentication);
+router.use(authController.ensureSecurityServiceAuthentication);
 
 router
     .route("/")
