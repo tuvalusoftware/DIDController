@@ -182,7 +182,7 @@ describe("CREDENTIAL", function () {
                 });
         });
 
-        it("it should return an message correspond with the provided hash", (done) => {
+        it("it should return an credential correspond with the provided hash", (done) => {
             chai.request(server)
                 .get("/api/credential")
                 .set("hash", HASH1)
@@ -197,7 +197,7 @@ describe("CREDENTIAL", function () {
                 });
         });
 
-        it("it should return an message correspond with the provided hash - 2nd time", (done) => {
+        it("it should return an credential correspond with the provided hash - 2nd time", (done) => {
             chai.request(server)
                 .get("/api/credential")
                 .set("hash", HASH2)
@@ -207,6 +207,76 @@ describe("CREDENTIAL", function () {
 
                     expect(JSON.stringify(res.body)).equal(
                         JSON.stringify(CREDENTIAL_CONTENT2)
+                    );
+                    done();
+                });
+        });
+    });
+
+    describe("/PUT update credential", () => {
+        it("it should return a 'missing params' error as the required params are not provided", (done) => {
+            chai.request(server)
+                .put("/api/credential")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.MISSING_PARAMETERS)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a 'credential not found' error as the provided hash is invalid", (done) => {
+            chai.request(server)
+                .put("/api/credential")
+                .send({ hash: "in valid content", content: {} })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.CREDENTIAL_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return a success message states that credential is updated successfully", (done) => {
+            chai.request(server)
+                .put("/api/credential")
+                .send({
+                    hash: HASH2,
+                    content: { ...CREDENTIAL_CONTENT2, updated: true },
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(SUCCESS_CODES.UPDATE_SUCCESS)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should return an updated credential correspond with the provided hash", (done) => {
+            chai.request(server)
+                .get("/api/credential")
+                .set("hash", HASH2)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    expect(res.body).to.be.an("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify({
+                            ...CREDENTIAL_CONTENT2,
+                            updated: true,
+                        })
                     );
                     done();
                 });
