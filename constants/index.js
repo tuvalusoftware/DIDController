@@ -79,17 +79,23 @@ const ERROR_CODES = {
         error_code: 10000,
         error_message: "Something went wrong with the server!",
     },
-    AUTHENTICATION: {
+    SECURITY_SERVICE_AUTHENTICATION: {
         error_code: 10001,
         error_message: "Unauthorized.",
+        cause: "Invalid authentication info according to the Security Service",
+    },
+    MISSING_ACCESS_TOKEN: {
+        error_code: 10003,
+        error_message: "Unauthorized.",
+        cause: "Access token is not provided.",
     },
     MISSING_PARAMETERS: {
-        error_code: 10002,
+        error_code: 10004,
         error_message:
-            "Parameters in request body or header are missing. Please try again later.",
+            "Parameters in request body or query are missing. Please try again later.",
     },
     INVALID_QUERY_PARAMS: {
-        error_code: 10003,
+        error_code: 10005,
         error_message: "Query params provided are invalid.",
     },
 

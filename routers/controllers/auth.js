@@ -12,7 +12,7 @@ export default {
 
         const token = req.cookies["access_token"];
         if (!token) {
-            return next(ERROR_CODES.AUTHENTICATION);
+            return next(ERROR_CODES.MISSING_ACCESS_TOKEN);
         }
 
         // Call to Security Service to verify the access token
@@ -35,10 +35,10 @@ export default {
             next();
         } catch (err) {
             if (
-                err.response.data === "Unauthorized" &&
-                err.response.status === 401
+                err.response?.data === "Unauthorized" &&
+                err.response?.status === 401
             ) {
-                return next(ERROR_CODES.AUTHENTICATION);
+                return next(ERROR_CODES.SECURITY_SERVICE_AUTHENTICATION);
             }
 
             next(err);
