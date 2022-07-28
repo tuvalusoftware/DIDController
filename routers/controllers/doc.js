@@ -9,10 +9,9 @@ const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 export default {
     isExist: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("fileName");
         Logger.apiInfo(req, res, `CHECK FILE EXISTENCE`);
 
+        const { companyName, fileName } = req.query;
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -33,15 +32,14 @@ export default {
         }
     },
     getDoc: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("fileName");
-        const only = req.query.only;
         Logger.apiInfo(req, res, `GET WRAPPED DOCUMENT/DID DOCUMENT`);
 
+        const { companyName, fileName, only } = req.query;
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
 
+        // Check if the 'only' param value is invalid
         if (only && !["did", "doc"].includes(only)) {
             return next(ERROR_CODES.INVALID_QUERY_PARAMS);
         }
@@ -91,11 +89,9 @@ export default {
         }
     },
     getDocsByUser: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const ownerPublicKey = req.header("publicKey");
-
         Logger.apiInfo(req, res, `RETRIEVE ALL DOCS BY ISSUER'S PUBLIC KEY`);
 
+        const { companyName, publicKey: ownerPublicKey } = req.query;
         if (!companyName || !ownerPublicKey) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -145,9 +141,9 @@ export default {
         }
     },
     searchContent: async (req, res, next) => {
-        const { companyName, searchString } = req.query;
         Logger.apiInfo(req, res, `SEARCH A STRING IN DOCUMENT`);
 
+        const { companyName, searchString } = req.query;
         if (!companyName || !searchString) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -251,11 +247,9 @@ export default {
         }
     },
     deleteDoc: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("fileName");
-
         Logger.apiInfo(req, res, `DELETE DOCUMENT`);
 
+        const { companyName, fileName } = req.query;
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -286,10 +280,9 @@ export default {
         }
     },
     updateDidDocController: async (req, res, next) => {
-        const { didDoc, fileName, companyName } = req.body;
-
         Logger.apiInfo(req, res, `UPDATE DID DOCUMENT OF WRAPPED DOCUMENT`);
 
+        const { didDoc, fileName, companyName } = req.body;
         if (!companyName || !fileName || !didDoc) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -321,11 +314,9 @@ export default {
         }
     },
     getDidDocHistory: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("fileName");
-
         Logger.apiInfo(req, res, `GET HISTORY OF DID DOCUMENT`);
 
+        const { companyName, fileName } = req.query;
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }

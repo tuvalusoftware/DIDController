@@ -162,8 +162,10 @@ describe("DID", function () {
         it("it should GET a DID", (done) => {
             chai.request(server)
                 .get("/api/did")
-                .set("companyName", TEST_DATA.companyName)
-                .set("publicKey", TEST_DATA.publicKey)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    publicKey: TEST_DATA.publicKey,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -193,8 +195,10 @@ describe("DID", function () {
         it("it should return a 'company not found' error as the param 'companyName' cannot be found", (done) => {
             chai.request(server)
                 .get("/api/did")
-                .set("companyName", INVALID_COMPANY_NAME)
-                .set("publicKey", TEST_DATA.publicKey)
+                .query({
+                    companyName: INVALID_COMPANY_NAME,
+                    publicKey: TEST_DATA.publicKey,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -212,7 +216,9 @@ describe("DID", function () {
         it("it should GET an array of DID from a company", (done) => {
             chai.request(server)
                 .get("/api/did/all")
-                .set("companyName", TEST_BRANCH)
+                .query({
+                    companyName: TEST_BRANCH,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("array");
@@ -247,30 +253,15 @@ describe("DID", function () {
         it("it should return a 'company not found' error as the param 'companyName' cannot be found", (done) => {
             chai.request(server)
                 .get("/api/did/all")
-                .set("companyName", INVALID_COMPANY_NAME)
+                .query({
+                    companyName: INVALID_COMPANY_NAME,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
 
                     expect(JSON.stringify(res.body)).equal(
                         JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
-                    );
-
-                    done();
-                });
-        });
-
-        it("it should return a 'public key not found' error as the param 'publicKey' is invalid", (done) => {
-            chai.request(server)
-                .get("/api/did")
-                .set("companyName", TEST_DATA.companyName)
-                .set("publicKey", INVALID_PUBLIC_KEY)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a("object");
-
-                    expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(ERROR_CODES.FILE_NOT_FOUND)
                     );
 
                     done();
@@ -360,8 +351,10 @@ describe("DID", function () {
         it("it should GET the updated DID", (done) => {
             chai.request(server)
                 .get("/api/did")
-                .set("companyName", TEST_DATA2.companyName)
-                .set("publicKey", TEST_DATA2.publicKey)
+                .query({
+                    companyName: TEST_DATA2.companyName,
+                    publicKey: TEST_DATA2.publicKey,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -396,8 +389,10 @@ describe("DID", function () {
         it("it should return a 'company not found' error as the param 'companyName' cannot be found", (done) => {
             chai.request(server)
                 .delete("/api/did")
-                .set("companyName", INVALID_COMPANY_NAME)
-                .set("publicKey", TEST_DATA.publicKey)
+                .query({
+                    companyName: INVALID_COMPANY_NAME,
+                    publicKey: TEST_DATA.publicKey,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -413,8 +408,10 @@ describe("DID", function () {
         it("it should return a 'public key not found' error as the param 'publicKey' is invalid", (done) => {
             chai.request(server)
                 .delete("/api/did")
-                .set("companyName", TEST_DATA.companyName)
-                .set("publicKey", INVALID_PUBLIC_KEY)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    publicKey: INVALID_PUBLIC_KEY,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -430,8 +427,10 @@ describe("DID", function () {
         it("it should return a success message states that DID is deleted successfully", (done) => {
             chai.request(server)
                 .delete("/api/did")
-                .set("companyName", TEST_DATA.companyName)
-                .set("publicKey", TEST_DATA.publicKey)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    publicKey: TEST_DATA.publicKey,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -447,8 +446,10 @@ describe("DID", function () {
         it("it should return an error state that file not exists", (done) => {
             chai.request(server)
                 .get("/api/did")
-                .set("companyName", TEST_DATA.companyName)
-                .set("publicKey", TEST_DATA.publicKey)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    publicKey: TEST_DATA.publicKey,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
