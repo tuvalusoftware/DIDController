@@ -1,11 +1,10 @@
 {
-    "name": "js-my-utils",
+    "name": "did-controller",
     "version": "1.0.0",
     "description": "",
     "type": "module",
     "main": "index.js",
     "scripts": {
-        "main": "npx nodemon main.js",
         "start": "node server.js",
         "start:dev": "npx nodemon server.js",
         "test:did": "export NODE_ENV=test && mocha ./test/api/1.did.test.js --exit",

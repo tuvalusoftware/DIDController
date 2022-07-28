@@ -6,7 +6,7 @@ const REPOSITORY = process.env.MESSAGE_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 // The number of first letter of a receiver PK to determine its branch
-const FIRST_N_LETTERS = 3;
+const FIRST_N_LETTERS = 1;
 
 export default {
     getCredentialByHash: async (req, res, next) => {
