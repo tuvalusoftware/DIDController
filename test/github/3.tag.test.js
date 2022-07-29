@@ -83,7 +83,7 @@ describe("GITHUB INTERACTION --- Tag", function () {
             expect(data).to.have.property("sha");
             expect(data).to.have.property("size");
 
-            const { oid: sha } = await GithubProxy.getLatestCommit(
+            const { oid: sha } = await GithubProxy.getFileLatestCommit(
                 MAIN_TEST_BRANCH,
                 FILE.name
             );

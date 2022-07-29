@@ -34,6 +34,20 @@ NPM version 8
     npm run start:dev
     ```
 
+1. Run server using Docker
+
+    - Build Docker Container
+
+    ```
+    docker build -t <container_name> .
+    ```
+
+    - Run docker container
+
+    ```
+    docker run -it -p <host_port>:9000 <container_name>
+    ```
+
 <br />
 
 ## All The API

@@ -40,7 +40,7 @@ describe("MESSAGE", function () {
         await GithubProxy.deleteBranchIfExist(BRANCH_NAME);
     });
 
-    describe("/POST create new credential", () => {
+    describe("/POST create new message (notification)", () => {
         it("it should return a 'missing params' error as the required params are not provided", (done) => {
             chai.request(server)
                 .post("/api/message")

@@ -187,6 +187,22 @@ describe("DOC", function () {
                     done();
                 });
         });
+
+        it("it should return a 'file already existed' error", (done) => {
+            chai.request(server)
+                .post("/api/doc")
+                .send(TEST_DATA)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_EXISTED)
+                    );
+
+                    done();
+                });
+        });
     });
 
     describe("/GET check if document exists", () => {
@@ -422,7 +438,7 @@ describe("DOC", function () {
         });
     });
 
-    describe("/GET fetch list of documents own by an user", () => {
+    describe("/GET fetch list of documents which user is their owner/holder", () => {
         it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
             chai.request(server)
                 .get("/api/doc/user")
@@ -507,6 +523,55 @@ describe("DOC", function () {
                     res.body.should.be.an("array");
                     expect(JSON.stringify(res.body)).equal(
                         JSON.stringify(wrappedDocContents)
+                    );
+                    done();
+                });
+        });
+    });
+
+    describe("/GET search content", () => {
+        it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
+            chai.request(server)
+                .get("/api/doc/search-content")
+                .end((err, res) => {
+                    res.body.should.eql(ERROR_CODES.MISSING_PARAMETERS);
+                    done();
+                });
+        });
+
+        it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
+            chai.request(server)
+                .get(
+                    `/api/doc/search-content?companyName=${encodeURIComponent(
+                        INVALID_COMPANY_NAME
+                    )}&searchString=${encodeURIComponent("Search String")}`
+                )
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.COMPANY_NOT_FOUND)
+                    );
+
+                    done();
+                });
+        });
+
+        it("it should GET the wrapped document the contains the search string", (done) => {
+            chai.request(server)
+                .get(
+                    `/api/doc/search-content?companyName=${TEST_BRANCH}&searchString=${encodeURIComponent(
+                        "This is a sample wrapped doc 3"
+                    )}`
+                )
+
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.an("array");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify([TEST_WRAPPED_DOCS[2].wrappedDocument])
                     );
                     done();
                 });

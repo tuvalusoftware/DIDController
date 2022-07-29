@@ -6,9 +6,9 @@ import { ERROR_CODES } from "./constants/index.js";
 
 const customLogLevel = (logLevel) => {
     return {
-        error: "⛔️ ERROR",
-        warn: "⚠️ WARN",
-        info: "🆕 INFO",
+        error: "ERROR",
+        warn: "WARN",
+        info: "INFO",
     }[logLevel];
 };
 
@@ -20,9 +20,9 @@ const formatConfig = format.combine(
     format.align(),
     format.printf(
         (info) =>
-            `[${customLogLevel(info.level)}]: [${[info.timestamp]}]: ${
+            `[${customLogLevel(info.level)}] - [${[info.timestamp]}]: ${
                 info.message
-            }\n`
+            }`
     )
 );
 
@@ -61,16 +61,20 @@ export default {
     info(message) {
         infoLogger.info(message);
     },
+    functionInfo(fileInfo, functionInfo) {
+        infoLogger.info(`[${fileInfo}] ${functionInfo}`);
+    },
     apiInfo(req, res, message) {
         infoLogger.info(`[${req.method} - ${req.originalUrl}] ${message}`);
     },
     apiError(err, req, res) {
-        infoLogger.error(
-            `[${req.method} - ${req.originalUrl}] ${err.error_message}`
-        );
-        debugLogger.error(
-            `[${req.method} - ${req.originalUrl}] ${err.error_message}`
-        );
+        const errorMsg =
+            err instanceof Error
+                ? `${err.message} - ${err.stack}`
+                : err.error_message;
+
+        infoLogger.error(`[${req.method} - ${req.originalUrl}] ${errorMsg}`);
+        debugLogger.error(`[${req.method} - ${req.originalUrl}] ${errorMsg}`);
     },
     handleGithubError(err) {
         // If error is already identified as the custom error, return it.
@@ -85,10 +89,18 @@ export default {
             // Handle unexpected Github errors
             if (detectedErr === ERROR_CODES.GITHUB_API_ERROR) {
                 infoLogger.error(
-                    `Unexpected error when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
+                    `Unexpected error when call Github API error: Status: ${
+                        err.response.status
+                    }, Error message: ${
+                        err.response.data.message
+                    }, Errors: ${JSON.stringify(err.response.data.errors)}`
                 );
                 debugLogger.error(
-                    `Unexpected error when call Github API error: Status: ${err.response.status}, Error message: ${err.response.data.message}`
+                    `Unexpected error when call Github API error: Status: ${
+                        err.response.status
+                    }, Error message: ${
+                        err.response.data.message
+                    }, Errors: ${JSON.stringify(err.response.data.errors)}`
                 );
             }
 

@@ -1,87 +1,102 @@
-// ! Deprecated
-/* c8 ignore start */
-import GithubProxy from "../../db/github/index.js";
+import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
-import SchemaValidator from "../../schema/schemaValidator.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
-export default {
-    getCredentialsByPublicKey: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const publicKey = req.header("publicKey");
+const REPOSITORY = process.env.MESSAGE_REPO;
+const GithubProxy = GithubProxyConfig(REPOSITORY);
 
-        if (!companyName || !publicKey) {
-            return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
+// The number of first letter of a receiver PK to determine its branch
+const FIRST_N_LETTERS = 3;
+
+export default {
+    getCredentialByHash: async (req, res, next) => {
+        const hash = req.header("hash");
+
+        Logger.apiInfo(req, res, `RETRIEVE CREDENTIAL BY HASH`);
+
+        if (!hash) return next(ERROR_CODES.MISSING_PARAMETERS);
 
         try {
+            // Determine branch name
+            const branchName = `CRE_${hash.substring(0, FIRST_N_LETTERS)}`;
+
+            // Get branch and file
             const branchLatestSHA = await GithubProxy.getBranchLastCommitSHA(
-                `DID_${companyName}`
+                branchName
+            );
+            const fileData = await GithubProxy.getFile(
+                `${hash}.cre`,
+                branchLatestSHA
             );
 
-            const filesInfo = await GithubProxy.getFilesOfTree(
-                publicKey,
-                false,
-                branchLatestSHA,
-                true
-            );
-
-            const files = filesInfo.map((el) => JSON.parse(el.object.text));
-
-            res.status(200).json(files);
-            Logger.apiInfo(
-                req,
-                res,
-                `Get credentials of '${publicKey}' from company ${companyName}`
-            );
+            res.status(200).json(fileData.content);
         } catch (err) {
-            if (err === ERROR_CODES.FOLDER_NOT_EXISTED) {
-                return next(ERROR_CODES.BLOB_NOT_EXISTED);
-            }
+            if (
+                [
+                    ERROR_CODES.BRANCH_NOT_EXISTED,
+                    ERROR_CODES.BLOB_NOT_EXISTED,
+                ].includes(err)
+            )
+                return next(ERROR_CODES.CREDENTIAL_NOT_FOUND);
 
             next(err);
         }
     },
     saveCredential: async (req, res, next) => {
-        const { publicKey, companyName, credential } = req.body;
+        const { hash, content } = req.body;
 
-        if (!companyName || !publicKey || !credential) {
-            return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
+        Logger.apiInfo(req, res, `SAVE NEW CREDENTIAL`);
+
+        if (!hash || !content) return next(ERROR_CODES.MISSING_PARAMETERS);
 
         try {
-            // Validate the credential param
-            if (!SchemaValidator.validate(credential, "CREDENTIAL"))
-                return next(ERROR_CODES.CREDENTIAL_INVALID);
+            // Determine branch name
+            const branchName = `CRE_${hash.substring(0, FIRST_N_LETTERS)}`;
+            await GithubProxy.createBranchIfNotExist(branchName);
 
-            // Catch error if file does not exist
-            const branch = `DID_${companyName}`;
-            const isPublicKeyExist = await GithubProxy.isExistedFile(
-                `${publicKey}.did`,
-                branch
-            );
-
-            if (!isPublicKeyExist) return next(ERROR_CODES.BLOB_NOT_EXISTED);
-
-            // Save new credential
-            const now = Date.now();
-            const fileName = `${publicKey}/credential_${now}.cre`;
+            // Save credential a file
             await GithubProxy.createNewFile(
-                fileName,
-                credential,
-                branch,
-                `NEW: '${fileName}' credential from '${publicKey}' of company "${companyName}"`
+                `${hash}.cre`,
+                content,
+                branchName,
+                `NEW: '${hash}' credential`
             );
 
             res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
-            Logger.apiInfo(
-                req,
-                res,
-                `Create new credential '${fileName}' from '${publicKey}' from company ${companyName}`
-            );
         } catch (err) {
-            return next(err);
+            next(err);
+        }
+    },
+    updateCredential: async (req, res, next) => {
+        const { hash, content: updatedContent } = req.body;
+
+        Logger.apiInfo(req, res, `UPDATE CREDENTIAL`);
+
+        if (!hash || !updatedContent)
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+
+        try {
+            // Determine branch name
+            const branchName = `CRE_${hash.substring(0, FIRST_N_LETTERS)}`;
+
+            await GithubProxy.updateFile(
+                `${hash}.cre`,
+                updatedContent,
+                branchName,
+                `UPDATE: '${hash}' credential`
+            );
+
+            res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
+        } catch (err) {
+            if (
+                [
+                    ERROR_CODES.BRANCH_NOT_EXISTED,
+                    ERROR_CODES.BLOB_NOT_EXISTED,
+                ].includes(err)
+            )
+                return next(ERROR_CODES.CREDENTIAL_NOT_FOUND);
+
+            next(err);
         }
     },
 };
-/* c8 ignore stop */

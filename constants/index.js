@@ -74,15 +74,14 @@ const ERROR_CODES = {
             "Invalid wrapped document. Could not find the owner's address.",
     },
 
-    // Human readable error messages
     // Common Errors
     UNKNOWN_ERROR: {
         error_code: 10000,
-        error_message: "Something went wrong!",
+        error_message: "Something went wrong with the server!",
     },
     AUTHENTICATION: {
         error_code: 10001,
-        error_message: "Access Token is invalid or not provided.",
+        error_message: "Unauthorized.",
     },
     MISSING_PARAMETERS: {
         error_code: 10002,
@@ -120,6 +119,10 @@ const ERROR_CODES = {
     MESSAGE_CONTENT_INVALID: {
         error_code: 20005,
         error_message: "Sender Public Key or Receiver Public Key is invalid.",
+    },
+    CREDENTIAL_NOT_FOUND: {
+        error_code: 20005,
+        error_message: "Hash of credential cannot be found.",
     },
 
     // Content Errors

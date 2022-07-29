@@ -11,11 +11,7 @@ export default {
     isExist: async (req, res, next) => {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
-        Logger.apiInfo(
-            req,
-            res,
-            `Check the existence of '${fileName}' document from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `CHECK FILE EXISTENCE`);
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -30,6 +26,9 @@ export default {
 
             res.status(200).json({ isExisted });
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
             return next(err);
         }
     },
@@ -37,11 +36,7 @@ export default {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
         const only = req.query.only;
-        Logger.apiInfo(
-            req,
-            res,
-            `Get wrapped document/did document '${fileName}' from company ${companyName} with param query: only = "${only}"`
-        );
+        Logger.apiInfo(req, res, `GET WRAPPED DOCUMENT/DID DOCUMENT`);
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -72,21 +67,26 @@ export default {
                 );
                 return res.status(200).json({ wrappedDoc: wrappedDoc.content });
             }
+
             // Get both
-            else {
-                const [wrappedDoc, didDoc] = await Promise.all([
-                    GithubProxy.getFile(
-                        `${fileName}.document`,
-                        branchLastCommitSHA
-                    ),
-                    GithubProxy.getFile(`${fileName}.did`, branchLastCommitSHA),
-                ]);
-                return res.status(200).json({
-                    wrappedDoc: wrappedDoc.content,
-                    didDoc: didDoc.content,
-                });
-            }
+            const [wrappedDoc, didDoc] = await Promise.all([
+                GithubProxy.getFile(
+                    `${fileName}.document`,
+                    branchLastCommitSHA
+                ),
+                GithubProxy.getFile(`${fileName}.did`, branchLastCommitSHA),
+            ]);
+            return res.status(200).json({
+                wrappedDoc: wrappedDoc.content,
+                didDoc: didDoc.content,
+            });
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
+            if (err === ERROR_CODES.BLOB_NOT_EXISTED)
+                return next(ERROR_CODES.FILE_NOT_FOUND);
+
             next(err);
         }
     },
@@ -94,11 +94,7 @@ export default {
         const companyName = req.header("companyName");
         const ownerPublicKey = req.header("publicKey");
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Retrieve all documents issuer by '${ownerPublicKey}' document from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `RETRIEVE ALL DOCS BY ISSUER'S PUBLIC KEY`);
 
         if (!companyName || !ownerPublicKey) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -109,35 +105,81 @@ export default {
             const branchLastCommitSHA =
                 await GithubProxy.getBranchLastCommitSHA(branch);
 
-            // Get all files from the given company
+            // Get all files in a company branch
+            const allFiles = await GithubProxy.getFilesOfTree(
+                "",
+                false,
+                branchLastCommitSHA,
+                true
+            );
+
+            // Filter and Parse DID File contents
+            const didFiles = allFiles
+                .filter((file) => file.name.includes(".did"))
+                .map((file) => ({
+                    name: file.name,
+                    content: JSON.parse(file.object.text),
+                }));
+
+            // Filter through the DID document to find documents that belong to the owner or holder
+            const filesBelongToOwner = didFiles.filter(
+                (file) =>
+                    file.content.owner === ownerPublicKey ||
+                    file.content.holder === ownerPublicKey
+            );
+
+            const documents = filesBelongToOwner.map((file) => {
+                const fileContent = allFiles.find(
+                    (f) => f.name === file.content.url
+                );
+
+                return JSON.parse(fileContent.object.text);
+            });
+
+            return res.status(200).json(documents);
+        } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
+            next(err);
+        }
+    },
+    searchContent: async (req, res, next) => {
+        const { companyName, searchString } = req.query;
+        Logger.apiInfo(req, res, `SEARCH A STRING IN DOCUMENT`);
+
+        if (!companyName || !searchString) {
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+        }
+
+        try {
+            const branch = `DOC_${companyName}`;
+            const branchLastCommitSHA =
+                await GithubProxy.getBranchLastCommitSHA(branch);
+
+            // Get all files in a branch
             const files = await GithubProxy.getFilesOfTree(
                 "",
                 false,
-                branchLastCommitSHA
+                branchLastCommitSHA,
+                true
             );
 
-            // Check the did doc for the document with the owner public key as the controller
-            const didDocs = files.filter((el) => el.name.includes(".did"));
-            const getDidDocContentOperations = didDocs.map((el) =>
-                GithubProxy.getFile(el.name, branchLastCommitSHA)
-            );
-            const didDocsInfo = await Promise.all(getDidDocContentOperations);
-            const ownerDocumentNames = didDocsInfo.filter(
-                (el) => el.content.owner === ownerPublicKey
+            // Find documents that contains the search string
+            let results = files.filter(
+                (file) =>
+                    file.name.includes(".document") &&
+                    file.object.text.includes(searchString)
             );
 
-            if (ownerDocumentNames.length === 0)
-                return res.status(200).json([]);
+            // Parse content to JS object
+            results = results.map((file) => JSON.parse(file.object.text));
 
-            // Get all owner documents
-            const getWrappedDocOperations = ownerDocumentNames.map((el) =>
-                GithubProxy.getFile(el.content.url, branchLastCommitSHA)
-            );
-            const documents = await Promise.all(getWrappedDocOperations);
-            const results = documents.map((el) => el.content);
-
-            return res.status(200).json(results);
+            res.status(200).json(results);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
             next(err);
         }
     },
@@ -149,9 +191,7 @@ export default {
         Logger.apiInfo(
             req,
             res,
-            !isCloned
-                ? `Create a new document '${fileName}' from company ${companyName}`
-                : `Clone a new document '${fileName}' from company ${companyName}`
+            !isCloned ? `CREATE A NEW DOCUMENT` : `CLONE A NEW DOCUMENT`
         );
 
         if (!companyName || !fileName) {
@@ -200,6 +240,13 @@ export default {
                     : SUCCESS_CODES.CLONE_SUCCESS
             );
         } catch (err) {
+            if (err === ERROR_CODES.INVALID_REF_NAME)
+                return next(ERROR_CODES.COMPANY_NAME_INVALID);
+
+            if (err === ERROR_CODES.BLOB_EXISTED) {
+                return next(ERROR_CODES.FILE_EXISTED);
+            }
+
             next(err);
         }
     },
@@ -207,11 +254,7 @@ export default {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Delete document '${fileName}' from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `DELETE DOCUMENT`);
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -233,17 +276,19 @@ export default {
 
             res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
+            if (err === ERROR_CODES.BLOB_NOT_EXISTED)
+                return next(ERROR_CODES.FILE_NOT_FOUND);
+
             next(err);
         }
     },
     updateDidDocController: async (req, res, next) => {
         const { didDoc, fileName, companyName } = req.body;
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Update the did doc of '${fileName}' document from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `UPDATE DID DOCUMENT OF WRAPPED DOCUMENT`);
 
         if (!companyName || !fileName || !didDoc) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -269,6 +314,9 @@ export default {
 
             res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
             next(err);
         }
     },
@@ -276,11 +324,7 @@ export default {
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
 
-        Logger.apiInfo(
-            req,
-            res,
-            `Get the history of did doc of '${fileName}' document from company ${companyName}`
-        );
+        Logger.apiInfo(req, res, `GET HISTORY OF DID DOCUMENT`);
 
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
@@ -293,6 +337,12 @@ export default {
             const data = await GithubProxy.getFileHistory(didDocFile, branch);
             res.status(200).json(data);
         } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
+            if (err === ERROR_CODES.BLOB_NOT_EXISTED)
+                return next(ERROR_CODES.FILE_NOT_FOUND);
+
             next(err);
         }
     },

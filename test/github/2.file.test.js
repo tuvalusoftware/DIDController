@@ -275,7 +275,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
         });
 
         it("it should return the latest commit info of a file", async () => {
-            const commit = await GithubProxy.getLatestCommit(
+            const commit = await GithubProxy.getFileLatestCommit(
                 MAIN_TEST_BRANCH,
                 TEST_FILE_NAME
             );

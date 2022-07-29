@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import GithubRESTConfig from "./rest.js";
 import Logger from "../../logger.js";
 import { executeGraphQL } from "./helpers.js";
@@ -18,9 +15,10 @@ export default function (REPOSITORY) {
          * @description Get any object (blob, tree, commit) info from github using its SHA (Github ID)
          * @param {String} sha Git Object Id (could be blob, tree, commit)
          * @param {String} type Type of git object (default to 'blob')
-         * @returns {Object} Information of a git object
+         * @returns {Object} Git Object
          */
         get: function (sha, type = "blob") {
+            Logger.functionInfo("db/github/index.js", "get");
             return new Promise((resolve, reject) => {
                 GithubREST.get(`git/${type}s/${sha}`)
                     .then((response) => {
@@ -35,10 +33,30 @@ export default function (REPOSITORY) {
 
         /**
          * @async
+         * @description Return repository's info
+         * @returns {{ id: Number, name: String, full_name: String, private: Boolean, owner: { login: String, id: Number }, description: String|null, created_at: String, updated_at: String, size: Number, default_branch: String }} Repository Info
+         */
+        getRepoInfo: function () {
+            Logger.functionInfo("db/github/index.js", "getRepoInfo");
+            return new Promise((resolve, reject) => {
+                GithubREST.get(``)
+                    .then((response) => {
+                        resolve(response.data);
+                    })
+                    .catch((err) => {
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
+                    });
+            });
+        },
+
+        /**
+         * @async
          * @description Get the info of all branches from a repo
-         * @returns {Array} All branches from a repo
+         * @returns {{ name: String, commit: { sha: String, url: String }, protected: Boolean }[]} An array of branch objects
          */
         getAllBranches: function () {
+            Logger.functionInfo("db/github/index.js", "getAllBranches");
             return new Promise((resolve, reject) => {
                 GithubREST.get(`branches`)
                     .then((response) => {
@@ -55,9 +73,10 @@ export default function (REPOSITORY) {
          * @async
          * @description Get info of a branch
          * @param {String} branchName
-         * @returns {{ name: String, commit: Object }} check if branch is exist and return the branch object
+         * @returns {{ name: String, commit: { sha: String, url: String } }} Branch Object (there are other fields)
          */
         getBranchInfo: function (branchName = "main") {
+            Logger.functionInfo("db/github/index.js", "getBranchInfo");
             return new Promise((resolve, reject) => {
                 GithubREST.get(`branches/${branchName}`)
                     .then((response) => {
@@ -80,12 +99,69 @@ export default function (REPOSITORY) {
 
         /**
          * @async
+         * @description Set default branch for the repo
+         * @param {String} branchName Default to main
+         * @returns {{ id: Number, name: String, full_name: String, private: Boolean, owner: { login: String, id: Number }, description: String|null, created_at: String, updated_at: String, size: Number, default_branch: String }} Repository Info
+         */
+        setDefaultBranch: function (branchName = "main") {
+            Logger.functionInfo("db/github/index.js", "setDefaultBranch");
+            return new Promise((resolve, reject) => {
+                GithubREST.patch(``, {
+                    default_branch: branchName,
+                })
+                    .then((response) => {
+                        resolve(response.data);
+                    })
+                    .catch((err) => {
+                        if (
+                            err.response?.status === 422 &&
+                            err.response?.data.message === "Validation Failed"
+                        ) {
+                            return reject(ERROR_CODES.BRANCH_NOT_EXISTED);
+                        }
+
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
+                    });
+            });
+        },
+
+        /* c8 ignore start */
+        /**
+         * @async
+         * @description Perform Github Search API on a specific branch
+         * @warning Only works perfectly on default branch, otherwise there is a significant delay because the Search API cannot detect the change on default branch
+         * @reference https://docs.github.com/en/rest/search, https://docs.github.com/en/search-github/searching-on-github/searching-code, https://docs.github.com/en/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax
+         * @param {String} queryString Query String for Github Search API (For example: 'Hello in:file repo:kazCTU1077/Fuixlabs_Document')
+         * @returns {{ total_count: Number, incomplete_results: Boolean, items: { name: String, path: String, sha: String, text_matches: { fragment: String, matches: { text: String, indices: Number[] }[] }[] }[] }}
+         */
+        searchOnBranch: async function (queryString, branch = null) {
+            Logger.functionInfo("db/github/index.js", "search");
+
+            try {
+                // Set default branch
+                if (branch) {
+                    await this.setDefaultBranch(branch);
+                }
+
+                const { data } = await GithubREST.search(queryString);
+                return data;
+            } catch (err) {
+                const errInfo = Logger.handleGithubError(err);
+                reject(errInfo);
+            }
+        },
+        /* c8 ignore stop */
+
+        /**
+         * @async
          * @description Check out to new branch
          * @param {String} newBranchName new branch name
          * @param {String} fromBranch which branch to branch out from
-         * @returns {{ ref: Object, object: { sha: String } }} branch object { ref, object { sha } }
+         * @returns {{ name: String, commit: { sha: String, type: String, url: String } }} Branch object
          */
         checkoutNewBranch: async function (newBranchName, fromBranch = "main") {
+            Logger.functionInfo("db/github/index.js", "checkoutNewBranch");
             const lastCommitSHA = await this.getBranchLastCommitSHA(fromBranch);
 
             return new Promise((resolve, reject) => {
@@ -123,9 +199,10 @@ export default function (REPOSITORY) {
          * @async
          * @description If branch exists, return its info, else create a new empty branch and return its info
          * @param {String} branchName new branch's name
-         * @returns {{ ref: Object, object: { sha: String } }} branch object { ref, object { sha } }
+         * @returns {{ name: String, commit: { sha: String, url: String } }} Branch object
          */
         createBranchIfNotExist: async function (branchName) {
+            Logger.functionInfo("db/github/index.js", "createBranchIfNotExist");
             try {
                 const branch = await this.getBranchInfo(branchName);
                 return branch;
@@ -149,6 +226,7 @@ export default function (REPOSITORY) {
          * @returns {{ message: String }} Success message
          */
         deleteBranch: function (branch) {
+            Logger.functionInfo("db/github/index.js", "deleteBranch");
             return new Promise((resolve, reject) => {
                 if (branch === "main")
                     return reject(ERROR_CODES.DELETE_MAIN_BRANCH);
@@ -178,6 +256,7 @@ export default function (REPOSITORY) {
          * @param {String} branchName new branch's name
          */
         deleteBranchIfExist: async function (branchName) {
+            Logger.functionInfo("db/github/index.js", "deleteBranchIfExist");
             try {
                 await this.deleteBranch(branchName);
             } catch (err) {
@@ -188,10 +267,11 @@ export default function (REPOSITORY) {
         /**
          * @async
          * @description Return the last commit SHA (id) of a branch
-         * @param {string} branch Name of the branch (default to main)
-         * @returns {string} SHA of the last commit
+         * @param {String} branch Name of the branch (default to main)
+         * @returns {String} SHA of the last commit
          */
         getBranchLastCommitSHA: function (branch = "main") {
+            Logger.functionInfo("db/github/index.js", "getBranchLastCommitSHA");
             return new Promise((resolve, reject) => {
                 GithubREST.get(`git/ref/heads/${branch}`)
                     .then((response) => resolve(response.data.object.sha))
@@ -216,7 +296,7 @@ export default function (REPOSITORY) {
          * @param {String} branchName Name of the branch
          * @param {String} filePath If file path is provided, return the commit's history of that file only
          * @param {String} cursor Point at the commit to retrieve the previous commit
-         * @returns {Object} An object contains list of branch, total of commits, the cursor to start (to start at which commit)
+         * @returns {{ history: { oid: String, message: String, committedDate: String }[], totalCount: Number, pageInfo: { endCursor: String, hasNextPage: Boolean } }} An object contains list of branch, total of commits, the cursor to start (to start at which commit)
          */
         _getCommitHistory: function (
             deep = 5,
@@ -224,6 +304,7 @@ export default function (REPOSITORY) {
             filePath = null,
             cursor = null
         ) {
+            Logger.functionInfo("db/github/index.js", "_getCommitHistory");
             return new Promise((resolve, reject) => {
                 const fileExpr = filePath ? `path: "${filePath}"` : "";
                 const pagination = cursor ? `after: "${cursor}"` : "";
@@ -296,13 +377,14 @@ export default function (REPOSITORY) {
          * @param {Number} deep How far back to get commits
          * @param {String} branchName Name of the branch
          * @param {String} filePath If file path is provided, return the commit's history of that file only
-         * @returns {Object[]} Array of commits of a branch
+         * @returns {{ oid: String, message: String, committedDate: String }[]} Array of commits object
          */
         getCommitHistory: function (
             deep = 5,
             branchName = "main",
             filePath = null
         ) {
+            Logger.functionInfo("db/github/index.js", "getCommitHistory");
             return new Promise(async (resolve, reject) => {
                 let numElements = deep;
                 let results = [];
@@ -337,9 +419,10 @@ export default function (REPOSITORY) {
          * @description Get the latest commit of a file
          * @param {String} branchName Name of the branch (default to 'main')
          * @param {String} filePath
-         * @returns {Object} Latest commit object
+         * @returns {{ oid: String, message: String, committedDate: String }} Commit Object
          */
-        getLatestCommit: function (branchName = "main", filePath) {
+        getFileLatestCommit: function (branchName = "main", filePath) {
+            Logger.functionInfo("db/github/index.js", "getFileLatestCommit");
             return new Promise((resolve, reject) => {
                 this.getCommitHistory(1, branchName, filePath)
                     .then((response) => {
@@ -357,6 +440,7 @@ export default function (REPOSITORY) {
          * @returns {Boolean}
          */
         isExistedFile: function (fileName = "", branchName = "main") {
+            Logger.functionInfo("db/github/index.js", "isExistedFile");
             return new Promise((resolve, reject) => {
                 GithubREST.get(`contents/${fileName}?ref=${branchName}`)
                     .then((response) =>
@@ -382,6 +466,7 @@ export default function (REPOSITORY) {
          * @returns {String}
          */
         getFileAsBinary: function (fileSHA) {
+            Logger.functionInfo("db/github/index.js", "getFileAsBinary");
             return new Promise((resolve, reject) => {
                 GithubREST.get(`git/blobs/${fileSHA}`)
                     .then((response) => resolve(response.data.content))
@@ -397,9 +482,10 @@ export default function (REPOSITORY) {
          * @description Return info of a file object
          * @param {String} filePath Path of the file
          * @param {String} commitSHA SHA of a commit, default to HEAD which is the last commit
-         * @returns {Promise}
+         * @returns {{ text: String, byteSize: Number, oid: String, isBinary: Boolean, content: Object }}
          */
         getFile: function (filePath, commitSHA = "HEAD") {
+            Logger.functionInfo("db/github/index.js", "getFile");
             const queryString = `
                 query RepoFiles {
                     repository(owner: "${owner}", name: "${REPOSITORY}") {
@@ -454,9 +540,10 @@ export default function (REPOSITORY) {
          * @description Return different version of a file through its commit
          * @param {String} filePath Path of the file
          * @param {String} branchName name of the branch that contains the file
-         * @returns {Promise}
+         * @returns {Object[]}
          */
         getFileHistory: async function (filePath, branchName = "main") {
+            Logger.functionInfo("db/github/index.js", "getFileHistory");
             let commits = [];
             let cursor = null;
             const commitsPerQuery = 100;
@@ -492,7 +579,7 @@ export default function (REPOSITORY) {
          * @param {Boolean} allowFolder if true, the returns result will also include nested folder (default to true)
          * @param {String} commitSHA SHA of a commit, default to HEAD which is the last commit
          * @param {Boolean} includeContent if true, the returns result will also include the content of each file
-         * @returns {Array} Array of files (or folders)' info in a tree path
+         * @returns {{ name: String, type: String, mode: Number, object: { byteSize: Number, text: String, isBinary: Boolean, oid: String }}[]} Array of files (or folders)' info in a tree path
          */
         getFilesOfTree: function (
             treePath = "",
@@ -500,6 +587,7 @@ export default function (REPOSITORY) {
             commitSHA = "HEAD",
             includeContent = false
         ) {
+            Logger.functionInfo("db/github/index.js", "getFilesOfTree");
             const includeContentQuery = includeContent
                 ? ` object {
                     ... on Blob {
@@ -583,6 +671,7 @@ export default function (REPOSITORY) {
             commitMessage = "New Commit",
             sha = null
         ) {
+            Logger.functionInfo("db/github/index.js", "_updateContent");
             const contentData =
                 typeof content === "string"
                     ? content
@@ -617,6 +706,7 @@ export default function (REPOSITORY) {
             branch = "main",
             commitMessage = "CREATE a file"
         ) {
+            Logger.functionInfo("db/github/index.js", "createNewFile");
             return new Promise((resolve, reject) => {
                 this._updateContent(path, content, branch, commitMessage)
                     .then((response) => {
@@ -653,6 +743,7 @@ export default function (REPOSITORY) {
             branch = "main",
             commitMessage = "UPDATE a file"
         ) {
+            Logger.functionInfo("db/github/index.js", "updateFile");
             const lastCommitOfBranch = await this.getBranchLastCommitSHA(
                 branch
             );
@@ -689,13 +780,14 @@ export default function (REPOSITORY) {
          * @param {String} path
          * @param {String} branch
          * @param {String} commitMessage
-         * @returns {{ message }}
+         * @returns {{ message: String }}
          */
         deleteFile: async function (
             path,
             branch = "main",
             commitMessage = null
         ) {
+            Logger.functionInfo("db/github/index.js", "deleteFile");
             const lastCommitOfBranch = await this.getBranchLastCommitSHA(
                 branch
             );
@@ -725,7 +817,7 @@ export default function (REPOSITORY) {
         /**
          * @async
          * @description Query first 100 tags with GraphQL Github API
-         * @param {String} cursor element that the cursor point to after retrieve the last element
+         * @param {String} cursor indicates where the cursor is in the array
          * @ref: https://docs.github.com/en/graphql/reference/enums#reforderfield
          * @returns {Object} An object contains list of tags, { endCursor, hasNextPage }
          */
