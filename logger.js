@@ -77,7 +77,7 @@ export default {
         debugLogger.error(`[${req.method} - ${req.originalUrl}] ${errorMsg}`);
     },
     handleGithubError(err) {
-        // If error is already identified as the custom error, return it.
+        // If error is already identified as the default error, return it.
         if (SchemaValidator.validate(err, "ERROR_OBJECT")) {
             return err;
         }
