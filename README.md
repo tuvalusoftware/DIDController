@@ -13,13 +13,12 @@ NPM version 8
     npm i
     ```
 
-1. Config in .env file (you can create Github auth token [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-token))
-   There are 2 repositories required: One for saving Document and One for saving Message (notification).
+1. Paste this configuration to your .env file. Replace the with your own access token. (you can create Github auth token [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-token))
 
     ```
-    REPO_OWNER=kazCTU1077
-    DOCUMENT_REPO=Fuixlabs_Document
-    MESSAGE_REPO=FuixLabs_Message
+    REPO_OWNER=FuixLabs
+    DOCUMENT_REPO=DID_Store
+    MESSAGE_REPO=Credentials
     AUTH_TOKEN=<token>
     ```
 

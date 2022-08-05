@@ -93,14 +93,18 @@ export default {
                         err.response.status
                     }, Error message: ${
                         err.response.data.message
-                    }, Errors: ${JSON.stringify(err.response.data.errors)}`
+                    }, Other errors: ${JSON.stringify(
+                        err.response.data.errors
+                    )}`
                 );
                 debugLogger.error(
                     `Unexpected error when call Github API error: Status: ${
                         err.response.status
                     }, Error message: ${
                         err.response.data.message
-                    }, Errors: ${JSON.stringify(err.response.data.errors)}`
+                    }, Other errors: ${JSON.stringify(
+                        err.response.data.errors
+                    )}`
                 );
             }
 
