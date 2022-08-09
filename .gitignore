@@ -6,4 +6,7 @@ package-lock.json
 .DS_Store
 
 # Coverage output folder
-coverage/ 
+coverage/
+
+# Unnecessary Files
+playground.js
