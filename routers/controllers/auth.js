@@ -18,7 +18,7 @@ export default {
         // Call to Security Service to verify the access token
         try {
             const response = await axios.get(
-                `${SERVICES.AUTH}/api/auth/verify`,
+                `${SERVICES.AUTH_HTTPS}/api/auth/verify`,
                 {
                     withCredentials: true,
                     headers: {

@@ -77,7 +77,7 @@ export default {
         debugLogger.error(`[${req.method} - ${req.originalUrl}] ${errorMsg}`);
     },
     handleGithubError(err) {
-        // If error is already identified as the custom error, return it.
+        // If error is already identified as the default error, return it.
         if (SchemaValidator.validate(err, "ERROR_OBJECT")) {
             return err;
         }
@@ -93,14 +93,18 @@ export default {
                         err.response.status
                     }, Error message: ${
                         err.response.data.message
-                    }, Errors: ${JSON.stringify(err.response.data.errors)}`
+                    }, Other errors: ${JSON.stringify(
+                        err.response.data.errors
+                    )}`
                 );
                 debugLogger.error(
                     `Unexpected error when call Github API error: Status: ${
                         err.response.status
                     }, Error message: ${
                         err.response.data.message
-                    }, Errors: ${JSON.stringify(err.response.data.errors)}`
+                    }, Other errors: ${JSON.stringify(
+                        err.response.data.errors
+                    )}`
                 );
             }
 

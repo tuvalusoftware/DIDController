@@ -1,12 +1,14 @@
 const SERVICES = {
     AUTH: `http://18.139.84.180:12000`,
+    AUTH_HTTPS: `https://d876-18-139-84-180.ap.ngrok.io`,
 };
 
 const ERROR_CODES = {
     // Github API Error
     GITHUB_API_ERROR: {
         error_code: 1200,
-        error_message: "Have-not-catch error given by github API.",
+        error_message: "Unexpected Storage Error.",
+        error_cause: "Unexpected error given by Github API",
     },
     BAD_CREDENTIALS: {
         error_code: 1201,
@@ -15,7 +17,8 @@ const ERROR_CODES = {
     CONFLICT_PUSH: {
         error_code: 1202,
         error_message: "Asynchronous changes are pushed to the same branch.",
-        cause: "Update/Create/Delete file or any modification regard to commits on a same branch at the same time.",
+        error_cause:
+            "Update/Create/Delete file or any modification regard to commits on a same branch at the same time.",
     },
     BLOB_EXISTED: {
         error_code: 1203,
@@ -32,7 +35,7 @@ const ERROR_CODES = {
     BRANCH_EXISTED: {
         error_code: 1206,
         error_message: "Branch with the given name already exist.",
-        cause: "Create/Checkout new branch",
+        error_cause: "Create/Checkout new branch",
     },
     BRANCH_NOT_EXISTED: {
         error_code: 1207,
@@ -41,28 +44,29 @@ const ERROR_CODES = {
     REF_EXISTED: {
         error_code: 1208,
         error_message: "Reference already exist.",
-        cause: "Create a tag/release. A tag with the same name already exist",
+        error_cause:
+            "Create a tag/release. A tag with the same name already exist",
     },
     REF_NOT_EXISTED: {
         error_code: 1209,
         error_message: "Reference cannot be found.",
-        cause: "Query/Delete a tag/release.",
+        error_cause: "Query/Delete a tag/release.",
     },
     DATA_NOT_CHANGE: {
         error_code: 1210,
         error_message: "Content of file has not changed.",
-        cause: "Update a file",
+        error_cause: "Update a file",
     },
     DELETE_MAIN_BRANCH: {
         error_code: 1211,
         error_message: "Branch 'main' cannot be deleted.",
-        cause: "Someone try to delete branch main",
+        error_cause: "Someone try to delete branch main",
     },
     INVALID_REF_NAME: {
         error_code: 1212,
         error_message:
             "Name is invalid (should be like v0.0.1 for tag/release and 'branch_name' for branch).",
-        cause: "Create a tag or a release or a branch",
+        error_cause: "Create a tag or a release or a branch",
     },
     INVALID_GIT_OBJECT_ID: {
         error_code: 1213,

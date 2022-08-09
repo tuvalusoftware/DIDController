@@ -2,7 +2,7 @@ import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
-const REPOSITORY = process.env.MESSAGE_REPO;
+const REPOSITORY = process.env.CREDENTIAL_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 // The number of first letter of a receiver PK to determine its branch
