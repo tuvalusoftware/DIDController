@@ -5,6 +5,11 @@ Node version 17
 NPM version 8
 ```
 
+## Github Settings
+
+1. Repository for storing DID and Documents: [Fuixlabs/DID_Store](https://github.com/FuixLabs/DID_Store)
+1. Repository for storing Credentials: [Fuixlabs/Credentials](https://github.com/FuixLabs/Credentials)
+
 ## Set up
 
 1. Install modules
@@ -13,16 +18,14 @@ NPM version 8
     npm i
     ```
 
-1. Paste this configuration to your .env file. Replace the with your own access token. (you can create Github auth token [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-token))
+1. Paste this configuration to your .env file. Replace the `<token>` with Fuixlabs's github access token.
 
     ```
     REPO_OWNER=FuixLabs
     DOCUMENT_REPO=DID_Store
-    MESSAGE_REPO=Credentials
+    CREDENTIAL_REPO=Credentials
     AUTH_TOKEN=<token>
     ```
-
-1. For each repository, it should have the "main" branch and create another branch named "empty_branch" which should not have any file under that branch.
 
 1. Run server (server will run on port 9000)
 
