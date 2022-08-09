@@ -39,7 +39,9 @@ app.use((err, req, res, _) => {
 
 /* c8 ignore start */
 app.use("/api-docs", swaggerUiExpress.serve, (...args) =>
-    swaggerUiExpress.setup(services)(...args)
+    swaggerUiExpress.setup(services, {
+        customSiteTitle: "DID Controller",
+    })(...args)
 );
 /* c8 ignore stop */
 

@@ -44,7 +44,7 @@ describe("GITHUB INTERACTION --- Branch", function () {
     describe("Read Branches", () => {
         it("it should return an array with all branches (include 'main' && 'empty_branch')", async () => {
             const data = await GithubProxy.getAllBranches();
-            expect(data).to.be.an("array").to.have.length.greaterThan(2);
+            expect(data).to.be.an("array").to.have.length.greaterThanOrEqual(2);
 
             const names = data.map((el) => el.name);
             expect(names.includes("main")).equal(true);

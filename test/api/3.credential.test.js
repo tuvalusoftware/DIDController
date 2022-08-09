@@ -5,7 +5,7 @@ import GithubProxyConfig from "../../db/github/index.js";
 import server from "../../server.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
-const REPOSITORY = process.env.MESSAGE_REPO;
+const REPOSITORY = process.env.CREDENTIAL_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 let should = chai.should();

@@ -3,7 +3,7 @@ import Logger from "../../logger.js";
 import { validateDIDSyntax } from "../../utils/index.js";
 import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
 
-const REPOSITORY = process.env.MESSAGE_REPO;
+const REPOSITORY = process.env.CREDENTIAL_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 // The number of first letter of a receiver PK to determine its branch

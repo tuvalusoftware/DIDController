@@ -1,7 +1,7 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "description": "DID Controller services. Interaction with Github.",
+        "description": "DID Controller services. Using Github as a database.",
         "title": "DID Controller",
         "version": "v1.0"
     },
@@ -13,6 +13,10 @@
         {
             "url": "http://18.139.84.180:9000/api/",
             "description": "Anh Tam's remote host"
+        },
+        {
+            "url": "https://d3db-18-139-84-180.ap.ngrok.io/api/",
+            "description": "ngrok HTTPs host"
         }
     ],
     "tags": [
