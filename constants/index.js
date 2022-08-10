@@ -1,6 +1,6 @@
 const SERVICES = {
     AUTH: `http://18.139.84.180:12000`,
-    AUTH_HTTPS: `https://d876-18-139-84-180.ap.ngrok.io`,
+    AUTH_HTTPS: `https://auth-fuixlabs.ap.ngrok.io`,
 };
 
 const ERROR_CODES = {
