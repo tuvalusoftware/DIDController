@@ -8,7 +8,8 @@ const ERROR_CODES = {
     GITHUB_API_ERROR: {
         error_code: 1200,
         error_message: "Unexpected Storage Error.",
-        error_cause: "Unexpected error given by Github API",
+        error_cause:
+            "Could be invalid repository name, invalid github auth token, ... Or any other unexpected error given by Github API. ",
     },
     BAD_CREDENTIALS: {
         error_code: 1201,
@@ -95,6 +96,10 @@ const ERROR_CODES = {
     INVALID_QUERY_PARAMS: {
         error_code: 10003,
         error_message: "Query params provided are invalid.",
+    },
+    INVALID_JSON_BODY: {
+        error_code: 10004,
+        error_message: "JSON data in body is invalid.",
     },
 
     // Invalid Param Error
