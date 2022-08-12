@@ -9,10 +9,10 @@ const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 export default {
     isExist: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("fileName");
         Logger.apiInfo(req, res, `CHECK FILE EXISTENCE`);
 
+        const companyName = req.header("companyName");
+        const fileName = req.header("fileName");
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -33,11 +33,11 @@ export default {
         }
     },
     getDoc: async (req, res, next) => {
+        Logger.apiInfo(req, res, `GET WRAPPED DOCUMENT/DID DOCUMENT`);
+
         const companyName = req.header("companyName");
         const fileName = req.header("fileName");
         const only = req.query.only;
-        Logger.apiInfo(req, res, `GET WRAPPED DOCUMENT/DID DOCUMENT`);
-
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -91,11 +91,10 @@ export default {
         }
     },
     getDocsByUser: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const ownerPublicKey = req.header("publicKey");
-
         Logger.apiInfo(req, res, `RETRIEVE ALL DOCS BY ISSUER'S PUBLIC KEY`);
 
+        const companyName = req.header("companyName");
+        const ownerPublicKey = req.header("publicKey");
         if (!companyName || !ownerPublicKey) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -145,9 +144,9 @@ export default {
         }
     },
     searchContent: async (req, res, next) => {
-        const { companyName, searchString } = req.query;
         Logger.apiInfo(req, res, `SEARCH A STRING IN DOCUMENT`);
 
+        const { companyName, searchString } = req.query;
         if (!companyName || !searchString) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -206,7 +205,12 @@ export default {
             const ownerDID = wrappedDocument.data.issuers[0].address;
             if (!ownerDID) throw ERROR_CODES.INVALID_WRAPPED_DOCUMENT;
 
-            const ownerPublicKey = extractOwnerPKFromAddress(ownerDID);
+            // Get wrapped document target hash
+            const targetHash = wrappedDocument.signature?.targetHash;
+            if (!targetHash) throw ERROR_CODES.INVALID_WRAPPED_DOCUMENT;
+
+            const ownerPublicKey = extractOwnerPKFromAddress(ownerDID),
+                holderPublicKey = ownerPublicKey;
 
             // Save wrapped document
             await GithubProxy.createNewFile(
@@ -223,9 +227,9 @@ export default {
                 `${fileName}.did`,
                 {
                     controller: [ownerPublicKey],
-                    did: `did:${companyName}:${ownerPublicKey}:${ownerPublicKey}`,
+                    did: `did:${companyName}:${ownerPublicKey}:${targetHash}`,
                     owner: ownerPublicKey,
-                    holder: ownerPublicKey,
+                    holder: holderPublicKey,
                     url: `${fileName}.document`,
                 },
                 branchName,
@@ -243,9 +247,8 @@ export default {
             if (err === ERROR_CODES.INVALID_REF_NAME)
                 return next(ERROR_CODES.COMPANY_NAME_INVALID);
 
-            if (err === ERROR_CODES.BLOB_EXISTED) {
+            if (err === ERROR_CODES.BLOB_EXISTED)
                 return next(ERROR_CODES.FILE_EXISTED);
-            }
 
             next(err);
         }

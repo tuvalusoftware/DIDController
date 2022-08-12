@@ -75,6 +75,9 @@ const TEST_WRAPPED_DOCS = [
                 content: "This is a sample wrapped doc 1",
                 issuers: [{ address: TEST_PUBLIC_KEY }],
             },
+            signature: {
+                targetHash: "1234567rtyuio",
+            },
         },
         companyName: TEST_BRANCH,
     },
@@ -85,6 +88,9 @@ const TEST_WRAPPED_DOCS = [
                 content: "This is a sample wrapped doc 2",
                 issuers: [{ address: TEST_PUBLIC_KEY }],
             },
+            signature: {
+                targetHash: "cvbnmnbvcxfghjnbvfr67ui",
+            },
         },
         companyName: TEST_BRANCH,
     },
@@ -94,6 +100,9 @@ const TEST_WRAPPED_DOCS = [
             data: {
                 content: "This is a sample wrapped doc 3",
                 issuers: [{ address: TEST_PUBLIC_KEY }],
+            },
+            signature: {
+                targetHash: "2345678sdfghjk4567fghj4567gh",
             },
         },
         companyName: TEST_BRANCH,
