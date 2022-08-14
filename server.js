@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import compression from "compression";
 import methodOverride from "method-override";
 import swaggerUiExpress from "swagger-ui-express";
 import dotenv from "dotenv";
@@ -19,8 +20,15 @@ const services = require("./docs/swagger.json");
 const app = express();
 app.use(cors());
 app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(compression());
+app.use(bodyParser.json({ limit: "200mb" }));
+app.use(
+    bodyParser.urlencoded({
+        limit: "200mb",
+        extended: true,
+        parameterLimit: 1000000,
+    })
+);
 app.use(methodOverride());
 
 // Route
