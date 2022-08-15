@@ -43,9 +43,16 @@ app.use((err, req, res, _) => {
         return res.status(200).json(ERROR_CODES.INVALID_JSON_BODY);
     }
 
+    // Handle catch-able errors
     if (SchemaValidator.validate(err, "ERROR_OBJECT")) {
         return res.status(200).json(err);
     }
+
+    // Catch connection timeout and connection refuse error
+    if (err.code === "ECONNABORTED")
+        return res.status(200).json(ERROR_CODES.CONNECTION_TIMEOUT);
+    if (err.code === "ECONNREFUSED")
+        return res.status(200).json(ERROR_CODES.CONNECTION_REFUSED);
 
     return res.status(200).json(ERROR_CODES.UNKNOWN_ERROR);
 });
@@ -60,7 +67,7 @@ app.use("/api-docs", swaggerUiExpress.serve, (...args) =>
 
 const port = process.env.NODE_ENV !== "test" ? 9000 : 9001;
 app.listen(port, (_) => {
-    Logger.info(`Server is live on port ${port}`);
+    Logger.info(`Server is live: http://localhost:${port}`);
 });
 
 export default app;

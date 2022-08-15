@@ -37,9 +37,20 @@ export default {
             if (
                 err.response?.data === "Unauthorized" &&
                 err.response?.status === 401
-            ) {
+            )
                 return next(ERROR_CODES.SECURITY_SERVICE_AUTHENTICATION);
-            }
+
+            if (err.code === "ECONNABORTED")
+                return next({
+                    ...ERROR_CODES.CONNECTION_TIMEOUT,
+                    error_cause: "Cannot reach Security Service",
+                });
+
+            if (err.code === "ECONNREFUSED")
+                return next({
+                    ...ERROR_CODES.CONNECTION_REFUSED,
+                    error_cause: "Security Service refused to connect",
+                });
 
             next(err);
         }

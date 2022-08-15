@@ -1,5 +1,5 @@
 const SERVICES = {
-    AUTH: `http://18.139.84.180:12000`,
+    AUTH: `http://192.168.2.2:12000`,
     AUTH_HTTPS: `https://auth-fuixlabs.ap.ngrok.io`,
 };
 
@@ -106,6 +106,14 @@ const ERROR_CODES = {
     INVALID_JSON_BODY: {
         error_code: 10004,
         error_message: "JSON data in body is invalid.",
+    },
+    CONNECTION_TIMEOUT: {
+        error_code: 10005,
+        error_message: "Cannot reach the service.",
+    },
+    CONNECTION_REFUSED: {
+        error_code: 10006,
+        error_message: "Service refused to connect.",
     },
 
     // Invalid Param Error
