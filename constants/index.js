@@ -1,5 +1,5 @@
 const SERVICES = {
-    AUTH: `http://192.168.2.2:12000`,
+    AUTH: `http://18.139.84.180:12000`,
     AUTH_HTTPS: `https://auth-fuixlabs.ap.ngrok.io`,
 };
 
@@ -9,7 +9,7 @@ const ERROR_CODES = {
         error_code: 1200,
         error_message: "Unexpected Storage Error.",
         error_cause:
-            "Could be invalid repository name, invalid github auth token, ... Or any other unexpected error given by Github API. ",
+            "Potential Errors: invalid repository name, invalid github auth token, ... Or any other unexpected error given by Github API.",
     },
     BAD_CREDENTIALS: {
         error_code: 1201,
@@ -87,12 +87,13 @@ const ERROR_CODES = {
     SECURITY_SERVICE_AUTHENTICATION: {
         error_code: 10001,
         error_message: "Unauthorized.",
-        cause: "Invalid authentication info according to the Security Service",
+        error_cause:
+            "Invalid authentication info according to the Security Service",
     },
     MISSING_ACCESS_TOKEN: {
         error_code: 10003,
         error_message: "Unauthorized.",
-        cause: "Access token is not provided.",
+        error_cause: "Access token is not provided.",
     },
     MISSING_PARAMETERS: {
         error_code: 10004,
