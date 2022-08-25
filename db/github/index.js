@@ -20,7 +20,7 @@ export default function (REPOSITORY) {
         get: function (sha, type = "blob") {
             Logger.functionInfo("db/github/index.js", "get");
             return new Promise((resolve, reject) => {
-                GithubREST.get(`git/${type}s/${sha}`)
+                GithubREST.get(`git/${encodeURI(type)}s/${encodeURI(sha)}`)
                     .then((response) => {
                         resolve(response.data);
                     })
@@ -78,7 +78,7 @@ export default function (REPOSITORY) {
         getBranchInfo: function (branchName = "main") {
             Logger.functionInfo("db/github/index.js", "getBranchInfo");
             return new Promise((resolve, reject) => {
-                GithubREST.get(`branches/${branchName}`)
+                GithubREST.get(`branches/${encodeURI(branchName)}`)
                     .then((response) => {
                         const { name, commit } = response.data;
                         resolve({ name, commit });
@@ -273,7 +273,7 @@ export default function (REPOSITORY) {
         getBranchLastCommitSHA: function (branch = "main") {
             Logger.functionInfo("db/github/index.js", "getBranchLastCommitSHA");
             return new Promise((resolve, reject) => {
-                GithubREST.get(`git/ref/heads/${branch}`)
+                GithubREST.get(`git/ref/heads/${encodeURI(branch)}`)
                     .then((response) => resolve(response.data.object.sha))
                     .catch((err) => {
                         if (
@@ -442,7 +442,11 @@ export default function (REPOSITORY) {
         isExistedFile: function (fileName = "", branchName = "main") {
             Logger.functionInfo("db/github/index.js", "isExistedFile");
             return new Promise((resolve, reject) => {
-                GithubREST.get(`contents/${fileName}?ref=${branchName}`)
+                GithubREST.get(
+                    `contents/${encodeURI(fileName)}?ref=${encodeURI(
+                        branchName
+                    )}`
+                )
                     .then((response) =>
                         response.data ? resolve(true) : resolve(false)
                     )
@@ -468,7 +472,7 @@ export default function (REPOSITORY) {
         getFileAsBinary: function (fileSHA) {
             Logger.functionInfo("db/github/index.js", "getFileAsBinary");
             return new Promise((resolve, reject) => {
-                GithubREST.get(`git/blobs/${fileSHA}`)
+                GithubREST.get(`git/blobs/${encodeURI(fileSHA)}`)
                     .then((response) => resolve(response.data.content))
                     .catch((err) => {
                         const errInfo = Logger.handleGithubError(err);
@@ -909,7 +913,7 @@ export default function (REPOSITORY) {
          */
         getATag: function (tagName) {
             return new Promise((resolve, reject) => {
-                GithubREST.get(`git/matching-refs/tags/${tagName}`)
+                GithubREST.get(`git/matching-refs/tags/${encodeURI(tagName)}`)
                     .then((response) => {
                         const { length } = response.data;
 
@@ -1035,7 +1039,7 @@ export default function (REPOSITORY) {
          */
         getARelease: function (tagName) {
             return new Promise((resolve, reject) => {
-                GithubREST.get(`releases/tags/${tagName}`)
+                GithubREST.get(`releases/tags/${encodeURI(tagName)}`)
                     .then(({ data }) => {
                         const {
                             html_url,

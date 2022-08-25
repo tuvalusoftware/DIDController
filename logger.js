@@ -95,7 +95,7 @@ export default {
                         err.response.data.message
                     }, Other errors: ${JSON.stringify(
                         err.response.data.errors
-                    )}`
+                    )}, Stringify Errors: ${JSON.stringify(err.data)}`
                 );
                 debugLogger.error(
                     `Unexpected error when call Github API error: Status: ${
@@ -104,7 +104,7 @@ export default {
                         err.response.data.message
                     }, Other errors: ${JSON.stringify(
                         err.response.data.errors
-                    )}`
+                    )}, Stringify Errors: ${JSON.stringify(err.data)}`
                 );
             }
 

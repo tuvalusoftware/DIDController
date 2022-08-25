@@ -2,7 +2,11 @@ import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import SchemaValidator from "../../schema/schemaValidator.js";
 import { extractOwnerPKFromAddress } from "../../utils/index.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+import {
+    FILE_NAME_CONVENTION_REGEX,
+    ERROR_CODES,
+    SUCCESS_CODES,
+} from "../../constants/index.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -190,9 +194,11 @@ export default {
             !isCloned ? `CREATE A NEW DOCUMENT` : `CLONE A NEW DOCUMENT`
         );
 
-        if (!companyName || !fileName) {
+        if (!companyName || !fileName)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
+
+        if (!FILE_NAME_CONVENTION_REGEX.test(fileName))
+            return next(ERROR_CODES.FILE_NAME_INVALID);
 
         try {
             const branchName = `DOC_${companyName}`;
@@ -200,11 +206,11 @@ export default {
 
             // Get owner public key from the wrapped document
             const ownerDID = wrappedDocument.data.issuers[0].address;
-            if (!ownerDID) throw ERROR_CODES.INVALID_WRAPPED_DOCUMENT;
+            if (!ownerDID) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
 
             // Get wrapped document target hash
             const targetHash = wrappedDocument.signature?.targetHash;
-            if (!targetHash) throw ERROR_CODES.INVALID_WRAPPED_DOCUMENT;
+            if (!targetHash) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
 
             const ownerPublicKey = extractOwnerPKFromAddress(ownerDID),
                 holderPublicKey = ownerPublicKey;

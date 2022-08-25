@@ -3,6 +3,8 @@ const SERVICES = {
     AUTH_HTTPS: `https://auth-fuixlabs.ap.ngrok.io`,
 };
 
+const FILE_NAME_CONVENTION_REGEX = /^[\w,\s-]+[A-Za-z0-9]$/i;
+
 const ERROR_CODES = {
     // Github API Error
     GITHUB_API_ERROR: {
@@ -116,6 +118,11 @@ const ERROR_CODES = {
         error_code: 10006,
         error_message: "Service refused to connect.",
     },
+    FILE_NAME_INVALID: {
+        error_code: 10007,
+        error_message: "File name does not match the correct format.",
+        error_cause: `File name regex: ${FILE_NAME_CONVENTION_REGEX}`,
+    },
 
     // Invalid Param Error
     COMPANY_NOT_FOUND: {
@@ -178,4 +185,4 @@ const SUCCESS_CODES = {
     DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
 
-export { SERVICES, ERROR_CODES, SUCCESS_CODES };
+export { SERVICES, FILE_NAME_CONVENTION_REGEX, ERROR_CODES, SUCCESS_CODES };
