@@ -2,17 +2,20 @@ import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import SchemaValidator from "../../schema/schemaValidator.js";
 import { extractOwnerPKFromAddress } from "../../utils/index.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+import {
+    FILE_NAME_CONVENTION_REGEX,
+    ERROR_CODES,
+    SUCCESS_CODES,
+} from "../../constants/index.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 export default {
     isExist: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("fileName");
         Logger.apiInfo(req, res, `CHECK FILE EXISTENCE`);
 
+        const { companyName, fileName } = req.query;
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -33,15 +36,14 @@ export default {
         }
     },
     getDoc: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("fileName");
-        const only = req.query.only;
         Logger.apiInfo(req, res, `GET WRAPPED DOCUMENT/DID DOCUMENT`);
 
+        const { companyName, fileName, only } = req.query;
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
 
+        // Check if the 'only' param value is invalid
         if (only && !["did", "doc"].includes(only)) {
             return next(ERROR_CODES.INVALID_QUERY_PARAMS);
         }
@@ -91,11 +93,9 @@ export default {
         }
     },
     getDocsByUser: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const ownerPublicKey = req.header("publicKey");
-
         Logger.apiInfo(req, res, `RETRIEVE ALL DOCS BY ISSUER'S PUBLIC KEY`);
 
+        const { companyName, publicKey: ownerPublicKey } = req.query;
         if (!companyName || !ownerPublicKey) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -145,9 +145,9 @@ export default {
         }
     },
     searchContent: async (req, res, next) => {
-        const { companyName, searchString } = req.query;
         Logger.apiInfo(req, res, `SEARCH A STRING IN DOCUMENT`);
 
+        const { companyName, searchString } = req.query;
         if (!companyName || !searchString) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -194,9 +194,11 @@ export default {
             !isCloned ? `CREATE A NEW DOCUMENT` : `CLONE A NEW DOCUMENT`
         );
 
-        if (!companyName || !fileName) {
+        if (!companyName || !fileName)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
+
+        if (!FILE_NAME_CONVENTION_REGEX.test(fileName))
+            return next(ERROR_CODES.FILE_NAME_INVALID);
 
         try {
             const branchName = `DOC_${companyName}`;
@@ -204,9 +206,14 @@ export default {
 
             // Get owner public key from the wrapped document
             const ownerDID = wrappedDocument.data.issuers[0].address;
-            if (!ownerDID) throw ERROR_CODES.INVALID_WRAPPED_DOCUMENT;
+            if (!ownerDID) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
 
-            const ownerPublicKey = extractOwnerPKFromAddress(ownerDID);
+            // Get wrapped document target hash
+            const targetHash = wrappedDocument.signature?.targetHash;
+            if (!targetHash) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
+
+            const ownerPublicKey = extractOwnerPKFromAddress(ownerDID),
+                holderPublicKey = ownerPublicKey;
 
             // Save wrapped document
             await GithubProxy.createNewFile(
@@ -223,9 +230,9 @@ export default {
                 `${fileName}.did`,
                 {
                     controller: [ownerPublicKey],
-                    did: `did:${companyName}:${ownerPublicKey}:${ownerPublicKey}`,
+                    did: `did:${companyName}:${ownerPublicKey}:${targetHash}`,
                     owner: ownerPublicKey,
-                    holder: ownerPublicKey,
+                    holder: holderPublicKey,
                     url: `${fileName}.document`,
                 },
                 branchName,
@@ -243,19 +250,16 @@ export default {
             if (err === ERROR_CODES.INVALID_REF_NAME)
                 return next(ERROR_CODES.COMPANY_NAME_INVALID);
 
-            if (err === ERROR_CODES.BLOB_EXISTED) {
+            if (err === ERROR_CODES.BLOB_EXISTED)
                 return next(ERROR_CODES.FILE_EXISTED);
-            }
 
             next(err);
         }
     },
     deleteDoc: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("fileName");
-
         Logger.apiInfo(req, res, `DELETE DOCUMENT`);
 
+        const { companyName, fileName } = req.query;
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -286,10 +290,9 @@ export default {
         }
     },
     updateDidDocController: async (req, res, next) => {
-        const { didDoc, fileName, companyName } = req.body;
-
         Logger.apiInfo(req, res, `UPDATE DID DOCUMENT OF WRAPPED DOCUMENT`);
 
+        const { didDoc, fileName, companyName } = req.body;
         if (!companyName || !fileName || !didDoc) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -321,11 +324,9 @@ export default {
         }
     },
     getDidDocHistory: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("fileName");
-
         Logger.apiInfo(req, res, `GET HISTORY OF DID DOCUMENT`);
 
+        const { companyName, fileName } = req.query;
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }

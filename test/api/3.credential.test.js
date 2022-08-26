@@ -169,7 +169,7 @@ describe("CREDENTIAL", function () {
         it("it should return a 'credential not found' error as the provided public key is invalid", (done) => {
             chai.request(server)
                 .get("/api/credential")
-                .set("hash", "in va lid hash")
+                .query({ hash: "in va lid hash" })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -185,7 +185,7 @@ describe("CREDENTIAL", function () {
         it("it should return an credential correspond with the provided hash", (done) => {
             chai.request(server)
                 .get("/api/credential")
-                .set("hash", HASH1)
+                .query({ hash: HASH1 })
                 .end((err, res) => {
                     res.should.have.status(200);
                     expect(res.body).to.be.an("object");
@@ -200,7 +200,7 @@ describe("CREDENTIAL", function () {
         it("it should return an credential correspond with the provided hash - 2nd time", (done) => {
             chai.request(server)
                 .get("/api/credential")
-                .set("hash", HASH2)
+                .query({ hash: HASH2 })
                 .end((err, res) => {
                     res.should.have.status(200);
                     expect(res.body).to.be.an("object");
@@ -267,7 +267,7 @@ describe("CREDENTIAL", function () {
         it("it should return an updated credential correspond with the provided hash", (done) => {
             chai.request(server)
                 .get("/api/credential")
-                .set("hash", HASH2)
+                .query({ hash: HASH2 })
                 .end((err, res) => {
                     res.should.have.status(200);
                     expect(res.body).to.be.an("object");

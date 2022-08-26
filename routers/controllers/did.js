@@ -8,10 +8,9 @@ const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 export default {
     getAllDIDs: async (req, res, next) => {
-        const companyName = req.header("companyName");
-
         Logger.apiInfo(req, res, `RETRIEVE ALL DIDs BY COMPANY NAME`);
 
+        const { companyName } = req.query;
         if (!companyName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -38,11 +37,9 @@ export default {
         }
     },
     getSingleDID: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("publicKey");
-
         Logger.apiInfo(req, res, `RETRIEVE DID BY ITS NAME`);
 
+        const { companyName, publicKey: fileName } = req.query;
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -72,10 +69,9 @@ export default {
         }
     },
     createNewDID: async (req, res, next) => {
-        const { companyName, publicKey: fileName, content } = req.body;
-
         Logger.apiInfo(req, res, `CREATE A DID`);
 
+        const { companyName, publicKey: fileName, content } = req.body;
         if (!companyName || !fileName || !content) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -105,10 +101,9 @@ export default {
         }
     },
     updateDID: async (req, res, next) => {
-        const { companyName, publicKey: fileName, content } = req.body;
-
         Logger.apiInfo(req, res, `UPDATE DID DOCUMENT OF A DID`);
 
+        const { companyName, publicKey: fileName, content } = req.body;
         if (!companyName || !fileName || !content) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }
@@ -138,11 +133,9 @@ export default {
         }
     },
     deleteDID: async (req, res, next) => {
-        const companyName = req.header("companyName");
-        const fileName = req.header("publicKey");
-
         Logger.apiInfo(req, res, `DELETE A DID`);
 
+        const { companyName, publicKey: fileName } = req.query;
         if (!companyName || !fileName) {
             return next(ERROR_CODES.MISSING_PARAMETERS);
         }

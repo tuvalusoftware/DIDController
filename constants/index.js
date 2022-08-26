@@ -1,14 +1,17 @@
 const SERVICES = {
     AUTH: `http://18.139.84.180:12000`,
-    AUTH_HTTPS: `https://d876-18-139-84-180.ap.ngrok.io`,
+    AUTH_HTTPS: `https://auth-fuixlabs.ap.ngrok.io`,
 };
+
+const FILE_NAME_CONVENTION_REGEX = /^[\w,\s-]+[A-Za-z0-9]$/i;
 
 const ERROR_CODES = {
     // Github API Error
     GITHUB_API_ERROR: {
         error_code: 1200,
         error_message: "Unexpected Storage Error.",
-        error_cause: "Unexpected error given by Github API",
+        error_cause:
+            "Potential Errors: invalid repository name, invalid github auth token, ... Or any other unexpected error given by Github API.",
     },
     BAD_CREDENTIALS: {
         error_code: 1201,
@@ -83,18 +86,42 @@ const ERROR_CODES = {
         error_code: 10000,
         error_message: "Something went wrong with the server!",
     },
-    AUTHENTICATION: {
+    SECURITY_SERVICE_AUTHENTICATION: {
         error_code: 10001,
         error_message: "Unauthorized.",
+        error_cause:
+            "Invalid authentication info according to the Security Service",
+    },
+    MISSING_ACCESS_TOKEN: {
+        error_code: 10003,
+        error_message: "Unauthorized.",
+        error_cause: "Access token is not provided.",
     },
     MISSING_PARAMETERS: {
-        error_code: 10002,
+        error_code: 10004,
         error_message:
-            "Parameters in request body or header are missing. Please try again later.",
+            "Parameters in request body or query are missing. Please try again later.",
     },
     INVALID_QUERY_PARAMS: {
-        error_code: 10003,
+        error_code: 10005,
         error_message: "Query params provided are invalid.",
+    },
+    INVALID_JSON_BODY: {
+        error_code: 10004,
+        error_message: "JSON data in body is invalid.",
+    },
+    CONNECTION_TIMEOUT: {
+        error_code: 10005,
+        error_message: "Cannot reach the service.",
+    },
+    CONNECTION_REFUSED: {
+        error_code: 10006,
+        error_message: "Service refused to connect.",
+    },
+    FILE_NAME_INVALID: {
+        error_code: 10007,
+        error_message: "File name does not match the correct format.",
+        error_cause: `File name regex: ${FILE_NAME_CONVENTION_REGEX}`,
     },
 
     // Invalid Param Error
@@ -158,4 +185,4 @@ const SUCCESS_CODES = {
     DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
 
-export { SERVICES, ERROR_CODES, SUCCESS_CODES };
+export { SERVICES, FILE_NAME_CONVENTION_REGEX, ERROR_CODES, SUCCESS_CODES };

@@ -18,19 +18,20 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/NgoQuocBao1010/My-JS-Utils.git"
+        "url": "git+https://github.com/tuvalusoftware/DIDController.git"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/NgoQuocBao1010/My-JS-Utils/issues"
+        "url": "https://github.com/tuvalusoftware/DIDController/issues"
     },
-    "homepage": "https://github.com/NgoQuocBao1010/My-JS-Utils#readme",
+    "homepage": "https://github.com/tuvalusoftware/DIDController#readme",
     "dependencies": {
         "ajv": "^8.11.0",
         "axios": "^0.27.2",
         "body-parser": "^1.20.0",
+        "compression": "^1.7.4",
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
         "dayjs": "^1.11.2",

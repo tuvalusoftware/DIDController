@@ -100,7 +100,7 @@
                 "parameters": [
                     {
                         "name": "companyName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of a company",
                         "required": true,
                         "example": "Kukulu",
@@ -138,7 +138,7 @@
                 "parameters": [
                     {
                         "name": "companyName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of a company",
                         "required": true,
                         "example": "Kukulu",
@@ -148,7 +148,7 @@
                     },
                     {
                         "name": "publicKey",
-                        "in": "header",
+                        "in": "query",
                         "description": "Public Key of the user's wallet.",
                         "required": true,
                         "example": "public_key",
@@ -274,7 +274,7 @@
                 "parameters": [
                     {
                         "name": "companyName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of a company",
                         "required": true,
                         "example": "Kukulu",
@@ -284,7 +284,7 @@
                     },
                     {
                         "name": "publicKey",
-                        "in": "header",
+                        "in": "query",
                         "description": "Public Key of the user's wallet.",
                         "required": true,
                         "example": "public_key",
@@ -314,7 +314,7 @@
                 "parameters": [
                     {
                         "name": "companyName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of a company",
                         "required": true,
                         "example": "Kukulu",
@@ -324,7 +324,7 @@
                     },
                     {
                         "name": "fileName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of the document file.",
                         "required": true,
                         "example": "file_name",
@@ -466,7 +466,7 @@
                 "parameters": [
                     {
                         "name": "companyName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of a company",
                         "required": true,
                         "example": "Kukulu",
@@ -476,7 +476,7 @@
                     },
                     {
                         "name": "fileName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of the document file.",
                         "required": true,
                         "example": "file_name",
@@ -509,7 +509,7 @@
                 "parameters": [
                     {
                         "name": "companyName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of a company",
                         "required": true,
                         "example": "Kukulu",
@@ -519,7 +519,7 @@
                     },
                     {
                         "name": "fileName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of the document (not include the file extension).",
                         "required": true,
                         "example": "document_name",
@@ -593,7 +593,7 @@
                 "parameters": [
                     {
                         "name": "companyName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of a company",
                         "required": true,
                         "example": "Kukulu",
@@ -603,7 +603,7 @@
                     },
                     {
                         "name": "fileName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of the document (not include the file extension).",
                         "required": true,
                         "example": "document_name",
@@ -648,7 +648,7 @@
                 "parameters": [
                     {
                         "name": "companyName",
-                        "in": "header",
+                        "in": "query",
                         "description": "Name of a company",
                         "required": true,
                         "example": "Kukulu",
@@ -658,7 +658,7 @@
                     },
                     {
                         "name": "publicKey",
-                        "in": "header",
+                        "in": "query",
                         "description": "User's address (public key).",
                         "required": true,
                         "example": "0071fc0cc009dab1ec32a25ee2d242c9e269ae967b8ffe80d9ddfd4ecfe24b09415e7642ee02ff59f2aabc9f106cb49595ff2e04a11b4259e3",
@@ -726,39 +726,6 @@
                 }
             }
         },
-        "/message/receiver": {
-            "get": {
-                "tags": ["MSG"],
-                "summary": "Retrieve all messages belong to a receiver.",
-                "parameters": [
-                    {
-                        "name": "publicKey",
-                        "in": "header",
-                        "description": "Receiver's Public Key",
-                        "required": true,
-                        "example": "receiver_public_key",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Return a list of messages.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/MessageWithID"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/credential": {
             "get": {
                 "tags": ["CREDENTIAL"],
@@ -766,7 +733,7 @@
                 "parameters": [
                     {
                         "name": "hash",
-                        "in": "header",
+                        "in": "query",
                         "description": "Hash of the credential",
                         "required": true,
                         "example": "ghjk_rtyuiocvbnm456dfghj",
@@ -854,6 +821,39 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/message/receiver": {
+            "get": {
+                "tags": ["MSG"],
+                "summary": "Retrieve all messages belong to a receiver.",
+                "parameters": [
+                    {
+                        "name": "publicKey",
+                        "in": "header",
+                        "description": "Receiver's Public Key",
+                        "required": true,
+                        "example": "receiver_public_key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return a list of messages.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MessageWithID"
+                                    }
                                 }
                             }
                         }

@@ -75,6 +75,9 @@ const TEST_WRAPPED_DOCS = [
                 content: "This is a sample wrapped doc 1",
                 issuers: [{ address: TEST_PUBLIC_KEY }],
             },
+            signature: {
+                targetHash: "1234567rtyuio",
+            },
         },
         companyName: TEST_BRANCH,
     },
@@ -85,6 +88,9 @@ const TEST_WRAPPED_DOCS = [
                 content: "This is a sample wrapped doc 2",
                 issuers: [{ address: TEST_PUBLIC_KEY }],
             },
+            signature: {
+                targetHash: "cvbnmnbvcxfghjnbvfr67ui",
+            },
         },
         companyName: TEST_BRANCH,
     },
@@ -94,6 +100,9 @@ const TEST_WRAPPED_DOCS = [
             data: {
                 content: "This is a sample wrapped doc 3",
                 issuers: [{ address: TEST_PUBLIC_KEY }],
+            },
+            signature: {
+                targetHash: "2345678sdfghjk4567fghj4567gh",
             },
         },
         companyName: TEST_BRANCH,
@@ -172,6 +181,22 @@ describe("DOC", function () {
                 });
         });
 
+        it("it should return a 'invalid file name format' error as the param 'fileName' is incorrectly format", (done) => {
+            chai.request(server)
+                .post("/api/doc")
+                .send({ ...TEST_DATA, fileName: "#$%^&*(" })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_NAME_INVALID)
+                    );
+
+                    done();
+                });
+        });
+
         it("it should return a success message states that the wrapped document is saved successfully", (done) => {
             chai.request(server)
                 .post("/api/doc")
@@ -218,8 +243,10 @@ describe("DOC", function () {
         it("it should return a 'not found' error as the company name is invalid", (done) => {
             chai.request(server)
                 .get("/api/doc/exists")
-                .set("companyName", NOT_EXIST_BRANCH)
-                .set("fileName", NOT_EXIST_FILE)
+                .query({
+                    companyName: NOT_EXIST_BRANCH,
+                    fileName: NOT_EXIST_FILE,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -235,8 +262,10 @@ describe("DOC", function () {
         it("it should return 'false' as file does not exist", (done) => {
             chai.request(server)
                 .get("/api/doc/exists")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", NOT_EXIST_FILE)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: NOT_EXIST_FILE,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -248,8 +277,10 @@ describe("DOC", function () {
         it("it should return 'true' as the file does exist", (done) => {
             chai.request(server)
                 .get("/api/doc/exists")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", TEST_DATA.fileName)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: TEST_DATA.fileName,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -273,8 +304,10 @@ describe("DOC", function () {
         it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
             chai.request(server)
                 .get("/api/doc")
-                .set("companyName", INVALID_COMPANY_NAME)
-                .set("fileName", TEST_DATA.fileName)
+                .query({
+                    companyName: INVALID_COMPANY_NAME,
+                    fileName: TEST_DATA.fileName,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -290,8 +323,10 @@ describe("DOC", function () {
         it("it should return an 'file not found' error as the provided file name cannot be found", (done) => {
             chai.request(server)
                 .get("/api/doc")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", INVALID_FILE_NAME)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: INVALID_FILE_NAME,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -307,8 +342,10 @@ describe("DOC", function () {
         it("it should return 'true' because file had been created", (done) => {
             chai.request(server)
                 .get("/api/doc/exists")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", TEST_DATA.fileName)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: TEST_DATA.fileName,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -321,8 +358,10 @@ describe("DOC", function () {
         it("it should GET both the wrapped document and the did doc of the document", (done) => {
             chai.request(server)
                 .get("/api/doc")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", TEST_DATA.fileName)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: TEST_DATA.fileName,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -345,9 +384,12 @@ describe("DOC", function () {
 
         it("it should GET only the wrapped document as the flag indicates to exclude the did doc", (done) => {
             chai.request(server)
-                .get("/api/doc?only=doc")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", TEST_DATA.fileName)
+                .get("/api/doc")
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: TEST_DATA.fileName,
+                    only: "doc",
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -364,9 +406,12 @@ describe("DOC", function () {
 
         it("it should GET only the did document of the wrapped document as the flag indicates to exclude the wrapped document", (done) => {
             chai.request(server)
-                .get("/api/doc?only=did")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", TEST_DATA.fileName)
+                .get("/api/doc")
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: TEST_DATA.fileName,
+                    only: "did",
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -451,8 +496,10 @@ describe("DOC", function () {
         it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
             chai.request(server)
                 .get("/api/doc/user")
-                .set("companyName", INVALID_COMPANY_NAME)
-                .set("publicKey", TEST_PUBLIC_KEY)
+                .query({
+                    companyName: INVALID_COMPANY_NAME,
+                    publicKey: TEST_PUBLIC_KEY,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -468,6 +515,10 @@ describe("DOC", function () {
         it("it should return an empty list as the provided public key is invalid or unknown", (done) => {
             chai.request(server)
                 .get("/api/doc/user")
+                .query({
+                    companyName: TEST_BRANCH,
+                    publicKey: INVALID_PUBLIC_KEY,
+                })
                 .set("companyName", TEST_BRANCH)
                 .set("publicKey", INVALID_PUBLIC_KEY)
                 .end((err, res) => {
@@ -510,11 +561,13 @@ describe("DOC", function () {
                 });
         });
 
-        it("it should return the list of wrapped documents own by the user", (done) => {
+        it("it should return the list of wrapped documents in which the user is the owner or holder", (done) => {
             chai.request(server)
                 .get("/api/doc/user")
-                .set("companyName", TEST_BRANCH)
-                .set("publicKey", TEST_PUBLIC_KEY)
+                .query({
+                    companyName: TEST_BRANCH,
+                    publicKey: TEST_PUBLIC_KEY,
+                })
                 .end((err, res) => {
                     const wrappedDocContents = TEST_WRAPPED_DOCS.map(
                         (el) => el.wrappedDocument
@@ -662,8 +715,10 @@ describe("DOC", function () {
         it("it should successfully GET the updated did document ", (done) => {
             chai.request(server)
                 .get("/api/doc?only=did")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", TEST_DATA.fileName)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: TEST_DATA.fileName,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -693,8 +748,10 @@ describe("DOC", function () {
         it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
             chai.request(server)
                 .get("/api/doc/did-doc-history")
-                .set("companyName", INVALID_COMPANY_NAME)
-                .set("fileName", TEST_DATA.fileName)
+                .query({
+                    companyName: INVALID_COMPANY_NAME,
+                    fileName: TEST_DATA.fileName,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -710,8 +767,10 @@ describe("DOC", function () {
         it("it should return an 'file name not found' error as the provided file name cannot be found", (done) => {
             chai.request(server)
                 .get("/api/doc/did-doc-history")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", INVALID_FILE_NAME)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: INVALID_FILE_NAME,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -727,8 +786,10 @@ describe("DOC", function () {
         it("it should get all the previous history of the did doc", (done) => {
             chai.request(server)
                 .get("/api/doc/did-doc-history")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", TEST_DATA.fileName)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: TEST_DATA.fileName,
+                })
                 .end((err, res) => {
                     expect(res.body.length).equal(2);
                     expect(JSON.stringify(res.body)).equal(
@@ -755,8 +816,10 @@ describe("DOC", function () {
         it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
             chai.request(server)
                 .delete("/api/doc/")
-                .set("companyName", INVALID_COMPANY_NAME)
-                .set("fileName", TEST_DATA.fileName)
+                .query({
+                    companyName: INVALID_COMPANY_NAME,
+                    fileName: TEST_DATA.fileName,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -772,8 +835,10 @@ describe("DOC", function () {
         it("it should return an 'file name not found' error as the provided file name cannot be found", (done) => {
             chai.request(server)
                 .delete("/api/doc/")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", INVALID_FILE_NAME)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: INVALID_FILE_NAME,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -789,8 +854,10 @@ describe("DOC", function () {
         it("it should return a success message states that the wrapped document is deleted successfully", (done) => {
             chai.request(server)
                 .delete("/api/doc")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", TEST_DATA.fileName)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: TEST_DATA.fileName,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -806,8 +873,10 @@ describe("DOC", function () {
         it("it should return 'false' because file has been deleted", (done) => {
             chai.request(server)
                 .get("/api/doc/exists")
-                .set("companyName", TEST_DATA.companyName)
-                .set("fileName", TEST_DATA.fileName)
+                .query({
+                    companyName: TEST_DATA.companyName,
+                    fileName: TEST_DATA.fileName,
+                })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");

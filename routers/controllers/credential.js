@@ -10,10 +10,9 @@ const FIRST_N_LETTERS = 3;
 
 export default {
     getCredentialByHash: async (req, res, next) => {
-        const hash = req.header("hash");
-
         Logger.apiInfo(req, res, `RETRIEVE CREDENTIAL BY HASH`);
 
+        const { hash } = req.query;
         if (!hash) return next(ERROR_CODES.MISSING_PARAMETERS);
 
         try {
