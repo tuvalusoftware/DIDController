@@ -1,7 +1,11 @@
 import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import SchemaValidator from "../../schema/schemaValidator.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+import {
+    FILE_NAME_CONVENTION_REGEX,
+    ERROR_CODES,
+    SUCCESS_CODES,
+} from "../../constants/index.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -72,9 +76,11 @@ export default {
         Logger.apiInfo(req, res, `CREATE A DID`);
 
         const { companyName, publicKey: fileName, content } = req.body;
-        if (!companyName || !fileName || !content) {
+        if (!companyName || !fileName || !content)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
+
+        if (!FILE_NAME_CONVENTION_REGEX.test(fileName))
+            return next(ERROR_CODES.FILE_NAME_INVALID);
 
         try {
             // Validate user's did document
@@ -93,9 +99,8 @@ export default {
 
             res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
         } catch (err) {
-            if (err === ERROR_CODES.BLOB_EXISTED) {
+            if (err === ERROR_CODES.BLOB_EXISTED)
                 return next(ERROR_CODES.FILE_EXISTED);
-            }
 
             next(err);
         }
