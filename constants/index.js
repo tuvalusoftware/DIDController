@@ -1,8 +1,3 @@
-const SERVICES = {
-    AUTH: `http://18.139.84.180:12000`,
-    AUTH_HTTPS: `https://auth-fuixlabs.ap.ngrok.io`,
-};
-
 const FILE_NAME_CONVENTION_REGEX = /^[\w,\s-]+[A-Za-z0-9]$/i;
 
 const ERROR_CODES = {
@@ -185,4 +180,4 @@ const SUCCESS_CODES = {
     DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
 
-export { SERVICES, FILE_NAME_CONVENTION_REGEX, ERROR_CODES, SUCCESS_CODES };
+export { FILE_NAME_CONVENTION_REGEX, ERROR_CODES, SUCCESS_CODES };

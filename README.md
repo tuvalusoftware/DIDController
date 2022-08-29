@@ -25,6 +25,7 @@ NPM version 8
     DOCUMENT_REPO=DID_Store
     CREDENTIAL_REPO=Credentials
     AUTH_TOKEN=<token>
+    AUTH_SERVICE=https://auth-fuixlabs.ap.ngrok.io
     ```
 
 1. Run server (server will run on port 9000)
