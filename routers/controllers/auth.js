@@ -1,6 +1,8 @@
 import axios from "axios";
 import Logger from "../../logger.js";
-import { ERROR_CODES, SERVICES } from "../../constants/index.js";
+import { ERROR_CODES } from "../../constants/index.js";
+
+const AUTH_SERVICES_URL = process.env.AUTH_SERVICE;
 
 export default {
     /* c8 ignore start */
@@ -11,14 +13,12 @@ export default {
         Logger.apiInfo(req, res, "ENSURE AUTHENTICATION FROM SECURITY SERVICE");
 
         const token = req.cookies["access_token"];
-        if (!token) {
-            return next(ERROR_CODES.MISSING_ACCESS_TOKEN);
-        }
+        if (!token) return next(ERROR_CODES.MISSING_ACCESS_TOKEN);
 
         // Call to Security Service to verify the access token
         try {
             const response = await axios.get(
-                `${SERVICES.AUTH_HTTPS}/api/auth/verify`,
+                `${AUTH_SERVICES_URL}/api/auth/verify`,
                 {
                     withCredentials: true,
                     headers: {

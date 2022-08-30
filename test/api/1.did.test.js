@@ -94,6 +94,22 @@ describe("DID", function () {
                 });
         });
 
+        it("it should return a 'invalid file name format' error as the param 'fileName' is incorrectly format", (done) => {
+            chai.request(server)
+                .post("/api/did")
+                .send({ ...TEST_DATA, publicKey: "#$%^&*(" })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+
+                    expect(JSON.stringify(res.body)).equal(
+                        JSON.stringify(ERROR_CODES.FILE_NAME_INVALID)
+                    );
+
+                    done();
+                });
+        });
+
         it("it should return a success message states that DID is saved successfully", (done) => {
             chai.request(server)
                 .post("/api/did")
