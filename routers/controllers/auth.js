@@ -12,6 +12,9 @@ export default {
 
         Logger.apiInfo(req, res, "ENSURE AUTHENTICATION FROM SECURITY SERVICE");
 
+        if (!AUTH_SERVICES_URL)
+            return next(ERROR_CODES.SECURITY_SERVICE_URL_INVALID);
+
         const token = req.cookies["access_token"];
         if (!token) return next(ERROR_CODES.MISSING_ACCESS_TOKEN);
 
