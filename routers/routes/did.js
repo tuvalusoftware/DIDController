@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.use(authController.ensureSecurityServiceAuthentication);
 
-router.route("/all").get(didController.getAllDIDs);
+router.route("/all").get(didController.getDIDsByCompany);
 router
     .route("/")
     .get(didController.getSingleDID)

@@ -11,13 +11,11 @@ const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 export default {
-    getAllDIDs: async (req, res, next) => {
-        Logger.apiInfo(req, res, `RETRIEVE ALL DIDs BY COMPANY NAME`);
+    getDIDsByCompany: async (req, res, next) => {
+        Logger.apiInfo(req, res, `RETRIEVE ALL DIDs OF A COMPANY`);
 
         const { companyName } = req.query;
-        if (!companyName) {
-            return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
+        if (!companyName) return next(ERROR_CODES.MISSING_PARAMETERS);
 
         try {
             const branch = `DID_${companyName}`;
@@ -44,9 +42,8 @@ export default {
         Logger.apiInfo(req, res, `RETRIEVE DID BY ITS NAME`);
 
         const { companyName, publicKey: fileName } = req.query;
-        if (!companyName || !fileName) {
+        if (!companyName || !fileName)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             const branch = `DID_${companyName}`;
@@ -109,9 +106,8 @@ export default {
         Logger.apiInfo(req, res, `UPDATE DID DOCUMENT OF A DID`);
 
         const { companyName, publicKey: fileName, content } = req.body;
-        if (!companyName || !fileName || !content) {
+        if (!companyName || !fileName || !content)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             // Validate user's did document
@@ -141,9 +137,8 @@ export default {
         Logger.apiInfo(req, res, `DELETE A DID`);
 
         const { companyName, publicKey: fileName } = req.query;
-        if (!companyName || !fileName) {
+        if (!companyName || !fileName)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             const branch = `DID_${companyName}`;
