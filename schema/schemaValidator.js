@@ -1,4 +1,5 @@
 import Ajv from "ajv";
+import Logger from "../logger.js";
 
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
@@ -16,6 +17,11 @@ export default {
         // Validate schema using AJV
         const validate = ajv.compile(schema);
         const isValid = validate(obj);
+
+        if (!isValid)
+            Logger.error(
+                `[SCHEMA ERROR - ${type}]: ${JSON.parse(validate.errors)}`
+            );
 
         // Extra validation depends on the content
         let extraValidation = true;

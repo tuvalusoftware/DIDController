@@ -67,6 +67,10 @@ export default {
     apiInfo(req, res, message) {
         infoLogger.info(`[${req.method} - ${req.originalUrl}] ${message}`);
     },
+    error(message) {
+        infoLogger.error(message);
+        debugLogger.error(message);
+    },
     apiError(err, req, res) {
         const errorMsg =
             err instanceof Error
