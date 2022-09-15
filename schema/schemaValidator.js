@@ -18,9 +18,10 @@ export default {
         const validate = ajv.compile(schema);
         const isValid = validate(obj);
 
-        if (!isValid)
+        // Logging out Schema errors, ignore if it is a ERROR_OBJECT
+        if (!isValid && type !== "ERROR_OBJECT")
             Logger.error(
-                `[SCHEMA ERROR - ${type}]: ${JSON.parse(validate.errors)}`
+                `[SCHEMA ERROR - ${type}]: ${JSON.stringify(validate.errors)}`
             );
 
         // Extra validation depends on the content
