@@ -14,7 +14,7 @@ export default {
     getDIDsByCompany: async (req, res, next) => {
         Logger.apiInfo(req, res, `RETRIEVE ALL DIDs OF A COMPANY`);
 
-        const { companyName } = req.query;
+        const { companyName, content } = req.query;
         if (!companyName) return next(ERROR_CODES.MISSING_PARAMETERS);
 
         try {
@@ -22,13 +22,28 @@ export default {
             const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 branch
             );
+
+            const hasContent = content === "include" ? true : false;
+
+            // Get data from Github API
             const DID_strings = await GithubProxy.getFilesOfTree(
                 "",
                 false,
-                lastCommitOfBranch
+                lastCommitOfBranch,
+                hasContent
             );
 
-            const result = DID_strings.map((did) => did.name);
+            let result;
+            if (!hasContent) {
+                result = DID_strings.map((did) => did.name);
+            } else {
+                result = DID_strings.map((did) => {
+                    return {
+                        name: did.name,
+                        content: JSON.parse(did.object.text),
+                    };
+                });
+            }
 
             res.status(200).json(result);
         } catch (err) {

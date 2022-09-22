@@ -107,6 +107,25 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "content",
+                        "in": "query",
+                        "description": "Specify if the returned data should include the content of the files.",
+                        "enums": ["include", ""],
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "empty": {
+                                "value": "",
+                                "summary": "Return only file name."
+                            },
+                            "include": {
+                                "value": "include",
+                                "summary": "Include the content for each files."
+                            }
+                        }
                     }
                 ],
                 "responses": {
