@@ -178,11 +178,11 @@ const ERROR_CODES = {
     },
 };
 
-const SUCCESS_CODES = {
+const OPERATION_CODES = {
     SAVE_SUCCESS: { message: "Successfully Saved" },
     CLONE_SUCCESS: { message: "Successfully Cloned" },
     UPDATE_SUCCESS: { message: "Successfully Updated" },
     DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
 
-export { FILE_NAME_CONVENTION_REGEX, ERROR_CODES, SUCCESS_CODES };
+export { FILE_NAME_CONVENTION_REGEX, ERROR_CODES, OPERATION_CODES };

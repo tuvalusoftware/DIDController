@@ -5,7 +5,7 @@ import { extractOwnerPKFromAddress } from "../../utils/index.js";
 import {
     FILE_NAME_CONVENTION_REGEX,
     ERROR_CODES,
-    SUCCESS_CODES,
+    OPERATION_CODES,
 } from "../../constants/index.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
@@ -237,8 +237,8 @@ export default {
 
             res.status(201).json(
                 !isCloned
-                    ? SUCCESS_CODES.SAVE_SUCCESS
-                    : SUCCESS_CODES.CLONE_SUCCESS
+                    ? OPERATION_CODES.SAVE_SUCCESS
+                    : OPERATION_CODES.CLONE_SUCCESS
             );
         } catch (err) {
             if (err === ERROR_CODES.INVALID_REF_NAME)
@@ -271,7 +271,7 @@ export default {
                 `DELETE: '${fileName}' DID of doc company ${companyName}`
             );
 
-            res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
+            res.status(200).json(OPERATION_CODES.DELETE_SUCCESS);
         } catch (err) {
             if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
                 return next(ERROR_CODES.COMPANY_NOT_FOUND);
@@ -307,7 +307,7 @@ export default {
                 `UPDATE: '${fileName}' did document of company ${companyName}`
             );
 
-            res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
+            res.status(200).json(OPERATION_CODES.UPDATE_SUCCESS);
         } catch (err) {
             if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
                 return next(ERROR_CODES.COMPANY_NOT_FOUND);
