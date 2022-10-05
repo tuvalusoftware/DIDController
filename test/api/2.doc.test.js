@@ -3,7 +3,7 @@ import chaiHttp from "chai-http";
 
 import GithubProxyConfig from "../../db/github/index.js";
 import server from "../../server.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -206,7 +206,7 @@ describe("DOC", function () {
                     res.body.should.be.a("object");
 
                     expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                        JSON.stringify(OPERATION_CODES.SAVE_SUCCESS)
                     );
 
                     done();
@@ -475,7 +475,7 @@ describe("DOC", function () {
                     res.body.should.be.a("object");
 
                     expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(SUCCESS_CODES.CLONE_SUCCESS)
+                        JSON.stringify(OPERATION_CODES.CLONE_SUCCESS)
                     );
 
                     done();
@@ -705,7 +705,7 @@ describe("DOC", function () {
                     res.body.should.be.a("object");
 
                     expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(SUCCESS_CODES.UPDATE_SUCCESS)
+                        JSON.stringify(OPERATION_CODES.UPDATE_SUCCESS)
                     );
 
                     done();
@@ -863,7 +863,7 @@ describe("DOC", function () {
                     res.body.should.be.a("object");
 
                     expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(SUCCESS_CODES.DELETE_SUCCESS)
+                        JSON.stringify(OPERATION_CODES.DELETE_SUCCESS)
                     );
 
                     done();

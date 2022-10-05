@@ -2,7 +2,7 @@ import GithubRESTConfig from "./rest.js";
 import Logger from "../../logger.js";
 import { executeGraphQL } from "./helpers.js";
 import { tryParseStringToObj, getFileExtension } from "../../utils/index.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 
 const owner = process.env.REPO_OWNER;
 
@@ -233,7 +233,7 @@ export default function (REPOSITORY) {
 
                 GithubREST.delete(`git/refs/heads/${branch}`)
                     .then((_) => {
-                        resolve(SUCCESS_CODES.DELETE_SUCCESS);
+                        resolve(OPERATION_CODES.DELETE_SUCCESS);
                     })
                     .catch((err) => {
                         if (
@@ -810,7 +810,7 @@ export default function (REPOSITORY) {
                 };
 
                 GithubREST.delete(`contents/${path}`, data)
-                    .then((_) => resolve(SUCCESS_CODES.DELETE_SUCCESS))
+                    .then((_) => resolve(OPERATION_CODES.DELETE_SUCCESS))
                     .catch((err) => {
                         const errInfo = Logger.handleGithubError(err);
                         reject(errInfo);
@@ -963,7 +963,7 @@ export default function (REPOSITORY) {
             return new Promise((resolve, reject) => {
                 GithubREST.delete(`git/refs/tags/${tagName}`)
                     .then((_) => {
-                        resolve(SUCCESS_CODES.DELETE_SUCCESS);
+                        resolve(OPERATION_CODES.DELETE_SUCCESS);
                     })
                     .catch((err) => {
                         if (
@@ -1127,7 +1127,7 @@ export default function (REPOSITORY) {
                     this.deleteATag(tagName),
                 ]);
 
-                return SUCCESS_CODES.DELETE_SUCCESS;
+                return OPERATION_CODES.DELETE_SUCCESS;
             } catch (err) {
                 if (
                     err.response?.data.message === "Reference does not exist" &&

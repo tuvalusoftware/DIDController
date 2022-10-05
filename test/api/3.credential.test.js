@@ -3,7 +3,7 @@ import chaiHttp from "chai-http";
 
 import GithubProxyConfig from "../../db/github/index.js";
 import server from "../../server.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 
 const REPOSITORY = process.env.CREDENTIAL_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -126,7 +126,7 @@ describe("CREDENTIAL", function () {
                     res.body.should.be.a("object");
 
                     expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                        JSON.stringify(OPERATION_CODES.SAVE_SUCCESS)
                     );
 
                     done();
@@ -142,7 +142,7 @@ describe("CREDENTIAL", function () {
                     res.body.should.be.a("object");
 
                     expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(SUCCESS_CODES.SAVE_SUCCESS)
+                        JSON.stringify(OPERATION_CODES.SAVE_SUCCESS)
                     );
 
                     done();
@@ -257,7 +257,7 @@ describe("CREDENTIAL", function () {
                     res.body.should.be.a("object");
 
                     expect(JSON.stringify(res.body)).equal(
-                        JSON.stringify(SUCCESS_CODES.UPDATE_SUCCESS)
+                        JSON.stringify(OPERATION_CODES.UPDATE_SUCCESS)
                     );
 
                     done();

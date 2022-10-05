@@ -81,8 +81,13 @@ const ERROR_CODES = {
         error_code: 10000,
         error_message: "Something went wrong with the server!",
     },
-    SECURITY_SERVICE_AUTHENTICATION: {
+    SECURITY_SERVICE_URL_INVALID: {
         error_code: 10001,
+        error_message: "Unauthorized.",
+        error_cause: "Cannot found security service.",
+    },
+    SECURITY_SERVICE_AUTHENTICATION: {
+        error_code: 10002,
         error_message: "Unauthorized.",
         error_cause:
             "Invalid authentication info according to the Security Service",
@@ -102,19 +107,19 @@ const ERROR_CODES = {
         error_message: "Query params provided are invalid.",
     },
     INVALID_JSON_BODY: {
-        error_code: 10004,
+        error_code: 10006,
         error_message: "JSON data in body is invalid.",
     },
     CONNECTION_TIMEOUT: {
-        error_code: 10005,
+        error_code: 10007,
         error_message: "Cannot reach the service.",
     },
     CONNECTION_REFUSED: {
-        error_code: 10006,
+        error_code: 10008,
         error_message: "Service refused to connect.",
     },
     FILE_NAME_INVALID: {
-        error_code: 10007,
+        error_code: 10009,
         error_message: "File name does not match the correct format.",
         error_cause: `File name regex: ${FILE_NAME_CONVENTION_REGEX}`,
     },
@@ -173,11 +178,11 @@ const ERROR_CODES = {
     },
 };
 
-const SUCCESS_CODES = {
+const OPERATION_CODES = {
     SAVE_SUCCESS: { message: "Successfully Saved" },
     CLONE_SUCCESS: { message: "Successfully Cloned" },
     UPDATE_SUCCESS: { message: "Successfully Updated" },
     DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
 
-export { FILE_NAME_CONVENTION_REGEX, ERROR_CODES, SUCCESS_CODES };
+export { FILE_NAME_CONVENTION_REGEX, ERROR_CODES, OPERATION_CODES };

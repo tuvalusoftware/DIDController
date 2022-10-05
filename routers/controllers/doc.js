@@ -5,7 +5,7 @@ import { extractOwnerPKFromAddress } from "../../utils/index.js";
 import {
     FILE_NAME_CONVENTION_REGEX,
     ERROR_CODES,
-    SUCCESS_CODES,
+    OPERATION_CODES,
 } from "../../constants/index.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
@@ -16,9 +16,8 @@ export default {
         Logger.apiInfo(req, res, `CHECK FILE EXISTENCE`);
 
         const { companyName, fileName } = req.query;
-        if (!companyName || !fileName) {
+        if (!companyName || !fileName)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             const branchName = `DOC_${companyName}`;
@@ -39,14 +38,12 @@ export default {
         Logger.apiInfo(req, res, `GET WRAPPED DOCUMENT/DID DOCUMENT`);
 
         const { companyName, fileName, only } = req.query;
-        if (!companyName || !fileName) {
+        if (!companyName || !fileName)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         // Check if the 'only' param value is invalid
-        if (only && !["did", "doc"].includes(only)) {
+        if (only && !["did", "doc"].includes(only))
             return next(ERROR_CODES.INVALID_QUERY_PARAMS);
-        }
 
         try {
             const branch = `DOC_${companyName}`;
@@ -96,9 +93,8 @@ export default {
         Logger.apiInfo(req, res, `RETRIEVE ALL DOCS BY ISSUER'S PUBLIC KEY`);
 
         const { companyName, publicKey: ownerPublicKey } = req.query;
-        if (!companyName || !ownerPublicKey) {
+        if (!companyName || !ownerPublicKey)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             const branch = `DOC_${companyName}`;
@@ -113,7 +109,7 @@ export default {
                 true
             );
 
-            // Filter and Parse DID File contents
+            // Filter only .did files and parse their content from text to object
             const didFiles = allFiles
                 .filter((file) => file.name.includes(".did"))
                 .map((file) => ({
@@ -148,9 +144,8 @@ export default {
         Logger.apiInfo(req, res, `SEARCH A STRING IN DOCUMENT`);
 
         const { companyName, searchString } = req.query;
-        if (!companyName || !searchString) {
+        if (!companyName || !searchString)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             const branch = `DOC_${companyName}`;
@@ -165,7 +160,7 @@ export default {
                 true
             );
 
-            // Find documents that contains the search string
+            // Find .document files that contains the searched string
             let results = files.filter(
                 (file) =>
                     file.name.includes(".document") &&
@@ -212,8 +207,7 @@ export default {
             const targetHash = wrappedDocument.signature?.targetHash;
             if (!targetHash) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
 
-            const ownerPublicKey = extractOwnerPKFromAddress(ownerDID),
-                holderPublicKey = ownerPublicKey;
+            const ownerPublicKey = extractOwnerPKFromAddress(ownerDID);
 
             // Save wrapped document
             await GithubProxy.createNewFile(
@@ -232,7 +226,7 @@ export default {
                     controller: [ownerPublicKey],
                     did: `did:${companyName}:${ownerPublicKey}:${targetHash}`,
                     owner: ownerPublicKey,
-                    holder: holderPublicKey,
+                    holder: ownerPublicKey,
                     url: `${fileName}.document`,
                 },
                 branchName,
@@ -243,8 +237,8 @@ export default {
 
             res.status(201).json(
                 !isCloned
-                    ? SUCCESS_CODES.SAVE_SUCCESS
-                    : SUCCESS_CODES.CLONE_SUCCESS
+                    ? OPERATION_CODES.SAVE_SUCCESS
+                    : OPERATION_CODES.CLONE_SUCCESS
             );
         } catch (err) {
             if (err === ERROR_CODES.INVALID_REF_NAME)
@@ -260,9 +254,8 @@ export default {
         Logger.apiInfo(req, res, `DELETE DOCUMENT`);
 
         const { companyName, fileName } = req.query;
-        if (!companyName || !fileName) {
+        if (!companyName || !fileName)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             const branch = `DOC_${companyName}`;
@@ -278,7 +271,7 @@ export default {
                 `DELETE: '${fileName}' DID of doc company ${companyName}`
             );
 
-            res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
+            res.status(200).json(OPERATION_CODES.DELETE_SUCCESS);
         } catch (err) {
             if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
                 return next(ERROR_CODES.COMPANY_NOT_FOUND);
@@ -293,9 +286,8 @@ export default {
         Logger.apiInfo(req, res, `UPDATE DID DOCUMENT OF WRAPPED DOCUMENT`);
 
         const { didDoc, fileName, companyName } = req.body;
-        if (!companyName || !fileName || !didDoc) {
+        if (!companyName || !fileName || !didDoc)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             // Validate fields of did doc content
@@ -315,7 +307,7 @@ export default {
                 `UPDATE: '${fileName}' did document of company ${companyName}`
             );
 
-            res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
+            res.status(200).json(OPERATION_CODES.UPDATE_SUCCESS);
         } catch (err) {
             if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
                 return next(ERROR_CODES.COMPANY_NOT_FOUND);
@@ -327,9 +319,8 @@ export default {
         Logger.apiInfo(req, res, `GET HISTORY OF DID DOCUMENT`);
 
         const { companyName, fileName } = req.query;
-        if (!companyName || !fileName) {
+        if (!companyName || !fileName)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             const branch = `DOC_${companyName}`;

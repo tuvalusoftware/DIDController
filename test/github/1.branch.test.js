@@ -3,7 +3,7 @@ import chai from "chai";
 import GithubProxyConfig from "../../db/github/index.js";
 import { containAllElement } from "../../utils/index.js";
 import { MAIN_TEST_BRANCH } from "./constant.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -110,7 +110,7 @@ describe("GITHUB INTERACTION --- Branch", function () {
     describe("Delete branch", () => {
         it("it should return a success message as branch is successfully deleted", async () => {
             const response = await GithubProxy.deleteBranch(MAIN_TEST_BRANCH);
-            expect(response).equal(SUCCESS_CODES.DELETE_SUCCESS);
+            expect(response).equal(OPERATION_CODES.DELETE_SUCCESS);
         });
 
         it("it should return a 'not existed' error as the branch does not exist", async () => {

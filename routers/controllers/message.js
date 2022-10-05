@@ -1,7 +1,7 @@
 import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import { validateDIDSyntax } from "../../utils/index.js";
-import { ERROR_CODES, SUCCESS_CODES } from "../../constants/index.js";
+import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 
 const REPOSITORY = process.env.CREDENTIAL_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -137,7 +137,7 @@ export default {
                 `NEW: '${fileName}' message from '${receiverPK}'`
             );
 
-            res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
+            res.status(201).json(OPERATION_CODES.SAVE_SUCCESS);
         } catch (err) {
             next(err);
         }

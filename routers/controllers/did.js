@@ -4,33 +4,46 @@ import SchemaValidator from "../../schema/schemaValidator.js";
 import {
     FILE_NAME_CONVENTION_REGEX,
     ERROR_CODES,
-    SUCCESS_CODES,
+    OPERATION_CODES,
 } from "../../constants/index.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 export default {
-    getAllDIDs: async (req, res, next) => {
-        Logger.apiInfo(req, res, `RETRIEVE ALL DIDs BY COMPANY NAME`);
+    getDIDsByCompany: async (req, res, next) => {
+        Logger.apiInfo(req, res, `RETRIEVE ALL DIDs OF A COMPANY`);
 
-        const { companyName } = req.query;
-        if (!companyName) {
-            return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
+        const { companyName, content } = req.query;
+        if (!companyName) return next(ERROR_CODES.MISSING_PARAMETERS);
 
         try {
             const branch = `DID_${companyName}`;
             const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 branch
             );
+
+            const hasContent = content === "include" ? true : false;
+
+            // Get data from Github API
             const DID_strings = await GithubProxy.getFilesOfTree(
                 "",
                 false,
-                lastCommitOfBranch
+                lastCommitOfBranch,
+                hasContent
             );
 
-            const result = DID_strings.map((did) => did.name);
+            let result;
+            if (!hasContent) {
+                result = DID_strings.map((did) => did.name);
+            } else {
+                result = DID_strings.map((did) => {
+                    return {
+                        name: did.name,
+                        content: JSON.parse(did.object.text),
+                    };
+                });
+            }
 
             res.status(200).json(result);
         } catch (err) {
@@ -44,9 +57,8 @@ export default {
         Logger.apiInfo(req, res, `RETRIEVE DID BY ITS NAME`);
 
         const { companyName, publicKey: fileName } = req.query;
-        if (!companyName || !fileName) {
+        if (!companyName || !fileName)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             const branch = `DID_${companyName}`;
@@ -97,7 +109,7 @@ export default {
                 `NEW: '${fileName}' DID Doc of company "${companyName}"`
             );
 
-            res.status(201).json(SUCCESS_CODES.SAVE_SUCCESS);
+            res.status(201).json(OPERATION_CODES.SAVE_SUCCESS);
         } catch (err) {
             if (err === ERROR_CODES.BLOB_EXISTED)
                 return next(ERROR_CODES.FILE_EXISTED);
@@ -109,9 +121,8 @@ export default {
         Logger.apiInfo(req, res, `UPDATE DID DOCUMENT OF A DID`);
 
         const { companyName, publicKey: fileName, content } = req.body;
-        if (!companyName || !fileName || !content) {
+        if (!companyName || !fileName || !content)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             // Validate user's did document
@@ -126,7 +137,7 @@ export default {
                 `UPDATE: '${fileName}' DID of company ${companyName}`
             );
 
-            res.status(200).json(SUCCESS_CODES.UPDATE_SUCCESS);
+            res.status(200).json(OPERATION_CODES.UPDATE_SUCCESS);
         } catch (err) {
             if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
                 return next(ERROR_CODES.COMPANY_NOT_FOUND);
@@ -141,9 +152,8 @@ export default {
         Logger.apiInfo(req, res, `DELETE A DID`);
 
         const { companyName, publicKey: fileName } = req.query;
-        if (!companyName || !fileName) {
+        if (!companyName || !fileName)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        }
 
         try {
             const branch = `DID_${companyName}`;
@@ -153,7 +163,7 @@ export default {
                 `DELETE: '${fileName}' DID of company ${companyName}`
             );
 
-            res.status(200).json(SUCCESS_CODES.DELETE_SUCCESS);
+            res.status(200).json(OPERATION_CODES.DELETE_SUCCESS);
         } catch (err) {
             if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
                 return next(ERROR_CODES.COMPANY_NOT_FOUND);
