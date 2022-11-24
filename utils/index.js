@@ -81,6 +81,16 @@ const validateDIDSyntax = (did, isSalted = false) => {
     };
 };
 
+/**
+ * @description Remove file extension from a full file name
+ * @param {String} fileName
+ * @returns {String}
+ */
+const removeFileExtension = (fileName) => {
+    let parts = fileName.split(".");
+    return parts[0];
+};
+
 export {
     containAllElement,
     haveCommonElement,
@@ -88,4 +98,5 @@ export {
     getFileExtension,
     extractOwnerPKFromAddress,
     validateDIDSyntax,
+    removeFileExtension,
 };
