@@ -14,7 +14,9 @@
         "test:api": "export NODE_ENV=test && mocha ./test/api/**.test.js --exit",
         "test:github": "export NODE_ENV=test && mocha ./test/github/**.test.js --exit",
         "test": "export NODE_ENV=test && mocha --recursive --exit",
-        "coverage": "c8 --check-coverage --lines 85 npm test"
+        "coverage": "c8 --check-coverage --lines 85 npm test",
+        "dump-credentials": "node ./scripts/dumpCredentials.js",
+        "save-credentials": "node ./scripts/saveCredentials.js"
     },
     "repository": {
         "type": "git",
