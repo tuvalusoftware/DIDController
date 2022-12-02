@@ -67,14 +67,10 @@ export default function (REPOSITORY) {
                             `branches?per_page=100&page=${current_page}`
                         );
 
-                        all_branches = [...all_branches, ...branches_data];
+                        all_branches.push(...branches_data);
 
                         // All branches are already fetched
-                        if (
-                            branches_data.length == 0 ||
-                            branches_data.length < 100
-                        )
-                            break;
+                        if (branches_data.length < 100) break;
 
                         current_page += 1;
                     }

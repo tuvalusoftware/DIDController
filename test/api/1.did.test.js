@@ -1,9 +1,9 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 
+import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 import GithubProxyConfig from "../../db/github/index.js";
 import server from "../../server.js";
-import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -241,7 +241,7 @@ describe("DID", function () {
                     res.body.length.should.be.eql(2);
 
                     const nameArr = [TEST_DATA, TEST_DATA2].map(
-                        (data) => `${data.publicKey}.did`
+                        (data) => `${data.publicKey}`
                     );
                     expect(JSON.stringify(res.body)).equal(
                         JSON.stringify(nameArr)

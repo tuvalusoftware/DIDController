@@ -11,17 +11,17 @@ const FIRST_N_LETTERS = 1;
         const credentials = JSON.parse(data);
 
         for (let cre of credentials) {
-            const hash = cre.name;
+            const fileName = cre.name;
             const content = JSON.parse(cre.object.text);
 
-            const branchName = `CRE_${hash.substring(0, FIRST_N_LETTERS)}`;
+            const branchName = `CRE_${fileName.substring(0, FIRST_N_LETTERS)}`;
             await GithubProxy.createBranchIfNotExist(branchName);
 
             await GithubProxy.createNewFile(
-                `${hash}.cre`,
+                `${fileName}`,
                 content,
                 branchName,
-                `NEW: '${hash}' credential`
+                `NEW: '${fileName}' credential`
             );
         }
     } catch (err) {
