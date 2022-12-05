@@ -6,11 +6,14 @@ const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 (async () => {
     const branches = await GithubProxy.getAllBranches();
-    const credential_branches = branches.filter((el) => el.name.includes(""));
+    const credential_branches = branches.filter((el) =>
+        el.name.includes("CRE_")
+    );
 
     // Get credentials' contents
     let credentials = [];
     for (let branch of credential_branches) {
+        console.log("Fetching branch: ", branch.name);
         const latestCommitSHA = branch.commit.sha;
 
         const files = await GithubProxy.getFilesOfTree(
@@ -23,6 +26,6 @@ const GithubProxy = GithubProxyConfig(REPOSITORY);
         credentials.push(...files);
     }
 
-    console.log(credentials.length);
+    console.log(`Number of credentials: ${credentials.length}`);
     dumpDataToJSON(credentials, "credentials");
 })();

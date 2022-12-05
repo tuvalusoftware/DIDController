@@ -15,8 +15,9 @@
         "test:github": "export NODE_ENV=test && mocha ./test/github/**.test.js --exit",
         "test": "export NODE_ENV=test && mocha --recursive --exit",
         "coverage": "c8 --check-coverage --lines 85 npm test",
-        "dump-credentials": "node ./scripts/dumpCredentials.js",
-        "save-credentials": "node ./scripts/saveCredentials.js"
+        "dump-credentials": "node ./scripts/1.dumpCredentials.js",
+        "delete-old-branches": "node ./scripts/2.deleteOldBranches.js",
+        "save-credentials": "node ./scripts/3.saveCredentials.js"
     },
     "repository": {
         "type": "git",
