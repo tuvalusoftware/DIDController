@@ -776,7 +776,7 @@
                         "in": "query",
                         "description": "Hash of the credential",
                         "required": true,
-                        "example": "ghjk_rtyuiocvbnm456dfghj",
+                        "example": "__test_from_dev",
                         "schema": {
                             "type": "string"
                         }
@@ -807,7 +807,7 @@
                                     "hash": {
                                         "description": "Target hash of the credential.",
                                         "type": "string",
-                                        "example": "ghjk_rtyuiocvbnm456dfghj"
+                                        "example": "__test_from_dev"
                                     },
                                     "content": {
                                         "$ref": "#/components/schemas/Credential"
@@ -843,7 +843,7 @@
                                     "hash": {
                                         "description": "Target hash of the credential.",
                                         "type": "string",
-                                        "example": "ghjk_rtyuiocvbnm456dfghj"
+                                        "example": "__test_from_dev"
                                     },
                                     "content": {
                                         "$ref": "#/components/schemas/Credential"
@@ -1139,45 +1139,54 @@
             },
             "Credential": {
                 "type": "object",
-                "properties": {
-                    "issuer": {
-                        "type": "string",
-                        "description": "Public key of the issuer"
-                    },
-                    "subject": {
-                        "type": "string",
-                        "description": "Public key of the the other subject"
-                    },
+                "example": {
+                    "issuer": "did:fuixlabs:BELL:234567897654323456789876543234567erty234567876543234567dfg234567",
                     "credentialSubject": {
-                        "type": "object",
-                        "description": "Description of the subject for the credential.",
-                        "properties": {
-                            "object": {
-                                "type": "string",
-                                "description": "DID of an object (wrapped document)"
-                            },
-                            "action": {
-                                "type": "object",
-                                "description": "An object with an code to describe the action in the credential"
-                            }
+                        "newOwner": "did:fuixlabs:BELL:00887bf1654caf9bdfa50cc459982e66d7ee2b7424a00e9b6708b4c76357ff261f11661a035b84c7f9b1ecf6dba58769e7f6b20f9df0c3c35a",
+                        "object": "did:fuixlabs:BELL:preprod-tue-1-engineer-training-program",
+                        "action": {
+                            "code": 20,
+                            "value": "nominateChangeOwnership",
+                            "label": "Request transfer of Owner",
+                            "subTitle": "Owner can transfer the OwnerShip.",
+                            "formLabel": "New Owner Address",
+                            "buttonLabel": "Transfer",
+                            "fields": [
+                                {
+                                    "name": "newOwner",
+                                    "require": true,
+                                    "value": "ownerKey"
+                                }
+                            ],
+                            "updatedFieds": [
+                                {
+                                    "name": "ownerKey"
+                                }
+                            ],
+                            "surrender": false
                         }
                     },
                     "signature": {
-                        "type": "string",
-                        "description": "Signature of the issuer"
-                    }
-                },
-                "example": {
-                    "issuer": "did:company:owner_public_key",
-                    "subject": "did:company2:other_public_key",
-                    "credentialSubject": {
-                        "object": "did:some_method:an_wrapped_doc_did",
-                        "action": { "code": 3000, "value": "changeHolderShip" }
+                        "signature": "845846a2012767616464726573735839234567897654323456789876543234567erty234567876543234567dfg234567a166686173686564f459029e7b2261646472657373223a22303033376139333333656634366538333862653838626635666436393635653432336364336336323861313061663331326532303138326537316530373266356662313133326133353433323135353465366138313137353531623338313737613334616436323436303166383466303639222c227375626a656374223a7b226e65774f776e6572223a226469643a667569786c6162733a42454c4c3a303038383762663136353463616639626466613530636334353939383265363664376565326237343234613030653962363730386234633736333537666632363166313136363161303335623834633766396231656366366462613538373639653766366232306639646630633363333561222c226f626a656374223a226469643a667569786c6162733a42454c4c3a70726570726f642d7475652d312d656e67696e6565722d747261696e696e672d70726f6772616d222c22616374696f6e223a7b22636f6465223a32302c2276616c7565223a226e6f6d696e6174654368616e67654f776e657273686970222c226c6162656c223a2252657175657374207472616e73666572206f66204f776e6572222c227375625469746c65223a224f776e65722063616e207472616e7366657220746865204f776e6572536869702e222c22666f726d4c6162656c223a224e6577204f776e65722041646472657373222c22627574746f6e4c6162656c223a225472616e73666572222c226669656c6473223a5b7b226e616d65223a226e65774f776e6572222c2272657175697265223a747275652c2276616c7565223a226f776e65724b6579227d5d2c22757064617465644669656473223a5b7b226e616d65223a226f776e65724b6579227d5d2c2273757272656e646572223a66616c73657d7d7d5840eca6def244168ce7331cbe8d7eb597399b94b2fa5c4a43ce4ec0b870fcf67388fb5a55f2c72594784ec528d7db743df79759885f915fc895d059cc80cde16503",
+                        "key": "123456789009765432"
                     },
-                    "signature": "12345678986543234567qwertytwq231234567876543sdfghgfds",
                     "metadata": {
-                        "dateCreated": "22/06/2022",
-                        "some_fields": "some_data"
+                        "currentOwner": "234567897654323456789876543234567erty234567876543234567dfg234567",
+                        "currentHolder": "00857611ed50980db506eefebbe191d44b189cacaf50405ab55e5ff6d04440ddb67a6e73f4727a09c53c6d31204123ff34d915183937daec10"
+                    },
+                    "timestamp": 1667270372888,
+                    "status": "pending",
+                    "mintingNFTConfig": {
+                        "type": "credential",
+                        "policy": {
+                            "type": "Native",
+                            "id": "5678345678456789",
+                            "script": "8201828200581c4b3230ba5b12fffd92edd7aea44b6bebbcdf57ef7fe262760a3722ee82051abca8e936",
+                            "ttl": 3165186358,
+                            "reuse": true
+                        },
+                        "asset": "34567893456789",
+                        "txHash": "345678934567890"
                     }
                 }
             },

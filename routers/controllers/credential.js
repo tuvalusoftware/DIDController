@@ -1,6 +1,7 @@
 import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
+import SchemaValidator from "../../schema/schemaValidator.js";
 
 const REPOSITORY = process.env.CREDENTIAL_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -34,8 +35,8 @@ export default {
 
             credentials = credentials.map((el) => JSON.parse(el.object.text));
             res.status(200).json(credentials);
-        } catch (e) {
-            next(e);
+        } catch (err) {
+            next(err);
         }
     },
     getCredentialByHash: async (req, res, next) => {
@@ -78,6 +79,10 @@ export default {
         if (!hash || !content) return next(ERROR_CODES.MISSING_PARAMETERS);
 
         try {
+            // Schema validator for credential
+            if (!SchemaValidator.validate(content, "CREDENTIAL"))
+                return next(ERROR_CODES.CREDENTIAL_INVALID);
+
             // Determine branch name
             const branchName = `CRE_${hash.substring(0, FIRST_N_LETTERS)}`;
             await GithubProxy.createBranchIfNotExist(branchName);
@@ -96,10 +101,9 @@ export default {
         }
     },
     updateCredential: async (req, res, next) => {
-        const { hash, content: updatedContent } = req.body;
-
         Logger.apiInfo(req, res, `UPDATE CREDENTIAL`);
 
+        const { hash, content: updatedContent } = req.body;
         if (!hash || !updatedContent)
             return next(ERROR_CODES.MISSING_PARAMETERS);
 
