@@ -24,7 +24,7 @@ NPM version 8
     REPO_OWNER=FuixLabs
     DOCUMENT_REPO=DID_Store
     CREDENTIAL_REPO=Credentials
-    AUTH_TOKEN=<token>
+    GITHUB_AUTH_TOKEN=<token>
     AUTH_SERVICE=https://auth-fuixlabs.ap.ngrok.io
     ```
 

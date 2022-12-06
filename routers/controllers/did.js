@@ -1,11 +1,12 @@
+import {
+    ERROR_CODES,
+    FILE_NAME_CONVENTION_REGEX,
+    OPERATION_CODES,
+} from "../../constants/index.js";
 import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import SchemaValidator from "../../schema/schemaValidator.js";
-import {
-    FILE_NAME_CONVENTION_REGEX,
-    ERROR_CODES,
-    OPERATION_CODES,
-} from "../../constants/index.js";
+import { removeFileExtension } from "../../utils/index.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -35,11 +36,13 @@ export default {
 
             let result;
             if (!hasContent) {
-                result = DID_strings.map((did) => did.name);
+                result = DID_strings.map((did) =>
+                    removeFileExtension(did.name)
+                );
             } else {
                 result = DID_strings.map((did) => {
                     return {
-                        name: did.name,
+                        name: removeFileExtension(did.name),
                         content: JSON.parse(did.object.text),
                     };
                 });

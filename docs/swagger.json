@@ -745,6 +745,27 @@
                 }
             }
         },
+        "/credential/all": {
+            "get": {
+                "tags": ["CREDENTIAL"],
+                "summary": "Retrieve all credentials.",
+                "responses": {
+                    "200": {
+                        "description": "Return a list of all credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Credential"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/credential": {
             "get": {
                 "tags": ["CREDENTIAL"],

@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
+import fs from "fs";
 dayjs.extend(customParseFormat);
 
 /**
@@ -81,6 +82,25 @@ const validateDIDSyntax = (did, isSalted = false) => {
     };
 };
 
+/**
+ * @description Remove file extension from a full file name
+ * @param {String} fileName
+ * @returns {String}
+ */
+const removeFileExtension = (fileName) => {
+    let parts = fileName.split(".");
+    return parts[0];
+};
+
+/**
+ *
+ * @param {*} data
+ * @param {String} fileName Name of json file to dumped data to
+ */
+const dumpDataToJSON = (data, fileName) => {
+    fs.writeFileSync(`${fileName}.json`, JSON.stringify(data));
+};
+
 export {
     containAllElement,
     haveCommonElement,
@@ -88,4 +108,6 @@ export {
     getFileExtension,
     extractOwnerPKFromAddress,
     validateDIDSyntax,
+    removeFileExtension,
+    dumpDataToJSON,
 };

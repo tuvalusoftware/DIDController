@@ -1,8 +1,8 @@
-import GithubRESTConfig from "./rest.js";
-import Logger from "../../logger.js";
-import { executeGraphQL } from "./helpers.js";
-import { tryParseStringToObj, getFileExtension } from "../../utils/index.js";
 import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
+import Logger from "../../logger.js";
+import { getFileExtension, tryParseStringToObj } from "../../utils/index.js";
+import { executeGraphQL } from "./helpers.js";
+import GithubRESTConfig from "./rest.js";
 
 const owner = process.env.REPO_OWNER;
 
@@ -57,15 +57,29 @@ export default function (REPOSITORY) {
          */
         getAllBranches: function () {
             Logger.functionInfo("db/github/index.js", "getAllBranches");
-            return new Promise((resolve, reject) => {
-                GithubREST.get(`branches`)
-                    .then((response) => {
-                        resolve(response.data);
-                    })
-                    .catch((err) => {
-                        const errInfo = Logger.handleGithubError(err);
-                        reject(errInfo);
-                    });
+            return new Promise(async (resolve, reject) => {
+                let all_branches = [];
+                let current_page = 1;
+
+                try {
+                    while (true) {
+                        const { data: branches_data } = await GithubREST.get(
+                            `branches?per_page=100&page=${current_page}`
+                        );
+
+                        all_branches.push(...branches_data);
+
+                        // All branches are already fetched
+                        if (branches_data.length < 100) break;
+
+                        current_page += 1;
+                    }
+
+                    resolve(all_branches);
+                } catch (err) {
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                }
             });
         },
 

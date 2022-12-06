@@ -1,14 +1,43 @@
+import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
-import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 
 const REPOSITORY = process.env.CREDENTIAL_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 // The number of first letter of a receiver PK to determine its branch
-const FIRST_N_LETTERS = 3;
+const FIRST_N_LETTERS = 1;
 
 export default {
+    getAll: async (req, res, next) => {
+        Logger.apiInfo(req, res, `GET ALL CREDENTIALS`);
+        try {
+            const branches = await GithubProxy.getAllBranches();
+            const credential_branches = branches.filter((el) =>
+                el.name.includes("CRE")
+            );
+
+            // Get credentials' contents
+            let credentials = [];
+            for (let branch of credential_branches) {
+                const latestCommitSHA = branch.commit.sha;
+
+                const files = await GithubProxy.getFilesOfTree(
+                    "",
+                    false,
+                    latestCommitSHA,
+                    true
+                );
+
+                credentials.push(...files);
+            }
+
+            credentials = credentials.map((el) => JSON.parse(el.object.text));
+            res.status(200).json(credentials);
+        } catch (e) {
+            next(e);
+        }
+    },
     getCredentialByHash: async (req, res, next) => {
         Logger.apiInfo(req, res, `RETRIEVE CREDENTIAL BY HASH`);
 

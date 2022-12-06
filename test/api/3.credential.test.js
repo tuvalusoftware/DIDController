@@ -1,9 +1,10 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 
+import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 import GithubProxyConfig from "../../db/github/index.js";
 import server from "../../server.js";
-import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
+import { containAllElement } from "../../utils/index.js";
 
 const REPOSITORY = process.env.CREDENTIAL_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -14,7 +15,7 @@ chai.use(chaiHttp);
 
 const HASH1 = "MOCHA_public_key_12345";
 const HASH2 = "MOCHA_public_key_54321";
-const BRANCH_NAME = `CRE_${HASH1.substring(0, 3)}`;
+const BRANCH_NAME = `CRE_${HASH1.substring(0, 1)}`;
 
 const CREDENTIAL_CONTENT1 = {
     issuer: "did:fuixlabs:TEST_CREDENTIAL_COMP:publicKey",
@@ -29,7 +30,7 @@ const CREDENTIAL_CONTENT1 = {
             formLabel: "New Owner Address",
             buttonLabel: "Transfer",
             fields: [{ name: "newOwner", require: true, value: "ownerKey" }],
-            updatedFieds: [{ name: "ownerKey" }],
+            updatedFields: [{ name: "ownerKey" }],
             surrender: false,
         },
     },
@@ -150,7 +151,7 @@ describe("CREDENTIAL", function () {
         });
     });
 
-    describe("/GET get messages by ID", () => {
+    describe("/GET get credential by ID", () => {
         it("it should return a 'missing params' error as the required params are not provided", (done) => {
             chai.request(server)
                 .get("/api/credential")
@@ -208,6 +209,32 @@ describe("CREDENTIAL", function () {
                     expect(JSON.stringify(res.body)).equal(
                         JSON.stringify(CREDENTIAL_CONTENT2)
                     );
+                    done();
+                });
+        });
+    });
+
+    describe("/GET get all credentials", () => {
+        it("it should return all stored credentials", (done) => {
+            chai.request(server)
+                .get("/api/credential/all")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    expect(res.body).to.be.an("array");
+
+                    const allCredentialsToString = JSON.stringify(res.body);
+
+                    expect(
+                        allCredentialsToString.includes(
+                            JSON.stringify(CREDENTIAL_CONTENT1)
+                        )
+                    ).equals(true);
+                    expect(
+                        allCredentialsToString.includes(
+                            JSON.stringify(CREDENTIAL_CONTENT2)
+                        )
+                    ).equals(true);
+
                     done();
                 });
         });

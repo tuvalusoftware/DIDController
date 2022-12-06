@@ -1,7 +1,7 @@
 import axios from "axios";
 import { axiosHeaderConfig, gitRESTUrl } from "./constants.js";
 
-const token = process.env.AUTH_TOKEN;
+const token = process.env.GITHUB_AUTH_TOKEN;
 
 /* c8 ignore start */
 const constructURL = (repository, path) => {
