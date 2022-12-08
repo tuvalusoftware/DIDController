@@ -538,6 +538,8 @@ export default function (REPOSITORY) {
                             )
                                 data.isBinary = true;
 
+                            console.log(data.text);
+
                             // Parse content to JS object if data is a text file (e.g: json)
                             data.content = data.isBinary
                                 ? await this.getFileAsBinary(data.oid)

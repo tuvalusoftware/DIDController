@@ -8,7 +8,7 @@ const ERROR_CODES = {
         error_cause:
             "Potential Errors: invalid repository name, invalid github auth token, ... Or any other unexpected error given by Github API.",
     },
-    BAD_CREDENTIALS: {
+    INVALID_GITHUB_CREDENTIAL: {
         error_code: 1201,
         error_message: "Github Access Token is not provided or invalid.",
     },

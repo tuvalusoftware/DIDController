@@ -1,18 +1,18 @@
-import { createRequire } from "module";
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import compression from "compression";
-import methodOverride from "method-override";
-import swaggerUiExpress from "swagger-ui-express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import dotenv from "dotenv";
+import express from "express";
+import methodOverride from "method-override";
+import { createRequire } from "module";
+import swaggerUiExpress from "swagger-ui-express";
 dotenv.config();
 
-import router from "./routers/index.js";
-import Logger from "./logger.js";
-import SchemaValidator from "./schema/schemaValidator.js";
 import { ERROR_CODES } from "./constants/index.js";
+import Logger from "./logger.js";
+import router from "./routers/index.js";
+import SchemaValidator from "./schema/schemaValidator.js";
 
 const require = createRequire(import.meta.url);
 const services = require("./docs/swagger.json");
@@ -43,6 +43,7 @@ app.use((err, req, res, _) => {
         return res.status(200).json(ERROR_CODES.INVALID_JSON_BODY);
     }
 
+    /* c8 ignore start */
     // Handle catch-able errors
     if (SchemaValidator.validate(err, "ERROR_OBJECT")) {
         return res.status(200).json(err);
@@ -55,6 +56,7 @@ app.use((err, req, res, _) => {
         return res.status(200).json(ERROR_CODES.CONNECTION_REFUSED);
 
     return res.status(200).json(ERROR_CODES.UNKNOWN_ERROR);
+    /* c8 ignore stop */
 });
 
 /* c8 ignore start */

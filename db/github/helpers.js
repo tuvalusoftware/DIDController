@@ -1,7 +1,7 @@
 import axios from "axios";
 
-import { gitGraphQLUrl, axiosHeaderConfig } from "./constants.js";
 import { ERROR_CODES } from "../../constants/index.js";
+import { axiosHeaderConfig, gitGraphQLUrl } from "./constants.js";
 
 /**
  * @description Make API call to the GraphQL Github API to execute a GraphQL command
@@ -42,7 +42,7 @@ const detectGithubError = (err) => {
         err.response.status === 401 &&
         err.response.data.message === "Bad credentials"
     ) {
-        return ERROR_CODES.BAD_CREDENTIALS;
+        return ERROR_CODES.INVALID_GITHUB_CREDENTIAL;
     }
 
     if (
