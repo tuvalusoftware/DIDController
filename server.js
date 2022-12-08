@@ -38,12 +38,12 @@ router(app);
 app.use((err, req, res, _) => {
     Logger.apiError(err, req, res);
 
+    /* c8 ignore start */
     // Invalid JSON in body - body-parser
     if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
         return res.status(200).json(ERROR_CODES.INVALID_JSON_BODY);
     }
 
-    /* c8 ignore start */
     // Handle catch-able errors
     if (SchemaValidator.validate(err, "ERROR_OBJECT")) {
         return res.status(200).json(err);
