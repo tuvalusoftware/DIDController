@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { ERROR_CODES } from "../../constants/index.js";
-import { axiosHeaderConfig, gitGraphQLUrl } from "./constants.js";
+import { gitGraphQLUrl, headerConfigGitJSON } from "./constants.js";
 
 /**
  * @description Make API call to the GraphQL Github API to execute a GraphQL command
@@ -12,7 +12,7 @@ const executeGraphQL = (queryString) => {
     return axios.post(
         gitGraphQLUrl,
         JSON.stringify({ query: queryString }),
-        axiosHeaderConfig
+        headerConfigGitJSON
     );
 };
 
