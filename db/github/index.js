@@ -538,8 +538,6 @@ export default function (REPOSITORY) {
                             )
                                 data.isBinary = true;
 
-                            console.log(data.text);
-
                             // Parse content to JS object if data is a text file (e.g: json)
                             data.content = data.isBinary
                                 ? await this.getFileAsBinary(data.oid)
@@ -549,6 +547,36 @@ export default function (REPOSITORY) {
                         } else reject(ERROR_CODES.BLOB_NOT_EXISTED);
                     })
                     .catch((err) => {
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
+                    });
+            });
+        },
+
+        /**
+         * @async
+         * @description Retrieve raw file from github
+         * @param {String} filePath Path of the file
+         * @param {String} commitSHA Branch of the file
+         * @returns {{ name: String, size: Number, sha: String, encoding: String, content: Object }}
+         */
+        getFileRaw: function (filePath, commitSHA) {
+            Logger.functionInfo("db/github/index.js", "getFileRaw");
+            return new Promise((resolve, reject) => {
+                GithubREST.get(
+                    `contents/${encodeURI(filePath)}?ref=${commitSHA}`,
+                    true
+                )
+                    .then(({ data }) => {
+                        return resolve(data);
+                    })
+                    .catch((err) => {
+                        if (
+                            err.response?.status === 404 &&
+                            err.response?.data.message === "Not Found"
+                        )
+                            return reject(ERROR_CODES.FILE_NOT_FOUND);
+
                         const errInfo = Logger.handleGithubError(err);
                         reject(errInfo);
                     });
@@ -950,7 +978,6 @@ export default function (REPOSITORY) {
          * @param {String} sha git object id (could be commit, blob, tree)
          * @returns {Object} Tag object
          */
-
         tag: async function (tagName, sha) {
             const data = {
                 ref: `refs/tags/${tagName}`,

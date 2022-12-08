@@ -7,7 +7,7 @@ const token = process.env.GITHUB_AUTH_TOKEN;
 const gitRESTUrl = `https://api.github.com/repos/${owner}`;
 const gitGraphQLUrl = `https://api.github.com/graphql`;
 
-const axiosHeaderConfig = {
+const headerConfigGitJSON = {
     maxContentLength: Infinity,
     maxBodyLength: Infinity,
     headers: {
@@ -16,4 +16,13 @@ const axiosHeaderConfig = {
     },
 };
 
-export { gitRESTUrl, gitGraphQLUrl, axiosHeaderConfig };
+const headerConfigGitRAW = {
+    maxContentLength: Infinity,
+    maxBodyLength: Infinity,
+    headers: {
+        Accept: "application/vnd.github.raw",
+        Authorization: `token ${token}`,
+    },
+};
+
+export { gitRESTUrl, gitGraphQLUrl, headerConfigGitJSON, headerConfigGitRAW };

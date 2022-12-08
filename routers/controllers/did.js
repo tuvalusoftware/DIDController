@@ -40,12 +40,26 @@ export default {
                     removeFileExtension(did.name)
                 );
             } else {
-                result = DID_strings.map((did) => {
-                    return {
-                        name: removeFileExtension(did.name),
-                        content: JSON.parse(did.object.text),
-                    };
-                });
+                result = [];
+                for (let did of DID_strings) {
+                    const sizeInMB = did.object.byteSize * 0.000001;
+
+                    if (sizeInMB < 1) {
+                        result.push({
+                            name: removeFileExtension(did.name),
+                            content: JSON.parse(did.object.text),
+                        });
+                    } else {
+                        const content = await GithubProxy.getFileRaw(
+                            did.name,
+                            lastCommitOfBranch
+                        );
+                        result.push({
+                            name: removeFileExtension(did.name),
+                            content,
+                        });
+                    }
+                }
             }
 
             res.status(200).json(result);
@@ -69,12 +83,15 @@ export default {
                 branch
             );
 
-            const fileData = await GithubProxy.getFile(
+            const content = await GithubProxy.getFileRaw(
                 `${fileName}.did`,
                 lastCommitOfBranch
             );
 
-            const data = { name: fileName, content: JSON.parse(fileData.text) };
+            const data = {
+                name: fileName,
+                content,
+            };
 
             res.status(200).json(data);
         } catch (err) {
