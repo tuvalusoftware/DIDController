@@ -120,6 +120,27 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
                 containAllElement(fileNames, [TEST_FILE_NAME, TEST_FILE_NAME2])
             ).equal(true);
         });
+
+        it("it should get an array of files contains the files info along with their contents", async () => {
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
+                MAIN_TEST_BRANCH
+            );
+            const files = await GithubProxy.getFilesOfTreeWithContent(
+                "",
+                lastCommitOfBranch
+            );
+
+            expect(files).to.be.an("array");
+            const fileNames = files.map((el) => el.name);
+            expect(
+                containAllElement(fileNames, [TEST_FILE_NAME, TEST_FILE_NAME2])
+            ).equal(true);
+
+            const fileContents = files.map((el) => el.content);
+            expect(JSON.stringify([EXAMPLE_DATA, EXAMPLE_DATA])).equal(
+                JSON.stringify(fileContents)
+            );
+        });
     });
 
     describe("Update and Read file", () => {
