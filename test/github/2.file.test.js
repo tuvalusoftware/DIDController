@@ -108,7 +108,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
             const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 MAIN_TEST_BRANCH
             );
-            const files = await GithubProxy.getFilesOfTree(
+            const files = await GithubProxy.getContentOfTree(
                 "",
                 false,
                 lastCommitOfBranch
@@ -207,7 +207,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
             const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 MAIN_TEST_BRANCH
             );
-            const files = await GithubProxy.getFilesOfTree(
+            const files = await GithubProxy.getContentOfTree(
                 "",
                 false,
                 lastCommitOfBranch
@@ -232,7 +232,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
             const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 MAIN_TEST_BRANCH
             );
-            const files = await GithubProxy.getFilesOfTree(
+            const files = await GithubProxy.getContentOfTree(
                 "",
                 false,
                 lastCommitOfBranch

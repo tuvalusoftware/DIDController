@@ -1,7 +1,7 @@
+import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import { validateDIDSyntax } from "../../utils/index.js";
-import { ERROR_CODES, OPERATION_CODES } from "../../constants/index.js";
 
 const REPOSITORY = process.env.CREDENTIAL_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -75,7 +75,7 @@ export default {
             const branchLatestSHA = await GithubProxy.getBranchLastCommitSHA(
                 branchName
             );
-            const filesInfo = await GithubProxy.getFilesOfTree(
+            const filesInfo = await GithubProxy.getContentOfTree(
                 receiverPK,
                 false,
                 branchLatestSHA,

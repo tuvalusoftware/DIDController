@@ -23,7 +23,7 @@ export default {
             for (let branch of credential_branches) {
                 const latestCommitSHA = branch.commit.sha;
 
-                const files = await GithubProxy.getFilesOfTree(
+                const files = await GithubProxy.getContentOfTree(
                     "",
                     false,
                     latestCommitSHA,
