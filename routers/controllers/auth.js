@@ -7,8 +7,6 @@ const AUTH_SERVICES_URL = process.env.AUTH_SERVICE;
 export default {
     /* c8 ignore start */
     ensureSecurityServiceAuthentication: async (req, res, next) => {
-        return next();
-
         // Ignore Security Service If In Test Environment
         if (process.env.NODE_ENV === "test") return next();
 
