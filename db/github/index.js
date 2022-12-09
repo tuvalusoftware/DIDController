@@ -710,7 +710,10 @@ export default function (REPOSITORY) {
          * @param {String} commitSHA SHA of a commit, default to HEAD which is the last commit
          * @returns {{ name: String, content: Object }[]} Array of files (or folders)' info in a tree path
          */
-        getFilesOfTreeWithContent(treePath = "", commitSHA = "HEAD") {
+        getFilesOfTreeWithContent: function (
+            treePath = "",
+            commitSHA = "HEAD"
+        ) {
             Logger.functionInfo(
                 "db/github/index.js",
                 "getContentOfTreeWithContent"
@@ -752,7 +755,7 @@ export default function (REPOSITORY) {
          * @param {String} sha SHA string of a file that need to update
          * @returns {Promise}
          */
-        _updateContent: async function (
+        _updateContent: function (
             path,
             content,
             branch = "main",
