@@ -26,43 +26,28 @@ export default {
 
             const hasContent = content === "include" ? true : false;
 
-            // Get data from Github API
-            const DID_strings = await GithubProxy.getFilesOfTree(
-                "",
-                false,
-                lastCommitOfBranch,
-                hasContent
-            );
-
-            let result;
-            if (!hasContent) {
-                result = DID_strings.map((did) =>
-                    removeFileExtension(did.name)
+            let results = [];
+            let didsData = [];
+            if (hasContent) {
+                didsData = await GithubProxy.getFilesOfTreeWithContent(
+                    "",
+                    lastCommitOfBranch
                 );
+                results = didsData.map((did) => {
+                    return { ...did, name: removeFileExtension(did.name) };
+                });
             } else {
-                result = [];
-                for (let did of DID_strings) {
-                    const sizeInMB = did.object.byteSize * 0.000001;
+                didsData = await GithubProxy.getContentOfTree(
+                    "",
+                    false,
+                    lastCommitOfBranch,
+                    false
+                );
 
-                    if (sizeInMB < 1) {
-                        result.push({
-                            name: removeFileExtension(did.name),
-                            content: JSON.parse(did.object.text),
-                        });
-                    } else {
-                        const content = await GithubProxy.getFileRaw(
-                            did.name,
-                            lastCommitOfBranch
-                        );
-                        result.push({
-                            name: removeFileExtension(did.name),
-                            content,
-                        });
-                    }
-                }
+                results = didsData.map((did) => removeFileExtension(did.name));
             }
 
-            res.status(200).json(result);
+            return res.status(200).json(results);
         } catch (err) {
             if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
                 return next(ERROR_CODES.COMPANY_NOT_FOUND);
