@@ -85,18 +85,6 @@
                 },
                 "additionalProperties": true
             },
-            "signature": {
-                "type": "object",
-                "required": ["signature", "key"],
-                "properties": {
-                    "signature": {
-                        "type": "string"
-                    },
-                    "key": {
-                        "type": "string"
-                    }
-                }
-            },
             "metadata": {
                 "type": "object",
                 "additionalProperties": true
