@@ -555,6 +555,36 @@ export default function (REPOSITORY) {
 
         /**
          * @async
+         * @description Retrieve raw file from github
+         * @param {String} filePath Path of the file
+         * @param {String} commitSHA Branch of the file
+         * @returns {{ name: String, size: Number, sha: String, encoding: String, content: Object }}
+         */
+        getFileRaw: function (filePath, commitSHA) {
+            Logger.functionInfo("db/github/index.js", "getFileRaw");
+            return new Promise((resolve, reject) => {
+                GithubREST.get(
+                    `contents/${encodeURI(filePath)}?ref=${commitSHA}`,
+                    true
+                )
+                    .then(({ data }) => {
+                        return resolve(data);
+                    })
+                    .catch((err) => {
+                        if (
+                            err.response?.status === 404 &&
+                            err.response?.data.message === "Not Found"
+                        )
+                            return reject(ERROR_CODES.FILE_NOT_FOUND);
+
+                        const errInfo = Logger.handleGithubError(err);
+                        reject(errInfo);
+                    });
+            });
+        },
+
+        /**
+         * @async
          * @description Return different version of a file through its commit
          * @param {String} filePath Path of the file
          * @param {String} branchName name of the branch that contains the file
@@ -592,20 +622,20 @@ export default function (REPOSITORY) {
 
         /**
          * @async
-         * @description Return all files from a folder of a repo
+         * @description Return all content (files, folder) inside a folder of a repo
          * @param {String} treePath folder's path (default to an empty string - which mean the root folder of a repo)
          * @param {Boolean} allowFolder if true, the returns result will also include nested folder (default to true)
          * @param {String} commitSHA SHA of a commit, default to HEAD which is the last commit
          * @param {Boolean} includeContent if true, the returns result will also include the content of each file
          * @returns {{ name: String, type: String, mode: Number, object: { byteSize: Number, text: String, isBinary: Boolean, oid: String }}[]} Array of files (or folders)' info in a tree path
          */
-        getFilesOfTree: function (
+        getContentOfTree: function (
             treePath = "",
             allowFolder = true,
             commitSHA = "HEAD",
             includeContent = false
         ) {
-            Logger.functionInfo("db/github/index.js", "getFilesOfTree");
+            Logger.functionInfo("db/github/index.js", "getContentOfTree");
             const includeContentQuery = includeContent
                 ? ` object {
                     ... on Blob {
@@ -647,6 +677,7 @@ export default function (REPOSITORY) {
 
                         const responseData =
                             response.data.data?.repository?.object;
+
                         if (
                             (responseData &&
                                 Object.keys(responseData).length === 0 &&
@@ -674,6 +705,49 @@ export default function (REPOSITORY) {
 
         /**
          * @async
+         * @description Return all files from a folder of a repo along with their contents
+         * @param {String} treePath folder's path (default to an empty string - which mean the root folder of a repo)
+         * @param {String} commitSHA SHA of a commit, default to HEAD which is the last commit
+         * @returns {{ name: String, content: Object }[]} Array of files (or folders)' info in a tree path
+         */
+        getFilesOfTreeWithContent: function (
+            treePath = "",
+            commitSHA = "HEAD"
+        ) {
+            Logger.functionInfo(
+                "db/github/index.js",
+                "getContentOfTreeWithContent"
+            );
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const filesData = await this.getContentOfTree(
+                        treePath,
+                        true,
+                        commitSHA,
+                        true
+                    );
+
+                    let results = [];
+                    for (let fData of filesData) {
+                        const BYTE_TO_MB = 0.000001;
+                        const sizeInMB = fData.object.byteSize * BYTE_TO_MB;
+                        const content =
+                            sizeInMB < 1
+                                ? JSON.parse(fData.object.text)
+                                : await this.getFileRaw(fData.name, commitSHA);
+                        results.push({ name: fData.name, content });
+                    }
+
+                    resolve(results);
+                } catch (err) {
+                    const errInfo = Logger.handleGithubError(err);
+                    reject(errInfo);
+                }
+            });
+        },
+
+        /**
+         * @async
          * @description Update or Create a new file to repository
          * @param {String} path Path of a file
          * @param {Object} content Content of a file
@@ -682,7 +756,7 @@ export default function (REPOSITORY) {
          * @param {String} sha SHA string of a file that need to update
          * @returns {Promise}
          */
-        _updateContent: async function (
+        _updateContent: function (
             path,
             content,
             branch = "main",
@@ -948,7 +1022,6 @@ export default function (REPOSITORY) {
          * @param {String} sha git object id (could be commit, blob, tree)
          * @returns {Object} Tag object
          */
-
         tag: async function (tagName, sha) {
             const data = {
                 ref: `refs/tags/${tagName}`,

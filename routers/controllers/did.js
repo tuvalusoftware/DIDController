@@ -26,29 +26,28 @@ export default {
 
             const hasContent = content === "include" ? true : false;
 
-            // Get data from Github API
-            const DID_strings = await GithubProxy.getFilesOfTree(
-                "",
-                false,
-                lastCommitOfBranch,
-                hasContent
-            );
-
-            let result;
-            if (!hasContent) {
-                result = DID_strings.map((did) =>
-                    removeFileExtension(did.name)
+            let results = [];
+            let didsData = [];
+            if (hasContent) {
+                didsData = await GithubProxy.getFilesOfTreeWithContent(
+                    "",
+                    lastCommitOfBranch
                 );
-            } else {
-                result = DID_strings.map((did) => {
-                    return {
-                        name: removeFileExtension(did.name),
-                        content: JSON.parse(did.object.text),
-                    };
+                results = didsData.map((did) => {
+                    return { ...did, name: removeFileExtension(did.name) };
                 });
+            } else {
+                didsData = await GithubProxy.getContentOfTree(
+                    "",
+                    false,
+                    lastCommitOfBranch,
+                    false
+                );
+
+                results = didsData.map((did) => removeFileExtension(did.name));
             }
 
-            res.status(200).json(result);
+            return res.status(200).json(results);
         } catch (err) {
             if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
                 return next(ERROR_CODES.COMPANY_NOT_FOUND);
@@ -69,12 +68,15 @@ export default {
                 branch
             );
 
-            const fileData = await GithubProxy.getFile(
+            const content = await GithubProxy.getFileRaw(
                 `${fileName}.did`,
                 lastCommitOfBranch
             );
 
-            const data = { name: fileName, content: JSON.parse(fileData.text) };
+            const data = {
+                name: fileName,
+                content,
+            };
 
             res.status(200).json(data);
         } catch (err) {

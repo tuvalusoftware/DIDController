@@ -1,5 +1,9 @@
 import axios from "axios";
-import { axiosHeaderConfig, gitRESTUrl } from "./constants.js";
+import {
+    gitRESTUrl,
+    headerConfigGitJSON,
+    headerConfigGitRAW,
+} from "./constants.js";
 
 const token = process.env.GITHUB_AUTH_TOKEN;
 
@@ -12,34 +16,36 @@ const constructURL = (repository, path) => {
 /* c8 ignore stop */
 
 const GithubREST = (REPOSITORY) => ({
-    get(path) {
-        return axios.get(constructURL(REPOSITORY, path), axiosHeaderConfig);
+    get(path, getRaw = false) {
+        // Header config for different data types
+        const header = getRaw ? headerConfigGitRAW : headerConfigGitJSON;
+        return axios.get(constructURL(REPOSITORY, path), header);
     },
     post(path, data) {
         return axios.post(
             constructURL(REPOSITORY, path),
             data,
-            axiosHeaderConfig
+            headerConfigGitJSON
         );
     },
     put(path, data) {
         return axios.put(
             constructURL(REPOSITORY, path),
             data,
-            axiosHeaderConfig
+            headerConfigGitJSON
         );
     },
     patch(path, data) {
         return axios.patch(
             constructURL(REPOSITORY, path),
             data,
-            axiosHeaderConfig
+            headerConfigGitJSON
         );
     },
     delete(path, data = {}) {
         return axios.delete(constructURL(REPOSITORY, path), {
             data,
-            ...axiosHeaderConfig,
+            ...headerConfigGitJSON,
         });
     },
     /* c8 ignore start */

@@ -1,6 +1,6 @@
 import axios from "axios";
-import Logger from "../../logger.js";
 import { ERROR_CODES } from "../../constants/index.js";
+import Logger from "../../logger.js";
 
 const AUTH_SERVICES_URL = process.env.AUTH_SERVICE;
 

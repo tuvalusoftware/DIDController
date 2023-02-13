@@ -1,12 +1,12 @@
+import {
+    ERROR_CODES,
+    FILE_NAME_CONVENTION_REGEX,
+    OPERATION_CODES,
+} from "../../constants/index.js";
 import GithubProxyConfig from "../../db/github/index.js";
 import Logger from "../../logger.js";
 import SchemaValidator from "../../schema/schemaValidator.js";
 import { extractOwnerPKFromAddress } from "../../utils/index.js";
-import {
-    FILE_NAME_CONVENTION_REGEX,
-    ERROR_CODES,
-    OPERATION_CODES,
-} from "../../constants/index.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -52,32 +52,32 @@ export default {
 
             // Get did document only
             if (only === "did") {
-                const didDoc = await GithubProxy.getFile(
+                const didDoc = await GithubProxy.getFileRaw(
                     `${fileName}.did`,
                     branchLastCommitSHA
                 );
-                return res.status(200).json({ didDoc: didDoc.content });
+                return res.status(200).json({ didDoc });
             }
             // Get document only
             else if (only === "doc") {
-                const wrappedDoc = await GithubProxy.getFile(
+                const wrappedDoc = await GithubProxy.getFileRaw(
                     `${fileName}.document`,
                     branchLastCommitSHA
                 );
-                return res.status(200).json({ wrappedDoc: wrappedDoc.content });
+                return res.status(200).json({ wrappedDoc });
             }
 
             // Get both
             const [wrappedDoc, didDoc] = await Promise.all([
-                GithubProxy.getFile(
+                GithubProxy.getFileRaw(
                     `${fileName}.document`,
                     branchLastCommitSHA
                 ),
-                GithubProxy.getFile(`${fileName}.did`, branchLastCommitSHA),
+                GithubProxy.getFileRaw(`${fileName}.did`, branchLastCommitSHA),
             ]);
             return res.status(200).json({
-                wrappedDoc: wrappedDoc.content,
-                didDoc: didDoc.content,
+                wrappedDoc,
+                didDoc,
             });
         } catch (err) {
             if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
@@ -102,20 +102,15 @@ export default {
                 await GithubProxy.getBranchLastCommitSHA(branch);
 
             // Get all files in a company branch
-            const allFiles = await GithubProxy.getFilesOfTree(
+            const allFiles = await GithubProxy.getFilesOfTreeWithContent(
                 "",
-                false,
-                branchLastCommitSHA,
-                true
+                branchLastCommitSHA
             );
 
             // Filter only .did files and parse their content from text to object
-            const didFiles = allFiles
-                .filter((file) => file.name.includes(".did"))
-                .map((file) => ({
-                    name: file.name,
-                    content: JSON.parse(file.object.text),
-                }));
+            const didFiles = allFiles.filter((file) =>
+                file.name.includes(".did")
+            );
 
             // Filter through the DID document to find documents that belong to the owner or holder
             const filesBelongToOwner = didFiles.filter(
@@ -129,7 +124,7 @@ export default {
                     (f) => f.name === file.content.url
                 );
 
-                return JSON.parse(fileContent.object.text);
+                return fileContent.content;
             });
 
             return res.status(200).json(documents);
@@ -153,7 +148,7 @@ export default {
                 await GithubProxy.getBranchLastCommitSHA(branch);
 
             // Get all files in a branch
-            const files = await GithubProxy.getFilesOfTree(
+            const files = await GithubProxy.getContentOfTree(
                 "",
                 false,
                 branchLastCommitSHA,

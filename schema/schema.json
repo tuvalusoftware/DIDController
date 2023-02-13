@@ -10,7 +10,7 @@
             "did": {
                 "type": "string",
                 "minLength": 2,
-                "pattern": "^did:[A-Za-z0-9_]+:[A-Za-z0-9.-:_]+$"
+                "pattern": "^did:[A-Za-z0-9_]+:[A-Za-z0-9.\\-:_ ]+$"
             },
             "data": {
                 "type": "object",
@@ -30,7 +30,7 @@
             },
             "did": {
                 "type": "string",
-                "pattern": "^did:[A-Za-z0-9_]+:[A-Za-z0-9.-:_]+$"
+                "pattern": "^did:[A-Za-z0-9_]+:[A-Za-z0-9.\\-:_ ]+$"
             },
             "owner": {
                 "type": "string",
@@ -52,15 +52,17 @@
     },
     "CREDENTIAL": {
         "type": "object",
-        "required": ["issuer", "subject", "credentialSubject", "signature"],
+        "required": [
+            "issuer",
+            "credentialSubject",
+            "signature",
+            "metadata",
+            "timestamp"
+        ],
         "properties": {
             "issuer": {
                 "type": "string",
-                "pattern": "^did:[a-z0-9_]+:[A-Za-z0-9.-:_]+$"
-            },
-            "subject": {
-                "type": "string",
-                "pattern": "^did:[a-z0-9_]+:[A-Za-z0-9.-:_]+$"
+                "pattern": "^did:[A-Za-z0-9_]+:[A-Za-z0-9.\\-:_ ]+$"
             },
             "credentialSubject": {
                 "type": "object",
@@ -68,28 +70,30 @@
                 "properties": {
                     "object": {
                         "type": "string",
-                        "pattern": "^did:[a-z0-9_]+:[A-Za-z0-9.-:_]+$"
+                        "pattern": "^did:[A-Za-z0-9_]+:[A-Za-z0-9.\\-:_ ]+$"
                     },
                     "action": {
                         "type": "object",
-                        "required": ["code", "value"],
+                        "required": ["code"],
                         "properties": {
                             "code": {
-                                "type": "number",
-                                "pattern": "^did:[a-z0-9_]+:[A-Za-z0-9.-:_]+$"
-                            },
-                            "value": {
-                                "type": "string"
+                                "type": "number"
                             }
-                        }
+                        },
+                        "additionalProperties": true
                     }
-                }
+                },
+                "additionalProperties": true
             },
-            "signature": {
-                "type": "string",
-                "minLength": 5
+            "metadata": {
+                "type": "object",
+                "additionalProperties": true
+            },
+            "timestamp": {
+                "type": "number"
             }
-        }
+        },
+        "additionalProperties": true
     },
     "ERROR_OBJECT": {
         "type": "object",

@@ -1,9 +1,9 @@
 import chai from "chai";
 
-import GithubProxyConfig from "../../db/github/index.js";
-import { haveCommonElement, containAllElement } from "../../utils/index.js";
-import { MAIN_TEST_BRANCH, COMMIT_MESSAGES } from "./constant.js";
 import { ERROR_CODES } from "../../constants/index.js";
+import GithubProxyConfig from "../../db/github/index.js";
+import { containAllElement, haveCommonElement } from "../../utils/index.js";
+import { COMMIT_MESSAGES, MAIN_TEST_BRANCH } from "./constant.js";
 
 const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
@@ -97,22 +97,18 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
             expect(data).to.have.property("oid");
             expect(data).to.have.property("text");
 
-            const data2 = await GithubProxy.getFile(
+            const data2 = await GithubProxy.getFileRaw(
                 TEST_FILE_NAME2,
                 lastCommitOfBranch
             );
-            expect(data2)
-                .to.have.property("text")
-                .equal(JSON.stringify(EXAMPLE_DATA));
-            expect(data2).to.have.property("oid");
-            expect(data2).to.have.property("text");
+            expect(JSON.stringify(data2)).equal(JSON.stringify(EXAMPLE_DATA));
         });
 
         it("it should get an array of files contains the files info", async () => {
             const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 MAIN_TEST_BRANCH
             );
-            const files = await GithubProxy.getFilesOfTree(
+            const files = await GithubProxy.getContentOfTree(
                 "",
                 false,
                 lastCommitOfBranch
@@ -123,6 +119,27 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
             expect(
                 containAllElement(fileNames, [TEST_FILE_NAME, TEST_FILE_NAME2])
             ).equal(true);
+        });
+
+        it("it should get an array of files contains the files info along with their contents", async () => {
+            const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
+                MAIN_TEST_BRANCH
+            );
+            const files = await GithubProxy.getFilesOfTreeWithContent(
+                "",
+                lastCommitOfBranch
+            );
+
+            expect(files).to.be.an("array");
+            const fileNames = files.map((el) => el.name);
+            expect(
+                containAllElement(fileNames, [TEST_FILE_NAME, TEST_FILE_NAME2])
+            ).equal(true);
+
+            const fileContents = files.map((el) => el.content);
+            expect(JSON.stringify([EXAMPLE_DATA, EXAMPLE_DATA])).equal(
+                JSON.stringify(fileContents)
+            );
         });
     });
 
@@ -211,7 +228,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
             const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 MAIN_TEST_BRANCH
             );
-            const files = await GithubProxy.getFilesOfTree(
+            const files = await GithubProxy.getContentOfTree(
                 "",
                 false,
                 lastCommitOfBranch
@@ -236,7 +253,7 @@ describe("GITHUB INTERACTION --- File && Commits", function () {
             const lastCommitOfBranch = await GithubProxy.getBranchLastCommitSHA(
                 MAIN_TEST_BRANCH
             );
-            const files = await GithubProxy.getFilesOfTree(
+            const files = await GithubProxy.getContentOfTree(
                 "",
                 false,
                 lastCommitOfBranch
