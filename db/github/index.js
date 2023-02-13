@@ -729,7 +729,8 @@ export default function (REPOSITORY) {
 
                     let results = [];
                     for (let fData of filesData) {
-                        const sizeInMB = fData.object.byteSize * 0.000001;
+                        const BYTE_TO_MB = 0.000001;
+                        const sizeInMB = fData.object.byteSize * BYTE_TO_MB;
                         const content =
                             sizeInMB < 1
                                 ? JSON.parse(fData.object.text)
