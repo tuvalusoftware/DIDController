@@ -53,47 +53,78 @@
     "CREDENTIAL": {
         "type": "object",
         "required": [
+            "@context",
+            "type",
             "issuer",
             "credentialSubject",
-            "signature",
-            "metadata",
-            "timestamp"
+            "proof"
         ],
         "properties": {
-            "issuer": {
-                "type": "string",
-                "pattern": "^did:[A-Za-z0-9_]+:[A-Za-z0-9.\\-:_ ]+$"
+            "@context": {
+                "type": "array",
+                "minItems": 1
+            },
+            "type": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string" }
+            },
+            "issuanceDate": {
+                "type": "string"
+            },
+            "expirationDate": {
+                "type": "string"
             },
             "credentialSubject": {
                 "type": "object",
-                "required": ["object", "action"],
+                "required": ["id"],
                 "properties": {
-                    "object": {
-                        "type": "string",
-                        "pattern": "^did:[A-Za-z0-9_]+:[A-Za-z0-9.\\-:_ ]+$"
-                    },
-                    "action": {
-                        "type": "object",
-                        "required": ["code"],
-                        "properties": {
-                            "code": {
-                                "type": "number"
-                            }
-                        },
-                        "additionalProperties": true
+                    "id": {
+                        "type": "string"
                     }
                 },
                 "additionalProperties": true
             },
-            "metadata": {
+            "proof": {
                 "type": "object",
-                "additionalProperties": true
-            },
-            "timestamp": {
-                "type": "number"
+                "required": [
+                    "type",
+                    "created",
+                    "verificationMethod",
+                    "proofPurpose",
+                    "proofValue"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string"
+                    },
+                    "created": {
+                        "type": "string"
+                    },
+                    "verificationMethod": {
+                        "type": "string"
+                    },
+                    "proofPurpose": {
+                        "type": "string"
+                    },
+                    "proofValue": {
+                        "type": "string"
+                    },
+                    "challenge": {
+                        "type": "string"
+                    },
+                    "domain": {
+                        "type": "string"
+                    },
+                    "nonce": {
+                        "type": "string"
+                    },
+                    "jws": {
+                        "type": "string"
+                    }
+                }
             }
-        },
-        "additionalProperties": true
+        }
     },
     "ERROR_OBJECT": {
         "type": "object",

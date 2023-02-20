@@ -8,10 +8,10 @@
     "servers": [
         {
             "url": "/api",
-            "description": "Localhost with port 9000"
+            "description": "Localhost with port 57000"
         },
         {
-            "url": "http://18.139.84.180:9000/api/",
+            "url": "http://18.139.84.180:57000/api/",
             "description": "Anh Tam's remote host"
         },
         {
