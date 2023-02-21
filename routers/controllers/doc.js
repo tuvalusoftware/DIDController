@@ -245,6 +245,39 @@ export default {
             next(err);
         }
     },
+    updateWrappedDocController: async (req, res, next) => {
+        Logger.apiInfo(req, res, `UPDATE WRAPPED DOCUMENT`);
+
+        const { wrappedDocument, fileName, companyName } = req.body;
+        if (!companyName || !fileName || !wrappedDocument)
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+
+        // Check owner public key from the wrapped document
+        const ownerDID = wrappedDocument?.data.issuers[0].address;
+        if (!ownerDID) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
+
+        // Check wrapped document target hash
+        const targetHash = wrappedDocument?.signature?.targetHash;
+        if (!targetHash) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
+
+        try {
+            // Update file
+            const branch = `DOC_${companyName}`;
+            await GithubProxy.updateFile(
+                `${fileName}.document`,
+                wrappedDocument,
+                branch,
+                `UPDATE: '${fileName}' wrapped document of company ${companyName}`
+            );
+
+            res.status(200).json(OPERATION_CODES.UPDATE_SUCCESS);
+        } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
+
+            next(err);
+        }
+    },
     deleteDoc: async (req, res, next) => {
         Logger.apiInfo(req, res, `DELETE DOCUMENT`);
 

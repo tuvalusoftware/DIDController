@@ -521,6 +521,48 @@
                 }
             }
         },
+        "/doc/update": {
+            "put": {
+                "tags": ["DOC"],
+                "summary": "Update wrapped document of the wrappedDocument.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "wrappedDocument": {
+                                        "$ref": "#/components/schemas/WrappedDocument"
+                                    },
+                                    "companyName": {
+                                        "description": "Name of the company.",
+                                        "type": "string",
+                                        "example": "Kukulu"
+                                    },
+                                    "fileName": {
+                                        "description": "Name of the file.",
+                                        "type": "string",
+                                        "example": "file_name"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/doc/exists": {
             "get": {
                 "tags": ["DOC"],
