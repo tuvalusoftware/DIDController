@@ -42,27 +42,22 @@
         }
     ],
     "paths": {
-        "/auth": {
-            "post": {
+        "/auth/set-token": {
+            "get": {
                 "tags": ["AUTH"],
-                "summary": "Set cookie for your requests.",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "accessToken": {
-                                        "description": "Access Token for Security service",
-                                        "type": "string",
-                                        "example": "1234567890"
-                                    }
-                                }
-                            }
+                "summary": "Set Access Token to Cookie.",
+                "parameters": [
+                    {
+                        "name": "access_token",
+                        "in": "query",
+                        "description": "Auth Token",
+                        "required": true,
+                        "example": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImFkZHJlc3MiOiIwMGE1MDg1NDUxMTIxZjhhYTg3Njk1NTc4NTJmYTYyNzE3MjAzMmU5NjFiZGVlNzA3NjIyMmRjYzQ5MmI5N2ViOTYzYzhmN2Y2MzQ5ZDFmZWQ4MzNhZWFhY2UwOGEzYmU3MTRlZDIyYTA2ZTZmMTNmZmIiLCJuZXR3b3JrIjoiQ2FyZGFubyJ9LCJpYXQiOjE2NzY5Njc5NDYsImV4cCI6MTY3Njk3MTU0Nn0.tc7xjBxDHlUmZq0ObGP2mvOq7MgAguZ4S0LzXaeelKEpxytD5mBqgcNAdbLt3_ZOEq3Iw9QBLAxS0e2NL9UUjMtbmVeOfRRptIVX0AQXX8A7PZUwD1XRZmyT8Nj-0Npsf3i2e1WpvPBbIWb25Q9mtxVf1zl6Ud5gl9rJsTK3jCHK573LAEknOetQZhmtrxzh2Ghvy0O3OrMxQavqC6_pBfmUFJZ7cydtaGvz_bJ-d3R2AMikmVpzouQtuD2_JlF17THIrOXgD4KJ0ege9VBXnk7yI7HAt3Cin9Jq2cFOs_habcMAqLCH-0J7kVpzjm-eQipLEeX7xzDlIAwwrfZXEg",
+                        "schema": {
+                            "type": "string"
                         }
-                    },
-                    "required": true
-                },
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "",
@@ -75,7 +70,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/auth/clear-token": {
             "get": {
                 "tags": ["AUTH"],
                 "summary": "Clear Cookie.",

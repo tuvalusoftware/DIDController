@@ -59,11 +59,13 @@ export default {
         }
     },
     setCookie: async (req, res, next) => {
-        const { accessToken } = req.body;
+        Logger.apiInfo(req, res, "SET AUTH TOKEN");
+        const { access_token: accessToken } = req.query;
         res.cookie("access_token", accessToken);
         res.json({ message: "Set Cookie Successfully" });
     },
     clearCookie: async (req, res, next) => {
+        Logger.apiInfo(req, res, "CLEAR AUTH TOKEN");
         res.clearCookie("access_token");
         res.json({ message: "Clear Cookie Successfully" });
     },
