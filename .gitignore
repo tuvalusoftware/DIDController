@@ -2,7 +2,7 @@ node_modules/
 .vscode/
 logs/
 package-lock.json
-.env
+*.env
 .DS_Store
 
 # Coverage output folder
