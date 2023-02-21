@@ -195,11 +195,11 @@ export default {
             await GithubProxy.createBranchIfNotExist(branchName);
 
             // Get owner public key from the wrapped document
-            const ownerDID = wrappedDocument.data.issuers[0].address;
+            const ownerDID = wrappedDocument?.data?.issuers?.[0]?.address;
             if (!ownerDID) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
 
             // Get wrapped document target hash
-            const targetHash = wrappedDocument.signature?.targetHash;
+            const targetHash = wrappedDocument?.signature?.targetHash;
             if (!targetHash) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
 
             const ownerPublicKey = extractOwnerPKFromAddress(ownerDID);
@@ -252,11 +252,11 @@ export default {
         if (!companyName || !fileName || !wrappedDocument)
             return next(ERROR_CODES.MISSING_PARAMETERS);
 
-        // Check owner public key from the wrapped document
-        const ownerDID = wrappedDocument?.data.issuers[0].address;
+        // Get owner public key from the wrapped document
+        const ownerDID = wrappedDocument?.data?.issuers?.[0]?.address;
         if (!ownerDID) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
 
-        // Check wrapped document target hash
+        // Get wrapped document target hash
         const targetHash = wrappedDocument?.signature?.targetHash;
         if (!targetHash) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
 
