@@ -40,10 +40,7 @@ export default {
                 err.response?.data === "Unauthorized" &&
                 err.response?.status === 401
             )
-                return next({
-                    ...ERROR_CODES.SECURITY_SERVICE_AUTHENTICATION,
-                    error_detail: token,
-                });
+                return next(ERROR_CODES.SECURITY_SERVICE_AUTHENTICATION);
 
             if (err.code === "ECONNABORTED")
                 return next({

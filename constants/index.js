@@ -83,19 +83,16 @@ const ERROR_CODES = {
     },
     SECURITY_SERVICE_URL_INVALID: {
         error_code: 10001,
-        error_message: "Unauthorized.",
-        error_cause: "Cannot found security service.",
+        error_message: "Unauthorized. Cannot found security service.",
     },
     SECURITY_SERVICE_AUTHENTICATION: {
         error_code: 10002,
-        error_message: "Unauthorized.",
-        error_cause:
-            "Invalid authentication info according to the Security Service",
+        error_message:
+            "Unauthorized. Invalid authentication info according to the Security Service.",
     },
     MISSING_ACCESS_TOKEN: {
         error_code: 10003,
-        error_message: "Unauthorized.",
-        error_cause: "Access token is not provided.",
+        error_message: "Unauthorized. Access token is not provided.",
     },
     MISSING_PARAMETERS: {
         error_code: 10004,

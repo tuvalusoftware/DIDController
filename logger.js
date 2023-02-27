@@ -75,7 +75,7 @@ export default {
         const errorMsg =
             err instanceof Error
                 ? `${err.message} - ${err.stack}`
-                : err.error_message;
+                : JSON.stringify(err.error_message);
 
         infoLogger.error(`[${req.method} - ${req.originalUrl}] ${errorMsg}`);
         debugLogger.error(`[${req.method} - ${req.originalUrl}] ${errorMsg}`);
