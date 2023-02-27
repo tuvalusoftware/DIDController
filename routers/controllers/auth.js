@@ -15,8 +15,8 @@ export default {
             return next(ERROR_CODES.SECURITY_SERVICE_URL_INVALID);
 
         const token = req.cookies["access_token"];
-        console.log(token);
-        console.log(req.cookies);
+        Logger.info(token);
+        Logger.info(req.cookies);
         if (!token) return next(ERROR_CODES.MISSING_ACCESS_TOKEN);
 
         // Call to Security Service to verify the access token
