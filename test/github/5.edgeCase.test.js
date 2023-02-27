@@ -49,7 +49,7 @@ const getFile = async (branchName) => {
 };
 
 describe("GITHUB INTERACTION --- Other edge cases", function () {
-    this.timeout(10000);
+    this.timeout(120000);
 
     before(async () => {
         await deleteAllTestBranches();
