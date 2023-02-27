@@ -11,8 +11,6 @@ export default {
         if (process.env.NODE_ENV === "test") return next();
 
         Logger.apiInfo(req, res, "ENSURE AUTHENTICATION FROM SECURITY SERVICE");
-        return next();
-
         if (!AUTH_SERVICES_URL)
             return next(ERROR_CODES.SECURITY_SERVICE_URL_INVALID);
 
@@ -42,7 +40,10 @@ export default {
                 err.response?.data === "Unauthorized" &&
                 err.response?.status === 401
             )
-                return next(ERROR_CODES.SECURITY_SERVICE_AUTHENTICATION);
+                return next({
+                    ...ERROR_CODES.SECURITY_SERVICE_AUTHENTICATION,
+                    error_detail: token,
+                });
 
             if (err.code === "ECONNABORTED")
                 return next({
