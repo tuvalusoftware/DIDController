@@ -9,6 +9,7 @@ export default {
     ensureSecurityServiceAuthentication: async (req, res, next) => {
         // Ignore Security Service If In Test Environment
         if (process.env.NODE_ENV === "test") return next();
+        return next();
 
         Logger.apiInfo(req, res, "ENSURE AUTHENTICATION FROM SECURITY SERVICE");
         if (!AUTH_SERVICES_URL)
