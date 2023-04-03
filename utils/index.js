@@ -101,13 +101,26 @@ const dumpDataToJSON = (data, fileName) => {
     fs.writeFileSync(`${fileName}.json`, JSON.stringify(data));
 };
 
+/**
+ * @description Check if a string is a base64 string
+ * @param {String} str
+ * @returns {Boolean}
+ */
+function isBase64(str) {
+    var base64regex =
+        /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+
+    return base64regex.test(str);
+}
+
 export {
     containAllElement,
-    haveCommonElement,
-    tryParseStringToObj,
-    getFileExtension,
-    extractOwnerPKFromAddress,
-    validateDIDSyntax,
-    removeFileExtension,
     dumpDataToJSON,
+    extractOwnerPKFromAddress,
+    getFileExtension,
+    haveCommonElement,
+    isBase64,
+    removeFileExtension,
+    tryParseStringToObj,
+    validateDIDSyntax,
 };

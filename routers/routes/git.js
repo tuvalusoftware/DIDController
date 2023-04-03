@@ -8,7 +8,8 @@ const router = express.Router();
 router.use(authController.ensureSecurityServiceAuthentication);
 
 router
-    .route("/image")
+    .route("/image/file")
     .post(multerParser.single("image"), git.saveImageFromFile);
+router.route("/image/base64").post(git.saveImageFromBase64String);
 
 export default router;

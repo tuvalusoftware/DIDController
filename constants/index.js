@@ -176,6 +176,10 @@ const ERROR_CODES = {
         error_message:
             "Content of credential is invalid. Please make sure all required fields are provided with their valid value.",
     },
+    INVALID_BASE64_STRING: {
+        error_code: 30004,
+        error_message: "The given string is not base64.",
+    },
 };
 
 const OPERATION_CODES = {
@@ -185,4 +189,4 @@ const OPERATION_CODES = {
     DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
 
-export { FILE_NAME_CONVENTION_REGEX, ERROR_CODES, OPERATION_CODES };
+export { ERROR_CODES, FILE_NAME_CONVENTION_REGEX, OPERATION_CODES };
