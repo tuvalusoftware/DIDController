@@ -8,7 +8,8 @@ export default {
     /* c8 ignore start */
     ensureSecurityServiceAuthentication: async (req, res, next) => {
         // Ignore Security Service If In Test Environment
-        if (process.env.NODE_ENV === "test") return next();
+        // if (process.env.NODE_ENV === "test") return next();
+        return next();
 
         Logger.apiInfo(req, res, "ENSURE AUTHENTICATION FROM SECURITY SERVICE");
 
