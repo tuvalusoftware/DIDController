@@ -7,20 +7,20 @@ const REPOSITORY = process.env.DOCUMENT_REPO;
 const GithubProxy = GithubProxyConfig(REPOSITORY);
 
 export default {
-    saveImageFromFile: async (req, res, next) => {
-        Logger.apiInfo(req, res, `SAVE AN IMAGE FROM FILE TO GIT`);
+    uploadFileDirectly: async (req, res, next) => {
+        Logger.apiInfo(req, res, `UPLOAD A FILE DIRECTLY TO GIT`);
 
-        const image = req.file;
-        if (!image) return next(ERROR_CODES.MISSING_PARAMETERS);
+        const uploadedFile = req.file;
+        if (!uploadedFile) return next(ERROR_CODES.MISSING_PARAMETERS);
 
-        const { buffer, originalname, size, encoding } = image;
+        const { buffer, originalname } = uploadedFile;
 
         try {
             const { download_url } = await GithubProxy.createNewFile(
                 `${Date.now()}_${originalname}`,
                 buffer,
                 "IMAGE",
-                `NEW: 'Save an image`
+                `NEW: 'Save an new file`
             );
 
             return res
@@ -30,24 +30,24 @@ export default {
             return next(err);
         }
     },
-    saveImageFromBase64String: async (req, res, next) => {
-        Logger.apiInfo(req, res, `SAVE AN IMAGE TO GIT`);
+    uploadFileByBase64String: async (req, res, next) => {
+        Logger.apiInfo(req, res, `UPLOAD A FILE THROUGH BASE64 TO GIT`);
 
-        const { imageBase64, imageName } = req.body;
+        const { base64Content, fileName } = req.body;
 
-        if (!imageBase64 || !imageName)
+        if (!base64Content || !fileName)
             return next(ERROR_CODES.MISSING_PARAMETERS);
-        if (!isBase64(imageBase64))
+        if (!isBase64(base64Content))
             return next(ERROR_CODES.INVALID_BASE64_STRING);
 
-        const buffer = Buffer.from(imageBase64, "base64");
+        const buffer = Buffer.from(base64Content, "base64");
 
         try {
             const { download_url } = await GithubProxy.createNewFile(
-                `${Date.now()}_${imageName}`,
+                `${Date.now()}_${fileName}`,
                 buffer,
                 "IMAGE",
-                `NEW: 'Save an image`
+                `NEW: 'Save an new file thru base64`
             );
 
             return res
