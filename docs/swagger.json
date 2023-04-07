@@ -868,7 +868,7 @@
                 }
             }
         },
-        "/git/image/base64": {
+        "/git/upload/base64": {
             "post": {
                 "tags": ["GIT"],
                 "summary": "Upload an image to Git by base64 string",
@@ -905,7 +905,7 @@
                 }
             }
         },
-        "/git/image/file": {
+        "/git/upload/file": {
             "post": {
                 "tags": ["GIT"],
                 "summary": "Upload an image to Git by file uploading",
