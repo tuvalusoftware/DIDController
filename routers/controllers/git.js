@@ -17,7 +17,7 @@ export default {
 
         try {
             const { download_url } = await GithubProxy.createNewFile(
-                `${Date.now()}_${originalname}`,
+                `${Date.now()}_${encodeURIComponent(originalname)}`,
                 buffer,
                 "IMAGE",
                 `NEW: 'Save an new file`
@@ -44,7 +44,7 @@ export default {
 
         try {
             const { download_url } = await GithubProxy.createNewFile(
-                `${Date.now()}_${fileName}`,
+                `${Date.now()}_${encodeURIComponent(fileName)}`,
                 buffer,
                 "IMAGE",
                 `NEW: 'Save an new file thru base64`
