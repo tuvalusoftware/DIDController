@@ -16,16 +16,18 @@ export default {
         const { buffer, originalname } = uploadedFile;
 
         try {
-            const { download_url } = await GithubProxy.createNewFile(
+            const { download_url, path } = await GithubProxy.createNewFile(
                 `${Date.now()}_${encodeURIComponent(originalname)}`,
                 buffer,
                 "IMAGE",
                 `NEW: 'Save an new file`
             );
 
-            return res
-                .status(201)
-                .json({ url: download_url, ...OPERATION_CODES.SAVE_SUCCESS });
+            return res.status(201).json({
+                url: download_url,
+                path,
+                ...OPERATION_CODES.SAVE_SUCCESS,
+            });
         } catch (err) {
             return next(err);
         }
@@ -53,6 +55,21 @@ export default {
             return res
                 .status(201)
                 .json({ url: download_url, ...OPERATION_CODES.SAVE_SUCCESS });
+        } catch (err) {
+            return next(err);
+        }
+    },
+    deleteFile: async (req, res, next) => {
+        Logger.apiInfo(req, res, `DELETE A FILE FROM GIT`);
+
+        const { fileName } = req.body;
+
+        if (!fileName) return next(ERROR_CODES.MISSING_PARAMETERS);
+
+        try {
+            await GithubProxy.deleteFile(path, "IMAGE");
+
+            return res.status(201).json({ ...OPERATION_CODES.DELETE_SUCCESS });
         } catch (err) {
             return next(err);
         }
