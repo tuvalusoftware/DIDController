@@ -8,7 +8,7 @@ const ERROR_CODES = {
         error_cause:
             "Potential Errors: invalid repository name, invalid github auth token, ... Or any other unexpected error given by Github API.",
     },
-    BAD_CREDENTIALS: {
+    INVALID_GITHUB_CREDENTIAL: {
         error_code: 1201,
         error_message: "Github Access Token is not provided or invalid.",
     },
@@ -176,6 +176,10 @@ const ERROR_CODES = {
         error_message:
             "Content of credential is invalid. Please make sure all required fields are provided with their valid value.",
     },
+    INVALID_BASE64_STRING: {
+        error_code: 30004,
+        error_message: "The given string is not base64.",
+    },
 };
 
 const OPERATION_CODES = {
@@ -185,4 +189,4 @@ const OPERATION_CODES = {
     DELETE_SUCCESS: { message: "Successfully Deleted" },
 };
 
-export { FILE_NAME_CONVENTION_REGEX, ERROR_CODES, OPERATION_CODES };
+export { ERROR_CODES, FILE_NAME_CONVENTION_REGEX, OPERATION_CODES };

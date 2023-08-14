@@ -1,8 +1,8 @@
 /* c8 ignore start */
 import { createLogger, format, transports } from "winston";
+import { ERROR_CODES } from "./constants/index.js";
 import { detectGithubError } from "./db/github/helpers.js";
 import SchemaValidator from "./schema/schemaValidator.js";
-import { ERROR_CODES } from "./constants/index.js";
 
 const customLogLevel = (logLevel) => {
     return {
@@ -99,7 +99,9 @@ export default {
                         err.response.data.message
                     }, Other errors: ${JSON.stringify(
                         err.response.data.errors
-                    )}, Stringify Errors: ${JSON.stringify(err.data)}`
+                    )}, default error catch: ${err.message}, ${
+                        err.code
+                    }, Stringify Errors Data: ${JSON.stringify(err)}`
                 );
                 debugLogger.error(
                     `Unexpected error when call Github API error: Status: ${
@@ -120,8 +122,8 @@ export default {
         }
         // Other unexpected errors
         else {
-            infoLogger.error(`Unexpected error: ${JSON.stringify(err)}`);
-            debugLogger.error(`Unexpected error: ${JSON.stringify(err)}`);
+            infoLogger.error(`Unexpected error: ${err}`);
+            debugLogger.error(`Unexpected error: ${err}`);
             return ERROR_CODES.UNKNOWN_ERROR;
         }
     },

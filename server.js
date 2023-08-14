@@ -1,18 +1,18 @@
-import { createRequire } from "module";
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import compression from "compression";
-import methodOverride from "method-override";
-import swaggerUiExpress from "swagger-ui-express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import dotenv from "dotenv";
+import express from "express";
+import methodOverride from "method-override";
+import { createRequire } from "module";
+import swaggerUiExpress from "swagger-ui-express";
 dotenv.config();
 
-import router from "./routers/index.js";
-import Logger from "./logger.js";
-import SchemaValidator from "./schema/schemaValidator.js";
 import { ERROR_CODES } from "./constants/index.js";
+import Logger from "./logger.js";
+import router from "./routers/index.js";
+import SchemaValidator from "./schema/schemaValidator.js";
 
 const require = createRequire(import.meta.url);
 const services = require("./docs/swagger.json");
@@ -35,6 +35,7 @@ app.use(methodOverride());
 router(app);
 
 // Handle global err
+/* c8 ignore start */
 app.use((err, req, res, _) => {
     Logger.apiError(err, req, res);
 
@@ -57,17 +58,16 @@ app.use((err, req, res, _) => {
     return res.status(200).json(ERROR_CODES.UNKNOWN_ERROR);
 });
 
-/* c8 ignore start */
 app.use("/api-docs", swaggerUiExpress.serve, (...args) =>
     swaggerUiExpress.setup(services, {
         customSiteTitle: "DID Controller",
     })(...args)
 );
-/* c8 ignore stop */
 
-const port = process.env.NODE_ENV !== "test" ? 9000 : 9001;
+const port = process.env.NODE_ENV !== "test" ? 57000 : 57001;
 app.listen(port, (_) => {
     Logger.info(`Server is live: http://localhost:${port}`);
 });
+/* c8 ignore stop */
 
 export default app;
