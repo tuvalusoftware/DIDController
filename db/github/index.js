@@ -767,9 +767,7 @@ export default function (REPOSITORY) {
             const contentData =
                 typeof content === "string"
                     ? content
-                    : new Buffer.from(JSON.stringify(content)).toString(
-                          "base64"
-                      );
+                    : new Buffer.from(content).toString("base64");
 
             let data = {
                 path,
@@ -790,7 +788,7 @@ export default function (REPOSITORY) {
          * @param {Object} content Content of a new file
          * @param {String} branch Name of the branch to save the file (default to main)
          * @param {String} commitMessage The commit message (default to 'New commit')
-         * @returns {{ path: String, sha: String, size: Number }}
+         * @returns {{ path: String, sha: String, size: Number, download_url: String }}
          */
         createNewFile: function (
             path,
@@ -802,8 +800,9 @@ export default function (REPOSITORY) {
             return new Promise((resolve, reject) => {
                 this._updateContent(path, content, branch, commitMessage)
                     .then((response) => {
-                        const { path, sha, size } = response.data.content;
-                        return resolve({ path, sha, size });
+                        const { path, sha, size, download_url } =
+                            response.data.content;
+                        return resolve({ path, sha, size, download_url });
                     })
                     .catch((err) => {
                         if (
@@ -827,7 +826,7 @@ export default function (REPOSITORY) {
          * @param {Object} content Content of a file
          * @param {String} branch Name of the branch to save the file (default to main)
          * @param {String} commitMessage The commit message (default to 'New update commit')
-         * @returns {{ path: String, sha: String, size: Number }}
+         * @returns {{ path: String, sha: String, size: Number, download_url: String }}
          */
         updateFile: async function (
             path,
@@ -856,8 +855,9 @@ export default function (REPOSITORY) {
                     fileSHA
                 )
                     .then((response) => {
-                        const { path, sha, size } = response.data.content;
-                        return resolve({ path, sha, size });
+                        const { path, sha, size, download_url } =
+                            response.data.content;
+                        return resolve({ path, sha, size, download_url });
                     })
                     .catch((err) => {
                         const errInfo = Logger.handleGithubError(err);

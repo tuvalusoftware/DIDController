@@ -28,7 +28,7 @@ NPM version 8
     AUTH_SERVICE=https://auth-fuixlabs.ap.ngrok.io
     ```
 
-1. Run server (server will run on port 9000)
+1. Run server (server will run on port 57000)
 
     ```
     npm start
@@ -48,11 +48,11 @@ NPM version 8
     - Run docker container
 
     ```
-    docker run -it -p <host_port>:9000 <container_name>
+    docker run -it -p <host_port>:57000 <container_name>
     ```
 
 <br />
 
 ## All The API
 
-You can view all the API by visiting the swagger UI [here](http://localhost:9000/api-docs/#/) after start the server.
+You can view all the API by visiting the swagger UI [here](http://localhost:57000/api-docs/#/) after start the server.
