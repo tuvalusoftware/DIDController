@@ -18,7 +18,18 @@ const require = createRequire(import.meta.url);
 const services = require("./docs/swagger.json");
 
 const app = express();
-app.use(cors());
+
+const corsOptions = {
+    origin: [
+        "http://18.139.84.180:11000",
+        "https://paperless-fuixlabs.ap.ngrok.io",
+        "https://tradetrust-fuixlabs.ap.ngrok.io",
+        "http://localhost:4000",
+    ],
+    credentials: true,
+};
+app.use(cors(corsOptions));
+
 app.use(cookieParser());
 app.use(compression());
 app.use(bodyParser.json({ limit: "200mb" }));

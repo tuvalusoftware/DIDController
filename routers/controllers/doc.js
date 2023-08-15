@@ -195,11 +195,11 @@ export default {
             await GithubProxy.createBranchIfNotExist(branchName);
 
             // Get owner public key from the wrapped document
-            const ownerDID = wrappedDocument.data.issuers[0].address;
+            const ownerDID = wrappedDocument?.data?.issuers?.[0]?.address;
             if (!ownerDID) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
 
             // Get wrapped document target hash
-            const targetHash = wrappedDocument.signature?.targetHash;
+            const targetHash = wrappedDocument?.signature?.targetHash;
             if (!targetHash) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
 
             const ownerPublicKey = extractOwnerPKFromAddress(ownerDID);
@@ -241,6 +241,39 @@ export default {
 
             if (err === ERROR_CODES.BLOB_EXISTED)
                 return next(ERROR_CODES.FILE_EXISTED);
+
+            next(err);
+        }
+    },
+    updateWrappedDocController: async (req, res, next) => {
+        Logger.apiInfo(req, res, `UPDATE WRAPPED DOCUMENT`);
+
+        const { wrappedDocument, fileName, companyName } = req.body;
+        if (!companyName || !fileName || !wrappedDocument)
+            return next(ERROR_CODES.MISSING_PARAMETERS);
+
+        // Get owner public key from the wrapped document
+        const ownerDID = wrappedDocument?.data?.issuers?.[0]?.address;
+        if (!ownerDID) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
+
+        // Get wrapped document target hash
+        const targetHash = wrappedDocument?.signature?.targetHash;
+        if (!targetHash) return next(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
+
+        try {
+            // Update file
+            const branch = `DOC_${companyName}`;
+            await GithubProxy.updateFile(
+                `${fileName}.document`,
+                wrappedDocument,
+                branch,
+                `UPDATE: '${fileName}' wrapped document of company ${companyName}`
+            );
+
+            res.status(200).json(OPERATION_CODES.UPDATE_SUCCESS);
+        } catch (err) {
+            if (err === ERROR_CODES.BRANCH_NOT_EXISTED)
+                return next(ERROR_CODES.COMPANY_NOT_FOUND);
 
             next(err);
         }

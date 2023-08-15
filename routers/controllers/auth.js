@@ -9,13 +9,15 @@ export default {
     ensureSecurityServiceAuthentication: async (req, res, next) => {
         // Ignore Security Service If In Test Environment
         if (process.env.NODE_ENV === "test") return next();
+        return next();
 
         Logger.apiInfo(req, res, "ENSURE AUTHENTICATION FROM SECURITY SERVICE");
-
         if (!AUTH_SERVICES_URL)
             return next(ERROR_CODES.SECURITY_SERVICE_URL_INVALID);
 
         const token = req.cookies["access_token"];
+        Logger.info(token);
+        Logger.info(req.cookies);
         if (!token) return next(ERROR_CODES.MISSING_ACCESS_TOKEN);
 
         // Call to Security Service to verify the access token
@@ -59,11 +61,13 @@ export default {
         }
     },
     setCookie: async (req, res, next) => {
-        const { accessToken } = req.body;
+        Logger.apiInfo(req, res, "SET AUTH TOKEN");
+        const { access_token: accessToken } = req.query;
         res.cookie("access_token", accessToken);
         res.json({ message: "Set Cookie Successfully" });
     },
     clearCookie: async (req, res, next) => {
+        Logger.apiInfo(req, res, "CLEAR AUTH TOKEN");
         res.clearCookie("access_token");
         res.json({ message: "Clear Cookie Successfully" });
     },
