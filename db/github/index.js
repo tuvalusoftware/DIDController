@@ -767,7 +767,9 @@ export default function (REPOSITORY) {
             const contentData =
                 typeof content === "string"
                     ? content
-                    : new Buffer.from(content).toString("base64");
+                    : new Buffer.from(JSON.stringify(content)).toString(
+                          "base64"
+                      );
 
             let data = {
                 path,
