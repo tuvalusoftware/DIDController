@@ -764,16 +764,13 @@ export default function (REPOSITORY) {
             sha = null
         ) {
             Logger.functionInfo("db/github/index.js", "_updateContent");
-            const contentData =
-                typeof content === "string"
-                    ? content
-                    : new Buffer.from(JSON.stringify(content)).toString(
-                          "base64"
-                      );
+
+            const isFile = Buffer.isBuffer(content);
+            const contentData = isFile ? content : JSON.stringify(content);
 
             let data = {
                 path,
-                content: contentData,
+                content: new Buffer.from(contentData).toString("base64"),
                 branch,
                 message: commitMessage,
             };
