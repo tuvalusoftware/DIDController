@@ -11,6 +11,7 @@ import { AppError } from "./errors/AppError";
 import { ERROR_CODES } from "./errors/errorCodes";
 import Logger from "./libs/Logger";
 import connectMongo from "./libs/connectMongo";
+import routersHandler from "./routers";
 import morganMiddleware from "./routers/middlewares/morganLogger";
 import swaggerSchema from "./schemas/swagger.schema";
 
@@ -52,6 +53,9 @@ app.get("/api/health-check", (req: Request, res: Response) => {
         version: "v2.0.0",
     });
 });
+
+// ** Routers
+routersHandler(app);
 
 // Handle global err
 app.use((err: any, req: Request, res: Response, _: NextFunction) => {
