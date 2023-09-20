@@ -1,4 +1,4 @@
-import { FILE_NAME_CONVENTION_REGEX } from "./common";
+import { FILE_NAME_CONVENTION_REGEX } from "../constants/common";
 
 export type ERROR_CODE = {
     error_code: number;
