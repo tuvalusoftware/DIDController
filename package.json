@@ -19,6 +19,7 @@
     },
     "homepage": "https://github.com/tuvalusoftware/DIDController#readme",
     "dependencies": {
+        "@typegoose/typegoose": "^11.5.0",
         "body-parser": "^1.20.2",
         "compression": "^1.7.4",
         "cookie-parser": "^1.4.6",
