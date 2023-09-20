@@ -67,7 +67,7 @@ const Logger = {
         logger.http(message);
     },
     error: (error: string | Error | AppError) => {
-        if (error instanceof String) logger.error(error);
+        if (typeof error === "string") logger.error(error);
         else logger.error(stringifyError(error));
     },
     info: (message: string) => {

@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+    mongodb:
+        image: mongo:7.0.0
+        container_name: dc-mongodb
+        ports:
+            - "${MONGODB_PORT}:27017"
+        volumes:
+            - ./docker-data/mongodb:/data/db
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+        networks:
+            - dc-network
+        restart: always
+
+networks:
+    dc-network:
+        driver: bridge

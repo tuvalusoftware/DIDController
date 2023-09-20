@@ -10,6 +10,7 @@ import env from "./constants/env";
 import { AppError } from "./errors/AppError";
 import { ERROR_CODES } from "./errors/errorCodes";
 import Logger from "./libs/Logger";
+import connectMongo from "./libs/connectMongo";
 import morganMiddleware from "./routers/middlewares/morganLogger";
 import swaggerSchema from "./schemas/swagger.schema";
 
@@ -26,6 +27,20 @@ app.use(
     })
 );
 app.use(methodOverride());
+
+// ** Connect to Mongo DB
+connectMongo();
+
+// Swagger
+/* c8 ignore start */
+app.use(
+    "/api-docs",
+    swaggerUiExpress.serve,
+    swaggerUiExpress.setup(swaggerSchema, {
+        customSiteTitle: "DID Controller",
+    })
+);
+/* c8 ignore stop */
 
 // Logging for each endpoint
 app.use(morganMiddleware);
@@ -64,16 +79,6 @@ app.use((err: any, req: Request, res: Response, _: NextFunction) => {
     }
     /* c8 ignore stop */
 });
-
-/* c8 ignore start */
-app.use(
-    "/api-docs",
-    swaggerUiExpress.serve,
-    swaggerUiExpress.setup(swaggerSchema, {
-        customSiteTitle: "DID Controller",
-    })
-);
-/* c8 ignore stop */
 
 const port = env.NODE_ENV !== "test" ? env.SERVER_PORT : 9001;
 app.listen(port, () => {

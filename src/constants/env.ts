@@ -15,17 +15,27 @@ export interface ENV {
     CREDENTIAL_REPO: string;
     GITHUB_AUTH_TOKEN: string;
     AUTH_SERVICE: string;
+    // MongoDB Config
+    MONGODB_PORT: number;
+    MONGO_INITDB_ROOT_USERNAME: string;
+    MONGO_INITDB_ROOT_PASSWORD: string;
+    MONGO_DB_NAME: string;
 }
 
 const env: ENV = cleanEnv(process.env, {
     NODE_ENV: str({ choices: ["dev", "test", "production", "staging"] }),
     SERVER_PORT: port({ default: 58000 }),
-    //Postgres SQL config
+    // Github DB config
     REPO_OWNER: str(),
     DOCUMENT_REPO: str(),
     CREDENTIAL_REPO: str(),
     GITHUB_AUTH_TOKEN: str(),
     AUTH_SERVICE: url(),
+    // MongoDB Config
+    MONGODB_PORT: port(),
+    MONGO_INITDB_ROOT_USERNAME: str(),
+    MONGO_INITDB_ROOT_PASSWORD: str(),
+    MONGO_DB_NAME: str(),
 });
 
 export default env;
