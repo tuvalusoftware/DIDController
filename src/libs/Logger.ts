@@ -83,7 +83,7 @@ const Logger = {
     apiError: (req: Request, error: Error | AppError) => {
         let errorMessage: string = "";
         if (error instanceof AppError) {
-            errorMessage = `${error} - ${error.error_message} ${
+            errorMessage = `${error} - ${error.message} ${
                 error.error_detail ? "- " + error.error_detail : ""
             }`;
         } else {

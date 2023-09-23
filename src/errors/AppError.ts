@@ -9,12 +9,16 @@ export class AppError extends Error {
         this.name = "AppError";
     }
 
-    get error_code(): number {
+    get code(): number {
         return this.error.error_code;
     }
 
-    get error_message(): string {
+    get message(): string {
         return this.error.error_message;
+    }
+
+    get detail() {
+        return { ...this.error, error_detail: this.error_detail };
     }
 
     getDetail(): string | undefined {

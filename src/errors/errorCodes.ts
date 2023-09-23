@@ -82,6 +82,38 @@ export const ERROR_CODES = {
             "Invalid wrapped document. Could not find the owner's address.",
     },
 
+    // Mongo DB Errors
+    MONGO_DATA_NOT_FOUND: {
+        error_code: 4000,
+        error_message:
+            "No results found for specified input query in database.",
+    },
+    MONGO_CAST_ERROR: {
+        error_code: 4010,
+        error_message: "The data of Mongo ID is invalid.",
+    },
+    MONGO_DUPLICATE_KEY: {
+        error_code: 4011,
+        error_message: "Duplicate key error.",
+    },
+    MONGO_LARGE_DOCUMENT: {
+        error_code: 4012,
+        error_message: "Document too large error.",
+    },
+    MONGO_VALIDATION: {
+        error_code: 4013,
+        error_message:
+            "Data contains properties that do not meet the specified validation criteria. Please check the provided values.",
+    },
+    MONGO_INVALID_GEOJSON: {
+        error_code: 4014,
+        error_message: "Sever error. Invalid GeoJSON detected in Mongo DB.",
+    },
+    MONGO_FIELD_NOT_EXIST: {
+        error_code: 4015,
+        error_message: "Sever error. Select not exist field.",
+    },
+
     // Common Errors
     UNKNOWN_ERROR: {
         error_code: 10000,
@@ -128,6 +160,10 @@ export const ERROR_CODES = {
         error_code: 10009,
         error_message: "File name does not match the correct format.",
         error_cause: `File name regex: ${FILE_NAME_CONVENTION_REGEX}`,
+    },
+    INVALID_INPUT: {
+        error_code: 10010,
+        error_message: "Invalid Input or Missing Fields.",
     },
 
     // Invalid Param Error
