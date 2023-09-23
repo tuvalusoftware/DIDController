@@ -12,20 +12,26 @@ NPM version 8
 
 ## Set up
 
+1. Set up `.env` file.
+
+1. Start mongo server with Docker.
+
+    - Ensure all Mongo configs are set in `.env`.
+    - Ensure that no other service is running on the same port as the one configured for MongoDB in the `.env` file. (Use the command below to check if there is any other mongo service run in the same port)
+        ```
+        sudo lsof -iTCP -sTCP:LISTEN | grep mongo
+        ```
+    - Start docker
+
+        ```
+        docker-compose up -d
+        docker ps -a
+        ```
+
 1. Install modules
 
     ```
     npm i
-    ```
-
-1. Paste this configuration to your .env file. Replace the `<token>` with Fuixlabs's github access token.
-
-    ```
-    REPO_OWNER=FuixLabs
-    DOCUMENT_REPO=DID_Store
-    CREDENTIAL_REPO=Credentials
-    GITHUB_AUTH_TOKEN=<token>
-    AUTH_SERVICE=https://auth-fuixlabs.ap.ngrok.io
     ```
 
 1. Run server (server will run on port 9000)
