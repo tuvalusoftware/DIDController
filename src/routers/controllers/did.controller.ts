@@ -31,7 +31,7 @@ export default {
 
             const did = await DidRepository.findByPKOrFail(publicKey);
 
-            return res.json(did);
+            return res.json(did.transform());
         } catch (error: any) {
             return next(handleMongoError(error));
         }

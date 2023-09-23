@@ -1,4 +1,9 @@
-import { getModelForClass, prop, Ref } from "@typegoose/typegoose";
+import {
+    DocumentType,
+    Ref,
+    getModelForClass,
+    prop,
+} from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { Company } from "./Company.model";
@@ -15,6 +20,13 @@ export class Did extends TimeStamps {
 
     @prop({ required: false })
     data: object;
+
+    transform(this: DocumentType<Did>) {
+        return {
+            name: this.controller,
+            content: { ...this.toJSON(), __v: undefined, _id: undefined },
+        };
+    }
 }
 
 export const DidModel = getModelForClass(Did);
