@@ -151,16 +151,6 @@ export default {
                 summary: "Retrieve one single DID.",
                 parameters: [
                     {
-                        name: "companyName",
-                        in: "query",
-                        description: "Name of a company",
-                        required: true,
-                        example: "Kukulu",
-                        schema: {
-                            type: "string",
-                        },
-                    },
-                    {
                         name: "publicKey",
                         in: "query",
                         description: "Public Key of the user's wallet.",
@@ -257,13 +247,7 @@ export default {
                                         example: "public_key",
                                     },
                                     content: {
-                                        description: "Content of the DID doc.",
-                                        type: "object",
-                                        example: {
-                                            date: "10-10-2000",
-                                            issuer: "123123abcd",
-                                            updated: true,
-                                        },
+                                        $ref: "#/components/schemas/DidDocOfUser",
                                     },
                                 },
                             },
@@ -288,16 +272,6 @@ export default {
                 tags: ["DID"],
                 summary: "Delete existed DID of a company.",
                 parameters: [
-                    {
-                        name: "companyName",
-                        in: "query",
-                        description: "Name of a company",
-                        required: true,
-                        example: "Kukulu",
-                        schema: {
-                            type: "string",
-                        },
-                    },
                     {
                         name: "publicKey",
                         in: "query",

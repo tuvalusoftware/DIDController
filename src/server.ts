@@ -79,7 +79,7 @@ app.use((err: any, req: Request, res: Response, _: NextFunction) => {
         throw new AppError(ERROR_CODES.UNKNOWN_ERROR);
     } catch (err: any) {
         Logger.apiError(req, err);
-        return res.status(200).json((err as AppError).error);
+        return res.status(200).json((err as AppError).detail);
     }
     /* c8 ignore stop */
 });
