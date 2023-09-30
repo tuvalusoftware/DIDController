@@ -2,12 +2,14 @@ import {
     DocumentType,
     Ref,
     getModelForClass,
+    modelOptions,
     prop,
 } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { Company } from "./Company.model";
 
+@modelOptions({ options: { allowMixed: 0 } })
 export class Did extends TimeStamps {
     @prop({ ref: () => Company, autopopulate: false, select: false })
     company: Ref<Company>;

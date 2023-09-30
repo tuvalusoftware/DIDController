@@ -13,6 +13,7 @@ export default () => {
     const dbURL = `mongodb://localhost:${port}/${dbName}`;
 
     const connect = () => {
+        Logger.warn("Connecting to MongoDB ...");
         mongoose
             .connect(dbURL, {
                 authSource: "admin",
@@ -20,7 +21,7 @@ export default () => {
                 pass: password,
             })
             .then(() => {
-                return Logger.info(`Successfully connected to ${dbURL}`);
+                Logger.info(`Successfully connected to ${dbURL}`);
             })
             .catch((error) => {
                 Logger.error("Error connecting to Mongo DB ...");

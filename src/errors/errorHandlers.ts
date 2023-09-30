@@ -61,8 +61,6 @@ export function handleMongoError(error: AppError | Error | any) {
     // }
     // GeoJSON invalid
     else if (error.constructor.name === "MongoServerError") {
-        Logger.error(error);
-
         switch (error.code) {
             case 11000:
                 return new AppError(ERROR_CODES.MONGO_DUPLICATE_KEY);

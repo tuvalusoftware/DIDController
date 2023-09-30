@@ -40,9 +40,8 @@ export const validateRequestInputSchema = <T>(
     // @ts-ignore
     const unionErrors = firstError.unionErrors as any;
     if (unionErrors) {
-        errorMessages = `'${JSON.stringify(unionErrors[0].issues[0].path)}': ${
-            unionErrors[0].issues[0].message
-        }`;
+        const path = unionErrors[0].issues[0].path[0];
+        errorMessages = `'${path}': ${unionErrors[0].issues[0].message}`;
     } else {
         errorMessages = `'${stringifyErrorPath(firstError.path)}': ${
             firstError.message
