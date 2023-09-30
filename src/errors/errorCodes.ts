@@ -193,10 +193,6 @@ export const ERROR_CODES = {
         error_code: 20005,
         error_message: "Sender Public Key or Receiver Public Key is invalid.",
     },
-    CREDENTIAL_NOT_FOUND: {
-        error_code: 20006,
-        error_message: "Hash of credential cannot be found.",
-    },
 
     // Content Errors
     USER_DID_DOC_INVALID: {
@@ -213,9 +209,19 @@ export const ERROR_CODES = {
         error_code: 30002,
         error_message: "DID of the did document should not be modified.",
     },
+
+    // Credential
     CREDENTIAL_INVALID: {
         error_code: 30003,
         error_message:
             "Content of credential is invalid. Please make sure all required fields are provided with their valid value.",
+    },
+    CREDENTIAL_NOT_FOUND: {
+        error_code: 20006,
+        error_message: "Hash of credential cannot be found.",
+    },
+    CREDENTIAL_EXISTED: {
+        error_code: 21006,
+        error_message: "Hash of credential already exist.",
     },
 };
