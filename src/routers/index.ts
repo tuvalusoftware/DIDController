@@ -5,5 +5,5 @@ import didRoute from "./routes/did.route";
 
 export default (app: Express) => {
     app.use("/api/did", didRoute);
-    app.use("/api/cre", creRoute);
+    app.use("/api/credential", creRoute);
 };

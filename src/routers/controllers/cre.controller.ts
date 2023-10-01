@@ -56,7 +56,7 @@ export default {
         try {
             const vcs = await VCRepository.findAll();
 
-            return res.status(201).json(vcs);
+            return res.json(vcs);
         } catch (error: any) {
             return next(error);
         }
@@ -72,7 +72,7 @@ export default {
                 req.params
             );
 
-            return res.json(await VCRepository.findById(id));
+            return res.json(await VCRepository.findByIdOrFail(id));
         } catch (error: any) {
             return next(error);
         }
