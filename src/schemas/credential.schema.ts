@@ -18,13 +18,14 @@ const issuerSchema = z.union([
         .nonstrict(),
 ]);
 
-const proofSchema = z.object({
-    type: z.string().nonempty(),
-    verificationMethod: z.string().nonempty(),
-    proofPurpose: z.string().nonempty(),
-    proofValue: z.string().nonempty(),
-    createdAt: z.string().datetime().nonempty().optional(),
-});
+const proofSchema = z
+    .object({
+        type: z.string().nonempty(),
+        verificationMethod: z.string().nonempty(),
+        proofPurpose: z.string().nonempty(),
+        proofValue: z.string().nonempty(),
+    })
+    .nonstrict();
 
 const credentialStatusSchema = z
     .object({

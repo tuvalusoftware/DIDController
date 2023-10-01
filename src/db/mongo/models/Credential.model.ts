@@ -37,7 +37,7 @@ interface VCProof {
 // @index({  })
 @modelOptions({
     options: { allowMixed: 0 },
-    schemaOptions: { timestamps: true },
+    schemaOptions: { timestamps: true, versionKey: false },
 })
 export class VerifiableCredential {
     @prop({ required: true, unique: true })
