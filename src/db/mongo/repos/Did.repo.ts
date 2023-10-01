@@ -2,7 +2,7 @@ import { AppError } from "../../../errors/AppError";
 import { ERROR_CODES } from "../../../errors/errorCodes";
 import type { DidCreationRequestBody } from "../../../schemas/did.schema";
 
-import { Did, DidModel } from "../models/Did.model";
+import { DidModel } from "../models/Did.model";
 import { CompanyRepository } from "./Company.repo";
 
 export const DidRepository = {

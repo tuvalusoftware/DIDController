@@ -218,7 +218,7 @@ export const ERROR_CODES = {
     },
     CREDENTIAL_NOT_FOUND: {
         error_code: 20006,
-        error_message: "Hash of credential cannot be found.",
+        error_message: "Credential with the given info cannot be found.",
     },
     CREDENTIAL_EXISTED: {
         error_code: 21006,
