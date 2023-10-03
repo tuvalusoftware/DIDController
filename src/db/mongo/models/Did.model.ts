@@ -32,3 +32,4 @@ export class Did extends TimeStamps {
 }
 
 export const DidModel = getModelForClass(Did);
+
