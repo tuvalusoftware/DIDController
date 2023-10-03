@@ -10,6 +10,7 @@
         "start:dev": "nodemon -w . -w .env --exec node --loader ts-node/esm ./src/server.ts",
         "test": "export NODE_ENV=test && mocha --require ts-node/register ./src/tests/**/**.test.ts --recursive --exit",
         "test:did": "export NODE_ENV=test && mocha --require ts-node/register ./src/tests/**/1.did.test.ts --exit",
+        "test:doc": "export NODE_ENV=test && mocha --require ts-node/register ./src/tests/**/2.doc.test.ts --exit",
         "test:cre": "export NODE_ENV=test && mocha --require ts-node/register ./src/tests/**/3.cre.test.ts --exit",
         "test:build": "npm run pre-start && export NODE_ENV=test && mocha --require ts-node/register ./build/**/**.test.js --recursive --exit"
     },
