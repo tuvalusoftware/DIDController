@@ -24,7 +24,7 @@ export const DocRepository = {
             fileName,
             company: company,
         });
-        if (!document) throw new AppError(ERROR_CODES.DOC_NOT_FOUND);
+        if (!document) throw new AppError(ERROR_CODES.DID_DOC_NOT_FOUND);
         return document;
     },
     findByDidDocAndCompany: async function (

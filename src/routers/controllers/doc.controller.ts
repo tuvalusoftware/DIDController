@@ -50,11 +50,12 @@ export default {
         z.object({
           companyName: z.string().nonempty(),
           fileName: z.string().min(2),
-          only: z.string(),
+          only: z.string().optional(),
         }),
         req.query
       );
       const company = await CompanyRepository.findByNameOrFail(companyName);
+
       if (only === "doc") {
         const wrappedDoc = await DocRepository.findByCompanyAndFileName(
           fileName,
@@ -114,9 +115,7 @@ export default {
           return wrappedDoc.content;
         })
       );
-      return res.status(200).json({
-        documents,
-      });
+      return res.status(200).json(documents);
     } catch (error: any) {
       return next(handleMongoError(error));
     }
@@ -161,7 +160,11 @@ export default {
       if (!ownerDid) throw new AppError(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
       const targetHash = wrappedDocument?.signature?.targetHash;
       if (!targetHash) throw new AppError(ERROR_CODES.INVALID_WRAPPED_DOCUMENT);
-      const ownerPublicKey = ownerDid.split(":")[ownerDid?.length - 1];
+      const ownerPublicKey =
+        ownerDid.split(":")[ownerDid.split(":")?.length - 1];
+      const didDocDid = `did:${companyName}:${ownerPublicKey}:${targetHash}`;
+      const didDocExist = await DidDocRepository.isExists(didDocDid, company);
+      if (didDocExist) throw new AppError(ERROR_CODES.FILE_EXISTED);
       const didDoc = await DidDocRepository.createDicDoc({
         company,
         controller: [ownerPublicKey],
