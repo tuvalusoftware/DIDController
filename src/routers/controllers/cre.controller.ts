@@ -71,7 +71,6 @@ export default {
                 z.object({ id: z.union([didString, z.string().url()]) }),
                 req.params
             );
-
             return res.json(await VCRepository.findByIdOrFail(id));
         } catch (error: any) {
             return next(error);
