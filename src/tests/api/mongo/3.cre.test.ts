@@ -139,7 +139,7 @@ describe("Verifiable Credential", function () {
     describe("/POST create new credential", () => {
         it("it should return a 'missing params' error as the 'id' is not provided", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -154,7 +154,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a 'invalid input' error as the 'id' is wrongly formatted", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .send({ id: "12345" })
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -173,7 +173,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a 'missing params' error as the '@contexts' is not provided", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .send({ ...W3C_VC_EXAMPLE_1, "@context": undefined })
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -193,7 +193,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a 'missing params' error as the 'type' is not provided", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .send({ ...W3C_VC_EXAMPLE_1, type: undefined })
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -212,7 +212,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a 'missing params' error as the 'issuer' is not provided", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .send({ ...W3C_VC_EXAMPLE_1, issuer: undefined })
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -231,7 +231,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a 'missing params' error as the 'proof' is not provided", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .send({ ...W3C_VC_EXAMPLE_1, proof: undefined })
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -250,7 +250,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a 'missing params' error as the 'credentialSubject' is not provided", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .send({ ...W3C_VC_EXAMPLE_1, credentialSubject: undefined })
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -270,7 +270,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a success message states that credential is saved successfully - 1", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .send(W3C_VC_EXAMPLE_1)
                 .end((err, res) => {
                     res.should.have.status(201);
@@ -286,7 +286,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return 'credential existed' error", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .send(W3C_VC_EXAMPLE_1)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -302,7 +302,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a success message states that credential is saved successfully - 2", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .send(W3C_VC_EXAMPLE_2)
                 .end((err, res) => {
                     res.should.have.status(201);
@@ -318,7 +318,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a success message states that credential is saved successfully - 3", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .send(CML_VC_EXAMPLE_1)
                 .end((err, res) => {
                     res.should.have.status(201);
@@ -334,7 +334,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a success message states that credential is saved successfully - 4", (done) => {
             chai.request(server)
-                .post("/api/credential")
+                .post("/api/v2/credential")
                 .send(CML_VC_EXAMPLE_2)
                 .end((err, res) => {
                     res.should.have.status(201);
@@ -352,7 +352,7 @@ describe("Verifiable Credential", function () {
     describe("/GET get all credentials", () => {
         it("it should return all stored credentials", (done) => {
             chai.request(server)
-                .get("/api/credential/all")
+                .get("/api/v2/credential/all")
                 .end((err, res) => {
                     res.should.have.status(200);
 
@@ -387,7 +387,7 @@ describe("Verifiable Credential", function () {
     describe("/GET get credential by its ID", () => {
         it("it should return a 'invalid input' error as the provided id is wrongly format", (done) => {
             chai.request(server)
-                .get(`/api/credential/invalid-id`)
+                .get(`/api/v2/credential/invalid-id`)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -405,7 +405,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a 'credential not found' error as the provided id is invalid", (done) => {
             chai.request(server)
-                .get(`/api/credential/did:company:invalid-id`)
+                .get(`/api/v2/credential/did:company:invalid-id`)
 
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -421,7 +421,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return an credential correspond with the provided id - 1", (done) => {
             chai.request(server)
-                .get(`/api/credential/${CML_VC_EXAMPLE_1.id}`)
+                .get(`/api/v2/credential/${CML_VC_EXAMPLE_1.id}`)
                 .end((err, res) => {
                     res.should.have.status(200);
                     expect(res.body).to.be.an("object");
@@ -441,7 +441,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return an credential correspond with the provided id - 2", (done) => {
             chai.request(server)
-                .get(`/api/credential/${CML_VC_EXAMPLE_2.id}`)
+                .get(`/api/v2/credential/${CML_VC_EXAMPLE_2.id}`)
                 .end((err, res) => {
                     res.should.have.status(200);
                     expect(res.body).to.be.an("object");
@@ -463,7 +463,7 @@ describe("Verifiable Credential", function () {
     describe("/PUT update credential", () => {
         it("it should return a 'missing params' error as the required params are not provided", (done) => {
             chai.request(server)
-                .put("/api/credential")
+                .put("/api/v2/credential")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -478,7 +478,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a 'credential not found' error as the provided hash is invalid", (done) => {
             chai.request(server)
-                .put("/api/credential")
+                .put("/api/v2/credential")
                 .send({ ...CML_VC_EXAMPLE_1, id: "did:example:not-found" })
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -494,7 +494,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a success message after modify the content of credential subject", (done) => {
             chai.request(server)
-                .put("/api/credential")
+                .put("/api/v2/credential")
                 .send({
                     ...CML_VC_EXAMPLE_1,
                     credentialSubject:
@@ -514,7 +514,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return an updated credential correspond with the provided id - 1", (done) => {
             chai.request(server)
-                .get(`/api/credential/${CML_VC_EXAMPLE_1.id}`)
+                .get(`/api/v2/credential/${CML_VC_EXAMPLE_1.id}`)
                 .end((err, res) => {
                     res.should.have.status(200);
                     expect(res.body).to.be.an("object");
@@ -537,7 +537,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a success message after add 'validFrom', 'validUntil' fields into the credential", (done) => {
             chai.request(server)
-                .put("/api/credential")
+                .put("/api/v2/credential")
                 .send({
                     ...CML_VC_EXAMPLE_2,
                     validFrom: "2022-09-13T12:00:00Z",
@@ -557,7 +557,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return an updated credential correspond with the provided id - 2", (done) => {
             chai.request(server)
-                .get(`/api/credential/${CML_VC_EXAMPLE_2.id}`)
+                .get(`/api/v2/credential/${CML_VC_EXAMPLE_2.id}`)
                 .end((err, res) => {
                     res.should.have.status(200);
                     expect(res.body).to.be.an("object");
@@ -584,7 +584,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return a success message after remove 'validUntil' field of the credential", (done) => {
             chai.request(server)
-                .put("/api/credential")
+                .put("/api/v2/credential")
                 .send({
                     ...CML_VC_EXAMPLE_2,
                     validFrom: "2022-09-13T12:00:00Z",
@@ -603,7 +603,7 @@ describe("Verifiable Credential", function () {
 
         it("it should return an updated credential correspond with the provided id - 3", (done) => {
             chai.request(server)
-                .get(`/api/credential/${CML_VC_EXAMPLE_2.id}`)
+                .get(`/api/v2/credential/${CML_VC_EXAMPLE_2.id}`)
                 .end((err, res) => {
                     res.should.have.status(200);
                     expect(res.body).to.be.an("object");

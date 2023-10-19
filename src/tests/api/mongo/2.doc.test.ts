@@ -118,7 +118,7 @@ describe("DID", function () {
     it("it should return a 'missing params' error as the required params are not provided", (done) => {
       chai
         .request(server)
-        .post("/api/doc")
+        .post("/api/v2/doc")
         .send({})
         .end((err, res) => {
           res.should.have.status(200);
@@ -135,7 +135,7 @@ describe("DID", function () {
     it("it should return a success message states that the wrapped document is saved successfully", (done) => {
       chai
         .request(server)
-        .post("/api/doc")
+        .post("/api/v2/doc")
         .send(TEST_DATA)
         .end((err, res) => {
           res.should.have.status(201);
@@ -150,7 +150,7 @@ describe("DID", function () {
     it("it should return a 'file already existed' error", (done) => {
       chai
         .request(server)
-        .post("/api/doc")
+        .post("/api/v2/doc")
         .send(TEST_DATA)
         .end((err, res) => {
           res.should.have.status(200);
@@ -169,7 +169,7 @@ describe("DID", function () {
     it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
       chai
         .request(server)
-        .get("/api/doc/exists")
+        .get("/api/v2/doc/exists")
         .query({})
         .end((err, res) => {
           expect(res.body.error_code).equal(
@@ -182,7 +182,7 @@ describe("DID", function () {
     it("it should return 'false' as file does not exist", (done) => {
       chai
         .request(server)
-        .get("/api/doc/exists")
+        .get("/api/v2/doc/exists")
         .query({
           companyName: TEST_DATA.companyName,
           fileName: NOT_EXIST_FILE,
@@ -198,7 +198,7 @@ describe("DID", function () {
     it("it should return 'true' as the file does exist", (done) => {
       chai
         .request(server)
-        .get("/api/doc/exists")
+        .get("/api/v2/doc/exists")
         .query({
           companyName: TEST_DATA.companyName,
           fileName: TEST_DATA.fileName,
@@ -216,7 +216,7 @@ describe("DID", function () {
     it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
       chai
         .request(server)
-        .get("/api/doc/")
+        .get("/api/v2/doc/")
         .end((err, res) => {
           res.body.should.be.a("object");
           expect(res.body.error_code).equal(
@@ -229,7 +229,7 @@ describe("DID", function () {
     it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
       chai
         .request(server)
-        .get("/api/doc")
+        .get("/api/v2/doc")
         .query({
           companyName: "invalidCompanyName",
           fileName: TEST_DATA.fileName,
@@ -249,7 +249,7 @@ describe("DID", function () {
     it("it should return an 'file not found' error as the provided file name cannot be found", (done) => {
       chai
         .request(server)
-        .get("/api/doc")
+        .get("/api/v2/doc")
         .query({
           companyName: TEST_DATA.companyName,
           fileName: "INVALID_FILE_NAME",
@@ -267,7 +267,7 @@ describe("DID", function () {
     it("it should return 'true' because file had been created", (done) => {
       chai
         .request(server)
-        .get("/api/doc/exists")
+        .get("/api/v2/doc/exists")
         .query({
           companyName: TEST_DATA.companyName,
           fileName: TEST_DATA.fileName,
@@ -283,7 +283,7 @@ describe("DID", function () {
     it("it should GET both the wrapped document and the did doc of the document", (done) => {
       chai
         .request(server)
-        .get("/api/doc")
+        .get("/api/v2/doc")
         .query({
           companyName: TEST_DATA.companyName,
           fileName: TEST_DATA.fileName,
@@ -311,7 +311,7 @@ describe("DID", function () {
     it("it should GET only the wrapped document as the flag indicates to exclude the did doc", (done) => {
       chai
         .request(server)
-        .get("/api/doc")
+        .get("/api/v2/doc")
         .query({
           companyName: TEST_DATA.companyName,
           fileName: TEST_DATA.fileName,
@@ -334,7 +334,7 @@ describe("DID", function () {
     it("it should GET only the did document of the wrapped document as the flag indicates to exclude the wrapped document", (done) => {
       chai
         .request(server)
-        .get("/api/doc")
+        .get("/api/v2/doc")
         .query({
           companyName: TEST_DATA.companyName,
           fileName: TEST_DATA.fileName,
@@ -363,7 +363,7 @@ describe("DID", function () {
     it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
       chai
         .request(server)
-        .delete("/api/doc/")
+        .delete("/api/v2/doc/")
         .end((err, res) => {
           res.body.should.be.a("object");
           expect(res.body.error_code).equal(
@@ -376,7 +376,7 @@ describe("DID", function () {
     it("it should return an 'file name not found' error as the provided file name cannot be found", (done) => {
       chai
         .request(server)
-        .delete("/api/doc/")
+        .delete("/api/v2/doc/")
         .query({
           companyName: TEST_DATA.companyName,
           fileName: INVALID_FILE_NAME,
@@ -395,7 +395,7 @@ describe("DID", function () {
     it("it should return a success message states that the wrapped document is deleted successfully", (done) => {
       chai
         .request(server)
-        .delete("/api/doc")
+        .delete("/api/v2/doc")
         .query({
           companyName: TEST_DATA.companyName,
           fileName: TEST_DATA.fileName,
@@ -414,7 +414,7 @@ describe("DID", function () {
     it("it should return 'false' because file has been deleted", (done) => {
       chai
         .request(server)
-        .get("/api/doc/exists")
+        .get("/api/v2/doc/exists")
         .query({
           companyName: TEST_DATA.companyName,
           fileName: TEST_DATA.fileName,
@@ -433,7 +433,7 @@ describe("DID", function () {
     it("it should return an 'missing params' error as the nessesary params are not provided", (done) => {
       chai
         .request(server)
-        .get("/api/doc/user")
+        .get("/api/v2/doc/user")
         .end((err, res) => {
           res.body.should.be.a("object");
           expect(res.body.error_code).equal(
@@ -446,7 +446,7 @@ describe("DID", function () {
     it("it should return a 'company not found' error as the param 'companyName' is invalid", (done) => {
       chai
         .request(server)
-        .get("/api/doc/user")
+        .get("/api/v2/doc/user")
         .query({
           companyName: INVALID_COMPANY_NAME,
           publicKey: TEST_PUBLIC_KEY,
@@ -466,7 +466,7 @@ describe("DID", function () {
     it("it should return a success message - Save 1st wrapped", (done) => {
       chai
         .request(server)
-        .post("/api/doc")
+        .post("/api/v2/doc")
         .send(TEST_WRAPPED_DOCS[0])
         .end((err, res) => {
           res.should.have.status(201);
@@ -478,7 +478,7 @@ describe("DID", function () {
     it("it should return a success message - Save 2nd wrapped", (done) => {
       chai
         .request(server)
-        .post("/api/doc")
+        .post("/api/v2/doc")
         .send(TEST_WRAPPED_DOCS[1])
         .end((err, res) => {
           res.should.have.status(201);
@@ -490,7 +490,7 @@ describe("DID", function () {
     it("it should return a success message - Save 3rd wrapped", (done) => {
       chai
         .request(server)
-        .post("/api/doc")
+        .post("/api/v2/doc")
         .send(TEST_WRAPPED_DOCS[2])
         .end((err, res) => {
           res.should.have.status(201);
@@ -502,7 +502,7 @@ describe("DID", function () {
     it("it should return the list of wrapped documents in which the user is the owner or holder", (done) => {
       chai
         .request(server)
-        .get("/api/doc/user")
+        .get("/api/v2/doc/user")
         .query({
           companyName: "TEST_BRANCH",
           publicKey: TEST_PUBLIC_KEY,
