@@ -47,7 +47,7 @@ app.use(
 app.use(morganMiddleware);
 
 // ** Health Check Endpoint
-app.get("/api/v2/health-check", (req: Request, res: Response) => {
+app.get("/api/health-check", (req: Request, res: Response) => {
     return res.status(200).json({
         name: "DID Controller",
         version: "v2.0.0",

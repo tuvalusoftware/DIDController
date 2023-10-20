@@ -82,7 +82,7 @@ describe("DID", function () {
     describe("/POST create new DID", () => {
         it("it should return a 'missing params' error as the required params are not provided", (done) => {
             chai.request(server)
-                .post("/api/v2/did")
+                .post("/api/did")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -97,7 +97,7 @@ describe("DID", function () {
 
         it("it should return a success message states that DID is saved successfully", (done) => {
             chai.request(server)
-                .post("/api/v2/did")
+                .post("/api/did")
                 .send(TEST_DATA)
                 .end((err, res) => {
                     res.should.have.status(201);
@@ -111,7 +111,7 @@ describe("DID", function () {
 
         it("it should return an 'already exist' message", (done) => {
             chai.request(server)
-                .post("/api/v2/did")
+                .post("/api/did")
                 .send(TEST_DATA)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -127,7 +127,7 @@ describe("DID", function () {
 
         it("it should return a success message states that DID is saved successfully", (done) => {
             chai.request(server)
-                .post("/api/v2/did")
+                .post("/api/did")
                 .send(TEST_DATA2)
                 .end((err, res) => {
                     res.should.have.status(201);
@@ -141,7 +141,7 @@ describe("DID", function () {
 
         it("it should return an 'invalid content' message as the provided content is invalid", (done) => {
             chai.request(server)
-                .post("/api/v2/did")
+                .post("/api/did")
                 .send(INVALID_DATA)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -158,7 +158,7 @@ describe("DID", function () {
     describe("/GET get single did", () => {
         it("it should GET a DID", (done) => {
             chai.request(server)
-                .get("/api/v2/did")
+                .get("/api/did")
                 .query({
                     publicKey: TEST_DATA.publicKey,
                 })
@@ -180,7 +180,7 @@ describe("DID", function () {
 
         it("it should return a 'missing params' error as the required params are not provided", (done) => {
             chai.request(server)
-                .get("/api/v2/did")
+                .get("/api/did")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -197,7 +197,7 @@ describe("DID", function () {
     describe("/GET get all dids of a company", () => {
         it("it should GET an array of DID from a company", (done) => {
             chai.request(server)
-                .get("/api/v2/did/all")
+                .get("/api/did/all")
                 .query({
                     companyName: TEST_COMPANY,
                 })
@@ -219,7 +219,7 @@ describe("DID", function () {
 
         it("it should return a 'missing params' error as the required params are not provided", (done) => {
             chai.request(server)
-                .get("/api/v2/did/all")
+                .get("/api/did/all")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -234,7 +234,7 @@ describe("DID", function () {
 
         it("it should return a 'company not found' error as the param 'companyName' cannot be found", (done) => {
             chai.request(server)
-                .get("/api/v2/did/all")
+                .get("/api/did/all")
                 .query({
                     companyName: "INVALID_COMPANY_NAME",
                 })
@@ -254,7 +254,7 @@ describe("DID", function () {
     describe("/PUT update data of a did", () => {
         it("it should return a 'missing params' error as the required params are not provided", (done) => {
             chai.request(server)
-                .put("/api/v2/did")
+                .put("/api/did")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -269,7 +269,7 @@ describe("DID", function () {
 
         it("it should return a 'public key not found' error as the param 'publicKey' is invalid", (done) => {
             chai.request(server)
-                .put("/api/v2/did")
+                .put("/api/did")
                 .send({ ...UPDATED_DATA, publicKey: "INVALID_PUBLIC_KEY" })
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -285,7 +285,7 @@ describe("DID", function () {
 
         it("it should return an 'invalid content' message as the provided content is invalid", (done) => {
             chai.request(server)
-                .put("/api/v2/did")
+                .put("/api/did")
                 .send(INVALID_DATA)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -301,7 +301,7 @@ describe("DID", function () {
 
         it("it should return a success message states that DID is updated successfully", (done) => {
             chai.request(server)
-                .put("/api/v2/did")
+                .put("/api/did")
                 .send(UPDATED_DATA)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -317,7 +317,7 @@ describe("DID", function () {
 
         it("it should GET the updated DID", (done) => {
             chai.request(server)
-                .get("/api/v2/did")
+                .get("/api/did")
                 .query({
                     companyName: TEST_DATA2.companyName,
                     publicKey: TEST_DATA2.publicKey,
@@ -347,7 +347,7 @@ describe("DID", function () {
     describe("/DELETE delete a DID", () => {
         it("it should return a 'missing params' error as the required params are not provided", (done) => {
             chai.request(server)
-                .delete("/api/v2/did")
+                .delete("/api/did")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -362,7 +362,7 @@ describe("DID", function () {
 
         it("it should return a 'public key not found' error as the param 'publicKey' is invalid", (done) => {
             chai.request(server)
-                .delete("/api/v2/did")
+                .delete("/api/did")
                 .query({
                     publicKey: "INVALID_PUBLIC_KEY",
                 })
@@ -380,7 +380,7 @@ describe("DID", function () {
 
         it("it should return a success message states that DID is deleted successfully", (done) => {
             chai.request(server)
-                .delete("/api/v2/did")
+                .delete("/api/did")
                 .query({
                     publicKey: TEST_DATA.publicKey,
                 })
@@ -398,7 +398,7 @@ describe("DID", function () {
 
         it("it should return an error state that file not exists", (done) => {
             chai.request(server)
-                .get("/api/v2/did")
+                .get("/api/did")
                 .query({
                     publicKey: TEST_DATA.publicKey,
                 })
