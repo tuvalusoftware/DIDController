@@ -1,7 +1,7 @@
 import morgan, { StreamOptions } from "morgan";
 
-import env from "../../constants/env";
-import Logger from "../../libs/Logger";
+import env from "../constants/env";
+import Logger from "../libs/Logger";
 
 const stream: StreamOptions = {
     write: (message) =>

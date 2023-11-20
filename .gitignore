@@ -5,3 +5,4 @@
 /logs
 /docker-data
 /build
+/secrets
