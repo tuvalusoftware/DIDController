@@ -72,6 +72,9 @@ export class VerifiableCredential {
 
     @prop()
     credentialStatus?: CredentialStatus;
+
+    @prop()
+    txHash?: string;
 }
 
 export const VCModel = getModelForClass(VerifiableCredential);

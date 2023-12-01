@@ -49,6 +49,7 @@ export const credentialCreateBodySchema = z.object({
     validFrom: z.string().datetime().optional(),
     validUntil: z.string().datetime().optional(),
     credentialStatus: credentialStatusSchema.optional(),
+    txHash: z.string().optional(),
 });
 
 export type CredentialCreationRequestBody = TypeOf<
