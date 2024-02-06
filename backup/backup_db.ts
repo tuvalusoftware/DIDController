@@ -11,7 +11,7 @@ if (!mongoURL) throw new Error("Cannot perform this operation");
 const now = dayjs();
 const formattedDate = now.format("ddddDDMMYYYY_HHmmss");
 
-const CMD = `mongodump --uri="${mongoURL}" --out ~/dc-back-up/data_${formattedDate}`;
+const CMD = `mongodump --username ${env.MONGO_INITDB_ROOT_USERNAME} --password ${env.MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --uri="${mongoURL}" --out ~/dc-back-up/data_${formattedDate}`;
 
 exec(CMD, function (error, stdout, stderr) {
     if (error) {
